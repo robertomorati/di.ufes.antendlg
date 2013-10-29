@@ -24,7 +24,7 @@
 				<td>{{ object.coletavel }}</td>
 				<td>{{ object.tipo_objeto }}</td>
 				<td>
-				<img  class="avatar" src="{{ STATIC_URL }}{{ object.icone_objeto }}" alt="avatar"/>
+				<img  class="avatar" src="{{ object.icone_objeto }}" alt="avatar"/>
 				</td>
 				<td>
 						{% csrf_token %}
