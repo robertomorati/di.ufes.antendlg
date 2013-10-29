@@ -272,6 +272,7 @@ class AventuraCreateView(CreateView):
 class AventuraUpdateView(UpdateView):
     template_name = 'editor_objetos/aventura/update.html'
     model = Aventura
+    form_class = AventuraForm
     
     def get_success_url(self):
         return reverse('aventura_list_view')

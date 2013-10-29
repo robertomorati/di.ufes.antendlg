@@ -47,7 +47,7 @@
 					// fecha o modal
 					$('#aventura').modal('hide');
 					// atualiza a div content
-					refreshDiv('{% url aventura_list_view %}','content');
+					refreshDiv('{% url aventura_list_view user.id %}','content');
 					
 					//após a deleção da aventura o mapa deverá ser limpado...
 					//pode ocorre tbm qndo o autor clicar em editar aventura...exibir mensagem que não existe aventura aberta e exibir o mapa limpo

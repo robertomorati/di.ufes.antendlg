@@ -8,13 +8,13 @@
 			<th>Descrição</th>
 			<th>Data Inicio</th>
 			<th>Data Fim</th>
-			<th>Posições geográficas</th>
+			<th>Localização</th>
 		</tr>
 		<tbody>
 			{% for object in object_list %}
 			<tr class="success">
 				<td><a data-toggle="modal"
-					onClick="openModal('{% url  tipo_objeto_update_view object.pk %}','aventura')"
+					onClick="openModal('{% url  aventura_update_view object.pk %}','aventura')"
 					href="#aventura">{{ object.nome }}</a></td>
 				<td>{{ object.descricao }}</td>
 				<td>{{ object.inicio }}</td>

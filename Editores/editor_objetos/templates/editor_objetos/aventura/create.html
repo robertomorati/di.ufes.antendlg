@@ -29,7 +29,7 @@
 				if (ct.indexOf('json') > -1) {
 					// fecha o modal
 					$('#aventura').modal('hide');
-					refreshDiv('{% url aventura_list_view %}','content');
+					refreshDiv('{% url aventura_list_view user.id %}','content');
 				}
 			}
 		
