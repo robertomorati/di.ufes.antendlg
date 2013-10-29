@@ -1,0 +1,49 @@
+{% block content %}
+
+	
+	<div class="form-actions">
+		<h3><strong>Tipos de Objetos</strong></h3>
+	<table class="table table-bordered">
+		<tr>
+			<th>Tipo</th>
+			<th>Descrição</th>
+			<th>Posições geográficas</th>
+			<th>Dialogo</th>
+		</tr>
+		<tbody>
+			{% for object in object_list %}
+			<tr class="success">
+				<td><a data-toggle="modal"
+					onClick="openModal('{% url  tipo_objeto_update_view object.pk %}','objeto')"
+					href="#objeto">{{ object.tipo }}</a></td>
+					 <!-- <script>addTabs("");</script> -->
+				<td>{{ object.descricao }}</td>
+				<td>{{ object.posicoes_geograficas }}</td>
+				<td>{{ object.dialogo }}</td>
+				<td>
+				{% csrf_token %} 
+				<!--<input type="submit" class="btn btn-block btn-small btn-danger " value="Deletar">-->
+					<a class="btn btn-block btn-small btn-danger" data-toggle="modal" onClick="openModal('{% url  tipo_objeto_delete_view object.pk %}','objeto')" href="#objeto">Deletar</a>
+				</td>
+			</tr>
+			{% empty %}
+			<tr>
+				<td colspan="4"><i style="margin-right: 10px;"
+					class="icon-warning-sign"></i><strong>Atenção!</strong>Não existem
+					tipos de objetos criados.</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+	<!-- Modal para criação de objetos -->
+	<a role="button"
+		onClick="openModal('{% url  tipo_objeto_create_view %}','objeto')"
+		class="btn btn-small btn-primary" data-toggle="modal" href="#objeto">Criar
+		Tipo Objeto</a>
+
+	<!-- Div para guardar a modal -->
+	<div id="objeto" class="modal hide fade"></div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta name="viewport"  content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"></meta>
+		<meta charset="utf-8"/>
+		<link href='http://fonts.googleapis.com/css?family=Ubuntu' rel='stylesheet' type='text/css'/>
+		
+		<!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    	<!--[if lt IE 9]>
+    	<script src="{{ STATIC_URL }}js/html5shiv.js"></script>
+    	<![endif]-->
+    		
+ 		<script src="//code.jquery.com/jquery.js"></script>
+		<script src="{{ STATIC_URL }}js/gmaputil.js"></script>
+ 		<script src="{{ STATIC_URL }}js/util.js"></script>
+ 		<link type="text/css" href="{{ STATIC_URL }}css/gmapstyle.css" rel="stylesheet" />
+		<link type="text/css" href="{{ STATIC_URL }}css/style.css" rel="stylesheet" />
+
+		
+ 		<link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/>
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js"></script>
+		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.9.1/jquery-ui.min.js"></script>
+
+		{% comment %}
+		<script src="{{ STATIC_URL }}js/kineticscrolling_compiled.js"></script>
+		<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
+		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.9.1/jquery-ui.min.js"></script>
+		<script src="{{ STATIC_URL }}js/jquery.form.min.js"></script>
+		{% endcomment%}
+    	
+    	{% load bootstrap_toolkit %}
+ 		{% bootstrap_stylesheet_tag %}
+ 		{% bootstrap_javascript_tag %}
+        {% bootstrap_stylesheet_tag "responsive" %}
+		
+		<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=places"></script>
+		
+		<title>{% if title %}{{ title }}{% else %}AntEnDLG - Ambiente de Autoria de Jogos Locativos de Decisão{% endif %}</title>
+	</head>
+		<body onload="refreshDiv('{% url gmaps_view %}','content'); addTabs('{% url tipo_objeto_get_view %}');">	
+		<div class="well well-small">
+			<div class="container-fluid">
+				<div class="row-fluid">
+					<div class="span12">
+						<img width="100%" class="avatar-frame"
+							src="{{ STATIC_URL }}img/logo7.png">
+					</div>
+				</div>
+				<div class="row-fluid">
+					<div class="form-actions">
+						<div class="span3">
+							<!-- <div class="form-actions">  -->
+							<div class="btn-group-vertical">
+								<!-- menu -->
+								<div class="accordion" id="leftMenu">
+									<div class="accordion-group">
+										<div class="accordion-heading">
+											<a class="accordion-toggle" data-toggle="collapse"
+												data-parent="#leftMenu" href="#collapseOne"> <i class="icon-cog"></i>
+												Configurações Aventura
+											</a>
+										</div>
+										<div id="collapseOne" class="accordion-body collapse"
+											style="height: 0px;">
+											<div class="accordion-inner">
+												<ul id="ulNoMaker">
+													<li><i class="icon-edit"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url icon_get_json_url_view 2 %}">Editar Aventura</a></li>
+													<li><i class="icon-map-marker"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url gmaps_view %}">Editar Mapa da Aventura</a></li>
+												</ul>
+											</div>
+										</div>
+									</div>
+									<div class="accordion-group">
+										<div class="accordion-heading">
+											<a class="accordion-toggle" data-toggle="collapse"
+												data-parent="#leftMenu" href="#collapseTwo"> <i
+												class="icon-share"></i> Editor de Objetos
+											</a>
+										</div>
+										<div id="collapseTwo" class="accordion-body collapse"
+											style="height: 0px;">
+											<div class="accordion-inner">
+												<ul id="ulNoMaker">
+													<li><i class="icon-edit"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url tipo_objeto_list_view %}">Editar Tipo de Objetos</a></li>
+													<li><i class="icon-edit"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url objeto_list_view %}">Editar Objetos</a></li>
+													<li><i class="icon-edit"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url icone_list_view %}">Editar Ícones</a></li>
+												</ul>
+											</div>
+										</div>
+									</div>
+									<div class="accordion-group">
+										<div class="accordion-heading">
+											<a class="accordion-toggle" data-toggle="collapse"
+												data-parent="#leftMenu" href="#collapseThree"> <i
+												class="icon-comment"></i> Editor de Missão
+											</a>
+										</div>
+										<div id="collapseThree" class="accordion-body collapse"
+											style="height: 0px;">
+											<div class="accordion-inner">
+												<ul id="ulNoMaker">
+													<li><i class="icon-edit"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="">Editar Missão</a></li>
+													<li><i class="icon-list-alt"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="">Editar Condições</a></li>					
+												</ul>
+											</div>
+										</div>
+									</div>
+									<div class="accordion-group">
+										<div class="accordion-heading">
+											<a class="accordion-toggle" data-toggle="collapse"
+												data-parent="#leftMenu" href="#collapseFour"> <i
+												class="icon-user"></i> Editor de Jogadores
+											</a>
+										</div>
+										<div id="collapseFour" class="accordion-body collapse"
+											style="height: 0px;">
+											<div class="accordion-inner">
+												<ul id="ulNoMaker">
+													<li><i class="icon-edit"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="">Algo aqui...</a></li>
+												</ul>
+											</div>
+										</div>
+									</div>
+									<div class="accordion-group">
+										<div class="accordion-heading">
+											<a class="accordion-toggle" data-toggle="collapse"
+												data-parent="#leftMenu" href="#collapseFive"> <i
+												class="icon-cog"></i> Editor de Movimentos
+											</a>
+										</div>
+										<div id="collapseFive" class="accordion-body collapse"
+											style="height: 0px;">
+											<div class="accordion-inner">
+												<ul id="ulNoMaker">
+													<li><i class="icon-edit"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="">Algo aqui...</a></li>
+												</ul>
+											</div>
+										</div>
+									</div>
+									<div class="accordion-group">
+										<div class="accordion-heading">
+											<a class="accordion-toggle" data-toggle="collapse"
+												data-parent="#leftMenu" href="#collapseSix"> <i
+												class="icon-file"></i> Editor de Enredo
+											</a>
+										</div>
+										<div id="collapseSix" class="accordion-body collapse"
+											style="height: 0px;">
+											<div class="accordion-inner">
+												<ul id="ulNoMaker">
+													<li><i class="icon-edit"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="">Algo aqui...</a></li>
+												</ul>
+											</div>
+										</div>
+									</div>
+								</div> <!-- end menu -->
+								    <!-- Apresentação dos Objetos -->
+									<div class="panel panel-info">
+										<div class="alert alert-info">						
+											<h4><strong><p class="text-center"><i class="icon-inbox"></i>Biblioteca de Objetos</h4></p></strong>
+											<ul id="objetoTab" class="nav nav-tabs">
+											</ul>
+											<div id="pageTabContent" class="tab-content">
+											
+											</div>
+										</div> <!-- Fim da div do menu de objetos -->
+									</div>
+							</div>
+							<!-- </div>  -->
+						</div>
+						<script type="text/javascript">
+							/**
+							* Atualiza conteudo da pagina
+							*/
+							$('a.menu-item').bind('click', function(e) {
+								var url = $(this).attr('href');
+								alert(url);
+								e.preventDefault(); // stop the browser from following the link
+								$('div#content').load(url); // load the html response into a DOM element
+								
+							});
+							
+							/**
+							 * Click Tab to show its contents
+							 */
+							$("#pageTab").on("click", "a", function(e) {
+							   
+							    $(this).tab('show');
+							    e.preventDefault();
+							});
+							
+						</script>
+						<div class="span9">
+							<div class="well well-small">
+								<div id="content" >
+									{% block content %}
+									{%endblock %}
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+					<div class="modal-footer">
+						<div class="well well-small">
+							<p class="text-center">
+								<small>UFES - Universidade Federal do Espírito Santo</small>
+							</p>
+							<p class="text-center">
+								<small>LIED - Laboratório de Informática na Educação</small>
+							</p>
+							<p class="text-center">
+								<small>Desenvolvido por: Roberto Guimarães Morati Junior</small>
+							</p>
+						</div>
+					</div>
+					<span class="label label-info">Viewport Width:<span class="label label-info"  id="monitor"></span></span>
+					<script>
+						$('#monitor').html($(window).width());
+						$(window).resize(function(){
+							var viewportWidth = $(window).width();
+							$('#monitor').html(viewportWidth);
+						});
+					</script>
+				</div>
+			</div>
+	</body>
+</html>
+
+

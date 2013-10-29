@@ -1,0 +1,62 @@
+	  <form id="aventura_delete_view" class="form-actions" method="post" action="{% url aventura_delete_view object.pk %}">
+		  <div class="modal-header">
+		    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" action="">×</button>
+		    <h3 id="myModalLabel">Deleção da Aventura</h3>
+		  </div>
+		  <div class="modal-body">  
+			  {% if messages %}
+					<div class="alert alert-error" width="30">
+						<button type="button" class="close" data-dismiss="alert">
+							<span class="badge badge-important">x</span>
+						</button>
+						<ul class="messages">
+							{% for message in messages %}
+								<li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li> 
+							{% endfor %}
+						</ul>
+					</div>
+			<div class="modal-footer">
+				<button class="btn" data-dismiss="modal" aria-hidden="true">Cancelar</button>
+				<button class="btn btn-danger disabled">Deletar</button>
+			</div>
+		  </div>	
+			 {% else %}	
+				 {% csrf_token %}
+				 <p>Tem certeza que deseja deletar a aventura {{object.nome}}?</p>
+	      </div>
+		  <div class="modal-footer">
+			<button class="btn" data-dismiss="modal" aria-hidden="true">Cancelar</button>
+			<button type="submit" class="btn btn-danger">Deletar</button>
+	      </div>
+		{% endif %}
+	  </form>
+
+
+		<script type="text/javascript">
+			var options = {
+				target : '#aventura',
+				success : showResponse
+			};
+		
+			// post-submit callback 
+			function showResponse(responseText, statusText, xhr, $form) {
+				var ct = xhr.getResponseHeader("content-type") || "";
+				   // se a resposta for um json, significa que o objeto foi criado com sucesso
+			      //if (ct.indexOf('json') > -1) {
+				  if (ct == 'application/json') {
+					// fecha o modal
+					$('#aventura').modal('hide');
+					// atualiza a div content
+					refreshDiv('{% url aventura_list_view %}','content');
+					
+					//após a deleção da aventura o mapa deverá ser limpado...
+					//pode ocorre tbm qndo o autor clicar em editar aventura...exibir mensagem que não existe aventura aberta e exibir o mapa limpo
+					
+				// Em caso de exceção, será retornado um text e a modal será atualizada para o usuário.
+				}else if (ct == 'text'){
+						openModal('{% url aventura_delete_view object.pk %}','aventura');
+				}
+			}
+		
+			$('#aventura_delete_view').ajaxForm(options);
+		</script>

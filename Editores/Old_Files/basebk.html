@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+{% load bootstrap_toolkit %}
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+  		<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+  		<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+ 		<link rel="stylesheet" href="/resources/demos/style.css" />
+ 		
+ 		<script src="{{ STATIC_URL }}js/jquery.form.min.js"></script>
+ 		 		{% comment %}
+ 			Nao esta sendo utilizado.
+ 			<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+			<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+ 			<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+  	        <script src="//code.jquery.com/jquery.js"></script>
+ 			<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+ 			<link href="{{ STATIC_URL }}bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
+ 			<script src="{{ STATIC_URL }}bootstrap/js/bootstrap.min.js"></script>
+ 			<link rel="stylesheet" href="{{ STATIC_URL }}resources/demos/style.css" />
+ 			<link href="{{ STATIC_URL }}bootstrap-3.0.0/css/bootstrap.min.css" rel="stylesheet" media="screen">
+ 			<script src="{{ STATIC_URL }}bootstrap-3.0.0/js/bootstrap.min.js"></script>
+ 			{% bootstrap_stylesheet_tag "responsive" %}
+ 			
+ 		{% endcomment%}
+    <style>
+		#map-canvas {
+			margin: 0;
+			padding: 0;
+			height: 600px;
+			width: 100%;
+			border: 5px solid #000000;
+		}
+		
+		.objects h4 {
+			border-bottom: 2px solid #CCCCCC;
+			margin: 20px 0;
+			padding-bottom: 5px;
+		}
+		
+		.drag {
+		 padding-left: 32px;
+		 height: 32px;
+		 background-repeat: no-repeat;
+		}
+
+</style>
+ 		
+ 		
+ 		<!-- Google maps exemplo -->
+ 		<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
+
+		<script>
+			var map;
+			function initialize() {
+				var mapOptions = {
+					zoom : 8,
+					center : new google.maps.LatLng(-34.397, 150.644),
+					mapTypeId : google.maps.MapTypeId.ROADMAP
+				};
+				map = new google.maps.Map(document.getElementById('map-canvas'),
+						mapOptions);
+				
+				
+			}
+			google.maps.event.addDomListener(window, 'load', initialize);
+		</script>
+
+
+
+
+
+<div class="container-fluid">
+	<div class="row-fluid">
+		<div class="span12">
+			<h3>
+				{% if title %}{{ title }}{% else %}AutEnDLG{% endif %}
+			</h3>
+		</div>
+	</div>
+	<div class="row-fluid">
+		<div class="span4">
+			<button class="btn btn-large btn-block" type="button">Enredo</button>
+			<button class="btn btn-block btn-large" type="button">Tipos de objeto</button>
+			<button class="btn btn-block btn-large" type="button">Missões</button>
+			<a href="#" class="btn btn-large btn-block" type="button">Configurações do jogo</a>
+			
+			<div class="objects">
+				<h4>Objetos</h4>
+
+				<ul class="nav nav-tabs">
+					<li class="active"><a href="#">Personagens</a></li>
+					<li><a href="#">Itens</a></li>
+					<li><a href="#">Obstáculo</a></li>
+					<li class="dropdown pull-right"><a href="#"
+						data-toggle="dropdown" class="dropdown-toggle">Outros objetos<strong
+							class="caret"></strong></a>
+						<ul class="dropdown-menu">
+							<li><a href="#">Placas</a></li>
+							<li><a href="#">Página WEB</a></li>
+						</ul></li>
+				</ul>
+
+				<ul>
+					{% for object in object_list %}
+					<li class="drag" style="background-image: url('http://maps.gstatic.com/mapfiles/ms/icons/ltblue-dot.png')">{{ object.descricao }}</li>
+					{% endfor %}
+				</ul>
+				
+				{% comment %}
+		<script src="//code.jquery.com/jquery.js"></script>
+		<script src="{{ STATIC_URL }}js/jquery.form.min.js"></script>
+		<script src="{{ STATIC_URL }}js/kineticscrolling_compiled.js"></script>
+		<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
+		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.9.1/jquery-ui.min.js"></script>
+		<script src="{{ STATIC_URL }}js/jquery.form.min.js"></script>
+		{% endcomment%}
+<div id="markers">
+
+<script>
+$(document).ready(function() {
+	$(".drag").draggable({helper: 'clone',
+	iframeFix: true,
+    start: function () {
+        $("div#map-canvas").css('z-index', '-1');
+    },
+	stop: function(e,ui) {
+		$("div#map-canvas").css('z-index', '0');
+		window.createMarker(ui.position);
+	    }
+	});
+});
+
+
+function createMarker(position) {
+	//Adjust Offset
+	var offset = {
+		left : 10,
+		top : -5
+	}
+
+	//Create a new GPoint
+	var myGPoint = new google.maps.Point(position.left + offset.left, position.top
+			+ offset.top);
+
+	//Calculate the LatLng for this point
+	var overlay = new google.maps.OverlayView();
+	overlay.setMap(map);
+	
+	var myLatLng = overlay.getProjection().fromLatLngToContainerPixel(myGPoint);
+
+	//Create the Marker and add it to the Map
+	var marker = new google.maps.GMarker(myLatLng);
+	map.addOverlay(marker);
+}
+</script>
+
+</div>
+
+				
+			</div>
+		</div>
+		<div class="span8">
+			<div id="map-canvas"></div>
+		</div>
+	</div>
+</div>
+ 		
+ 		
+ 		 {% bootstrap_stylesheet_tag %}
+    	 {% bootstrap_stylesheet_tag "responsive" %}
+ 		 {% bootstrap_javascript_tag %}
+         {% block extra_head %}{% endblock %}
+		<title>{% if title %}{{ title }}{% else %}AutEnDLG{% endif %}</title>
+	</head>
+	<body>
+		{% block content %}
+		{% endblock %}
+	</body>
+</html>
+
+

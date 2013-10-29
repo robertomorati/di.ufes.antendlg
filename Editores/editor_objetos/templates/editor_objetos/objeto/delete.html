@@ -1,0 +1,50 @@
+
+{% comment %}
+	{% extends 'base.html' %}
+	{% block content %}
+		<form method="post" action="">
+			{% csrf_token %}
+			<p>Tem certeza que deseja deletar o objeto {{object.nome}}?</p>
+			<input type="submit" value="Confirmar" />
+	    </form>
+	{% endblock %}
+{% endcomment%}
+		  <form id="objeto_delete_view" class="form-actions" method="post" action="{% url objeto_delete_view object.pk %}">
+		  <div class="modal-header">
+		    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" action="">×</button>
+		    <h3 id="myModalLabel"></h3>
+		  </div>
+		  <div class="modal-body">  
+				 {% csrf_token %}
+				 <p>Tem certeza que deseja deletar o objeto {{object.tipo}}?</p>
+		  </div>
+		  <div class="modal-footer">
+		    <button class="btn" data-dismiss="modal" aria-hidden="true">Cancelar</button>
+		    <button type="submit" class="btn btn-danger">Deletar Objeto</button>
+		  </div>
+	  </form>
+
+
+		<script type="text/javascript">
+			var options = {
+				target : '#objeto',
+				success : showResponse
+			};
+		
+			// post-submit callback 
+			function showResponse(responseText, statusText, xhr, $form) {
+				var ct = xhr.getResponseHeader("content-type") || "";
+				// se a resposta for um json, significa que o objeto foi criado com sucesso
+				//alert("delete"+ct.indexOf('json'));
+				if (ct.indexOf('json') > -1) {
+					// fecha o modal
+					$('#objeto').modal('hide');
+					refreshDiv('{% url objeto_list_view %}','content');
+				}
+			}
+		
+			$('#objeto_delete_view').ajaxForm(options);
+		</script>
+
+
+

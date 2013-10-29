@@ -1,0 +1,51 @@
+{% block content %}
+
+<div class="form-actions">
+		<h3><strong>Aventuras</strong></h3>
+	<table class="table table-bordered">
+		<tr>
+			<th>Tipo</th>
+			<th>Descrição</th>
+			<th>Data Inicio</th>
+			<th>Data Fim</th>
+			<th>Posições geográficas</th>
+		</tr>
+		<tbody>
+			{% for object in object_list %}
+			<tr class="success">
+				<td><a data-toggle="modal"
+					onClick="openModal('{% url  tipo_objeto_update_view object.pk %}','aventura')"
+					href="#aventura">{{ object.nome }}</a></td>
+				<td>{{ object.descricao }}</td>
+				<td>{{ object.inicio }}</td>
+				<td>{{ object.fim }}</td>
+				<td>{{ object.latitude }} 
+				    {{ object.longitude }}</td>
+				<td>
+				{% csrf_token %} 
+					<a class="btn btn-block btn-small btn-danger" data-toggle="modal" onClick="openModal('{% url  aventura_delete_view object.pk %}','aventura')" href="#aventura">Deletar</a>
+				</td>
+			</tr>
+			{% empty %}
+			<tr>
+				<td colspan="4"><i style="margin-right: 10px;"
+					class="icon-warning-sign"></i><strong>Atenção!</strong>Não existem
+					aventuras.
+				</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+	<!--  Modal para criação de aventuras - a criação de aventura se dará somente no inicio, por enquanto -->
+	<a role="button"
+		onClick="openModal('{% url aventura_create_view user.id %}','aventura')"
+		class="btn btn-small btn-primary" data-toggle="modal" href="#aventura">Criar
+		Aventura</a> 
+
+
+	<!-- Div para guardar a modal -->
+	<div id="aventura" class="modal hide fade"></div>
+
+</div>
+
+{% endblock %}

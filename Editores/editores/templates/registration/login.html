@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+		<meta name="viewport"  content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+		<meta charset="utf-8"/>
+		<script src="//code.jquery.com/jquery.js"></script>
+		<script src="{{ STATIC_URL }}js/jquery.form.min.js"></script>
+		<script type="text/javascript"
+			src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.9.1/jquery-ui.min.js"></script>
+			
+		<script src="{{ STATIC_URL }}js/util.js"></script>
+		{% load bootstrap_toolkit %} 
+		{% bootstrap_stylesheet_tag %} 
+		{% bootstrap_javascript_tag %} 
+		{% bootstrap_stylesheet_tag "responsive" %}
+</head>
+	<body>
+		<div class="well well-small">
+			<div class="container-fluid">
+						<div class="row-fluid">
+							<div class="span12">
+								<img width="100%" class="avatar-frame"
+									src="{{ STATIC_URL }}img/logo7.png"/>
+							</div> 				
+						</div>
+				{% block content %}
+				<div class="form-actions">
+					<div class="container login" style="margin: 0 auto; width: 500px">
+						<div class="row ">
+							<div class="center span4 well">
+								<legend>Autenticação Usuário</legend>
+								
+								 {% if messages %}
+										<div class="alert alert-error" width="30">
+											<button type="button" class="close" data-dismiss="alert">
+												<span class="badge badge-important">x</span>
+											</button>
+											<ul class="messages">
+												{% for message in messages %}
+													<li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li> 
+												{% endfor %}
+											</ul>
+										</div>	
+								{% endif %}
+								<form method="POST" action="." accept-charset="UTF-8">
+									{% csrf_token %}
+									<p>
+										<label><i class="icon-user"></i>Usuário:</label> 
+										
+										{{ form.username }}
+									</p>
+									<p>
+										<label><i class="icon-lock"></i>Senha:</label> 
+										{{ form.password }}
+									</p>
+									{% if next %} 
+									<input type="hidden" name="next" value="{{ login }}" />
+									{% else %} 
+									<input type="hidden" name="next" value="/autendlg/" />
+									{% endif %}
+									<div class="form-actions">
+										<button type="submit" name="submit" class="btn btn-small btn-primary ">Entrar</button>
+										
+										<a role="button"
+											onClick="openModal('{% url registrar_create_view %}','registrar')"
+											class="btn btn-small"  data-toggle="modal"
+											href="#registrar">Criar Conta</a>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+					<div id="registrar" class="modal hide fade"></div>
+				</div>
+				<div class="modal-footer">
+						<div class="well well-small">
+							<p class="text-center">
+								<small>UFES - Universidade Federal do Espírito Santo</small>
+							</p>
+							<p class="text-center">
+								<small>LIED - Laboratório de Informática na Educação</small>
+							</p>
+							<p class="text-center">
+								<small>Desenvolvido por: Roberto Guimarães Morati Junior</small>
+							</p>
+						</div>
+					</div>
+					<span class="label label-info">Viewport Width:<span class="label label-info"  id="monitor"></span></span>
+					<script>
+						$('#monitor').html($(window).width());
+						$(window).resize(function(){
+							var viewportWidth = $(window).width();
+							$('#monitor').html(viewportWidth);
+						});
+					</script>
+					</div>
+				{% endblock %}
+			</div>
+		</div>
+	</body>
+</html>
+
+

@@ -1,0 +1,71 @@
+<div class="form-actions">
+	<h3>
+		<strong>Objetos</strong>
+	</h3>
+	<table class="table table-bordered">
+		<tr>
+			<th>Nome</th>
+			<th>Descrição</th>
+			<th>Quantidade</th>
+			<th>Coletavel</th>
+			<th>Tipo Objeto</th>
+			<th>Ícone</th>
+		</tr>
+		<tbody>
+			{% for object in object_list %}
+			<tr class="success">
+				<td>
+					<!-- Modal para atualização de objetos   --> <a data-toggle="modal"
+					onClick="openModal('{% url  objeto_update_view object.pk %}','objeto')"
+					href="#objeto">{{ object.nome }}</a> <!-- <a class="update" data-toggle="modal" title="{% url  objeto_update_view object.pk %}" href="#objeto">{{ object.nome }}</a>-->
+				</td>
+				<td>{{ object.descricao }}</td>
+				<td>{{ object.quantidade }}</td>
+				<td>{{ object.coletavel }}</td>
+				<td>{{ object.tipo_objeto }}</td>
+				<td>
+				<img  class="avatar" src="{{ STATIC_URL }}{{ object.icone_objeto }}" alt="avatar"/>
+				</td>
+				<td>
+						{% csrf_token %}
+						<!--<input type="submit" class="btn btn-block btn-small btn-danger " value="Deletar">-->
+						<a class="btn btn-block btn-small btn-danger" data-toggle="modal"
+							onClick="openModal('{% url  objeto_delete_view object.pk %}','objeto')"
+							href="#objeto">Deletar</a>
+				</td>
+			</tr>
+			{% empty %}
+			<tr>
+				<td colspan="6"><i style="margin-right: 10px;"
+					class="icon-warning-sign"></i><strong>Atenção!</strong>Não existem
+					objetos criados.</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+	<!-- Modal para criação de objetos -->
+	<a role="button" onClick="openModal('{% url  objeto_create_view %}','objeto')" class="btn btn-small btn-primary" data-toggle="modal" href="#objeto">Criar Objeto</a>
+	<!-- Modal para criação de ícones 
+		<a role="button" onClick="openModal('{% url  objeto_create_view %}','objeto')" class="btn btn-small btn-primary" data-toggle="modal" href="#objeto">Criar Ícone</a>
+	-->
+
+	<!-- <a class="create" role="button" class="btn btn-small btn-primary create" data-toggle="modal" title="{% url objeto_create_view %}"  href="#objeto">Criar Objeto</a>   -->
+	<div id="objeto" class="modal hide fade"></div>
+</div>
+
+<!--Código antigo, pode servir para algo em outras páginas. Não deletar.  
+	<script type="text/javascript">
+		$('#create').click(function() {
+			$.get("{% url objeto_create_view %}", function(data) {
+				$("#criarObjeto").html(data);
+
+			});
+		});
+
+		$('#update').click(function(url) {
+			$.get(url, function(data) {
+				$("#atualizarObjeto").html(data);
+			});
+		});
+	</script>
+-->
