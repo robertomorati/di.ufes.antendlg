@@ -9,10 +9,7 @@ from django.core.exceptions import ValidationError
 from django.contrib import messages
 from django.core.urlresolvers import reverse
 from core.forms import LoginForm, AutorForm
-from django.shortcuts import render_to_response
-from django.template import RequestContext
 from django.core import serializers
-
 #from django.contrib.auth.models import User
 #from django.contrib.auth.hashers import PBKDF2PasswordHasher
 #from django.contrib.auth.models import User
@@ -77,19 +74,15 @@ class LoginView(FormView):
         #
         login(request, user)
         #return HttpResponseRedirect(self.get_success_url())
-        data = {}
+        #data = {}
         return HttpResponseRedirect(self.get_success_url())
         #return render_to_response('index.html', data, context_instance=RequestContext(request)) 
 
 class LoginCreateView(CreateView):
     success_url =  'login'
     template_name = 'registration/registration.html'
-   
-    exclude = ('is_staff','is_active','is_superuser','last_login','date_joined','groups','user_permissions',)
-    model = Autor
-    #model.objects.filter('is_staff','is_active','is_superuser','last_login','date_joined','groups','user_permissions',)
-    #['is_staff','is_active','is_superuser','last_login','date_joined','groups','user_permissions',]
-    
+    form_class = AutorForm
+  
     
     def get_success_url(self):
         return reverse('login')
@@ -117,18 +110,3 @@ class AutorGetJsonView(ListView):
 
     def render_to_response(self, context, **response_kwargs):
         return HttpResponse(serializers.serialize('json', Autor.objects.all().filter(pk=self.kwargs['pk']), fields=('icone_autor')))
-    
-'''
-def login_user(request):
-    logout(request)
-    username = password = ''
-    if request.POST:
-        username = request.POST['username']
-        password = request.POST['password']
-        user = authenticate(username=username, password=password)
-        if user is not None:
-            if user.is_active:
-                login(request, user)
-                return HttpResponseRedirect('/autendlg/login/')
-            return render_to_response('login.html', context_instance=RequestContext(request))
-'''  

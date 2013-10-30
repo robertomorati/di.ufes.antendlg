@@ -8,7 +8,8 @@ from editor_objetos.models import Aventura, Autor
 from django.forms.extras.widgets import SelectDateWidget
 from datetime import date
 from django.utils.translation import ugettext_lazy as _
-#from django.contrib.auth.models import User
+from django.contrib.auth.hashers import make_password
+from django.contrib.auth.forms import UserCreationForm
 
 class AventuraForm(forms.ModelForm):
     class Meta:
@@ -28,9 +29,29 @@ class LoginForm(forms.Form):
                                widget=forms.PasswordInput(render_value=False))
  
  
-class AutorForm(forms.Form):
-    password = forms.CharField(label=_("Password"),
-                               widget=forms.PasswordInput(render_value=False))
+ 
+class AutorForm(forms.ModelForm):
+    password = forms.CharField(label=_("Senha"), widget=forms.PasswordInput(render_value=False))
+    
+    def save(self, commit=True):
+        user = super(AutorForm, self).save(commit=False)
+        user.set_password(self.cleaned_data["password"])
+        if commit:
+            user.save()
+            return user
+    class Meta: 
+        model = Autor
+        exclude = ['is_staff','is_active','is_superuser','last_login','date_joined','groups','user_permissions','id_password1','id_password2']
+        
+        
+        
+        
+ 
+
+
+#class AutorForm(forms.Form):
+#    password = forms.CharField(label=_("Password"),
+#                               widget=forms.PasswordInput(render_value=False))
     #class Meta:
     #    model = Autor
     #    exclude = ['is_staff','is_active','is_superuser','last_login','date_joined','groups','user_permissions']
