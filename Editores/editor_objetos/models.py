@@ -15,8 +15,6 @@ from datetime import date
 from django.contrib.auth.models import User 
 #from django.contrib.auth.models import User, make_password, is_password_usable, check_password
 from django.utils.translation import gettext as _
-from django.template.defaultfilters import default
-from pkg_resources import require
 #from imagekit.models import ImageSpecField
 
 '''

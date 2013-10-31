@@ -2,7 +2,7 @@
 '''
 Created on 18/09/2013
 
-@author: Roberto
+@author: Roberto Guimarães Morati Junior
 '''
 from django.conf.urls import patterns, url
 from core.views import TipoObjetoUpdateView, TipoObjetoCreateView, TipoObjetoListView, TipoObjetoDeleteView, TipoObjetoGetJsonView

@@ -1,4 +1,9 @@
 # -*- coding: utf-8 -*-
+'''
+Created --/--/2013
+
+Autor: Roberto Guimarães Morati Junior
+'''
 from django.views.generic.base import TemplateView
 from django.http import HttpResponseRedirect
 from django.contrib.auth import login, logout, authenticate
@@ -10,9 +15,6 @@ from django.contrib import messages
 from django.core.urlresolvers import reverse
 from core.forms import LoginForm, AutorForm
 from django.core import serializers
-#from django.contrib.auth.models import User
-#from django.contrib.auth.hashers import PBKDF2PasswordHasher
-#from django.contrib.auth.models import User
 import json
 
 '''
@@ -24,7 +26,12 @@ class IndexView(TemplateView):
     
   
 '''
-Autenticação
+======================================================================
+                            Autenticação
+======================================================================
+'''
+'''
+Logout do usuário
 
 Pendencias: mudar para Class
 '''
@@ -37,11 +44,9 @@ def logout_page(request):
     #request.session['user'].flush()
     return HttpResponseRedirect('/autendlg/login/')
 
-
-
-#class Login(DetailView):
-#    template_name = 'login.html'
-#    model = Autor
+'''
+LoginView - autenticação do usuário
+'''
 class LoginView(FormView):
   
     template_name = "registration/login.html"
@@ -78,6 +83,9 @@ class LoginView(FormView):
         return HttpResponseRedirect(self.get_success_url())
         #return render_to_response('index.html', data, context_instance=RequestContext(request)) 
 
+'''
+LoginCreateView - criação de usuário
+'''
 class LoginCreateView(CreateView):
     success_url =  'login'
     template_name = 'registration/registration.html'
@@ -88,12 +96,7 @@ class LoginCreateView(CreateView):
         return reverse('login')
     #Override no form. 
     def form_valid(self, form):
-        #User.set_password(self.kwargs['password'])
-        #Autor.set_unusable_password(self)
-        
-        #user = super(Autor, self).save(commit=False)
-        #user.set_password(self.cleaned_data["password"])
-        #user.save()
+       
         self.object = form.save()
           
         #json.dumps() transforma objeto em string JSON e, json.loads() transforma string JSON em objeto    
@@ -102,7 +105,12 @@ class LoginCreateView(CreateView):
 
 
 '''
-Autor
+=======================================================
+                        Autor
+=======================================================
+'''
+'''
+AutorGerJsonView - retorna o avatar de um autor
 '''
 class AutorGetJsonView(ListView):
     #template_name = 'editor_objetos/icones/buffer.html'
