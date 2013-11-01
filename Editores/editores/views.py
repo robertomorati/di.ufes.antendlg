@@ -41,7 +41,6 @@ def logout_page(request):
     """
     Log users out and re-direct them to the main page.
     """
-    print request.session[SESSION_AVENTURA]
     logout(request)
     return HttpResponseRedirect('/autendlg/login/')
 
