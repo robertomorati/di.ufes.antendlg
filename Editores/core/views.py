@@ -18,6 +18,9 @@ from editor_objetos.models import Objeto, TipoObjeto, Icone, Aventura
 from django.core import serializers
 from forms import AventuraForm
 import json
+from django.core.context_processors import request
+from django.contrib.auth import login
+SESSION_AVENTURA = '_user_aventura_id'
 
 '''
 ===================================================================
@@ -85,8 +88,6 @@ class TipoObjetoGetJsonView(ListView):
 
     def render_to_response(self, context, **response_kwargs):
         return HttpResponse(serializers.serialize('json', TipoObjeto.objects.all(), fields=('pk','tipo')))
-
-    
 
 
 '''
@@ -245,8 +246,9 @@ class AventuraListView(ListView):
     model = Aventura
     template_name = 'editor_objetos/aventura/listar.html' 
     
+       
     def get_queryset(self):
-    
+        #print self.request.session[SESSION_AVENTURA]
         object_list = Aventura.objects.all().filter(autor=self.kwargs['pk'])
         #self.model.objects.filter(pk = self.kwargs['pk'])
         return object_list
@@ -322,10 +324,44 @@ class AventuraDeleteView(DeleteView):
     
     #def get_success_url(self):
     #    return reverse('aventura_list_view')  
+
+#Adiciona objeto da aventura na seção
+class AventuraEditarView(DeleteView):
+    template_name = 'editor_objetos/aventura/message.html'
+    model = Aventura
+    
+    def get_success_url(self):
+        return reverse('aventura_editar_view')
+    
+    #override metodo delete para criar a sessão com o id da aventura
+    #solução "alternativa" e temporária
+    def delete(self, request, *args, **kwargs):
+        self.request.session[SESSION_AVENTURA] = self.get_object()
+        print  self.request.session[SESSION_AVENTURA].nome
+        if self.request.session[SESSION_AVENTURA] == '-1':
+            ValidationError
+            messages.error(request, "".join("Ocorreu um problema ao ativar a aventura! Tente novmaente!"))
+            return HttpResponse(json.dumps({'response': 'exception delete'}), content_type="text")
+        return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")
+    #def render_to_response(self, context, **response_kwargs):
+        
+    #    self.request.session[SESSION_AVENTURA] = self.kwargs['pk']
+        
+    #    return HttpResponse(serializers.serialize('json', Aventura.objects.all().filter(id=self.kwargs['pk'])))
+         
+    #def get_queryset(self):
+    #    
+    #    object_list = Aventura.objects.all().filter(id=self.kwargs['pk'])
+    #    self.request.session[SESSION_AVENTURA] = self.kwargs['pk']
+    #    print self.request.session[SESSION_AVENTURA]
+    #    
+    #    return object_list
+        #return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")
+    
     
 #Retorna json contendo dados da aventura
 class AventuraGetJsonView(ListView):
     model = Aventura
-
+    
     def render_to_response(self, context, **response_kwargs):
         return HttpResponse(serializers.serialize('json', Aventura.objects.all().filter(pk=self.kwargs['pk'])))

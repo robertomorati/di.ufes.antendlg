@@ -15,7 +15,9 @@ from django.contrib import messages
 from django.core.urlresolvers import reverse
 from core.forms import LoginForm, AutorForm
 from django.core import serializers
+from  django.contrib.auth import *
 import json
+SESSION_AVENTURA = '_user_aventura_id'
 
 '''
 Página inicial
@@ -39,9 +41,8 @@ def logout_page(request):
     """
     Log users out and re-direct them to the main page.
     """
-   
+    print request.session[SESSION_AVENTURA]
     logout(request)
-    #request.session['user'].flush()
     return HttpResponseRedirect('/autendlg/login/')
 
 '''
@@ -77,12 +78,39 @@ class LoginView(FormView):
         
         # Persist user
         #
-        login(request, user)
+        #login(request, user)
+        #override login auth
+        def login(request, user):
+            """
+            Persist a user id and a backend in the request. This way a user doesn't
+            have to reauthenticate on every request. Note that data set during
+            the anonymous session is retained when the user logs in.
+            """
+            if user is None:
+                user = request.user
+        # TODO: It would be nice to support different login methods, like signed cookies.
+        if SESSION_KEY in request.session:
+            if request.session[SESSION_KEY] != user.id:
+                # To avoid reusing another user's session, create a new, empty
+                # session if the existing session corresponds to a different
+                # authenticated user.
+                request.session.flush()
+        else:
+            request.session.cycle_key()
+        request.session[SESSION_KEY] = user.id
+        #SESSION_AVENTURA com -1 significa que não existe aventuras sendo editadas
+        request.session[SESSION_AVENTURA] = '-1'
+        request.session[BACKEND_SESSION_KEY] = user.backend
+        if hasattr(request, 'user'):
+            request.user = user
+            user_logged_in.send(sender=user.__class__, request=request, user=user)
+            
+        #request.session[SESSION_KEY] = id_aventura
         #return HttpResponseRedirect(self.get_success_url())
         #data = {}
         return HttpResponseRedirect(self.get_success_url())
         #return render_to_response('index.html', data, context_instance=RequestContext(request)) 
-
+        
 '''
 LoginCreateView - criação de usuário
 '''

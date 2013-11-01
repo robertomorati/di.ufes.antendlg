@@ -99,6 +99,15 @@
 	overlay = new google.maps.OverlayView();
 	overlay.draw = function() {};
 	overlay.setMap($map);
+	
+	
+	var infowindow = new google.maps.InfoWindow({
+	      content: "InstanciaObjeto"
+	  });
+	
+
+
+	
 	} 
 	
 	function placeMarker(location,icon) {
@@ -110,6 +119,20 @@
 		  icon:	icon,
 		  zIndex: 5
 	  });
+	  
+	  //http://jsfiddle.net/kjy112/3CvaD/
+	  marker['infowindow'] = new google.maps.InfoWindow({
+            content: html
+      });
+	  
+	  google.maps.event.addListener(marker, 'click', function() {
+	       this['infowindow'].open(map, this);
+	  });
+	}
+	
+	function gotoPoint(myPoint){
+	    map.setCenter(new google.maps.LatLng(marker[myPoint-1].position.lat(), marker[myPoint-1].position.lng()));
+	    marker[myPoint-1]['infowindow'].open(map, marker[myPoint-1]);
 	}
 	
 	function map_recenter(latlng,offsetx,offsety) {
