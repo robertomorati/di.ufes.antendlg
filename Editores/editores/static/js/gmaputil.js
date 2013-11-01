@@ -4,8 +4,9 @@
 	var $map;
 	var $latlng;
 	var overlay;
-	function initialize() {
 	var markers = [];
+	function initialize() {
+	
 	var $latlng = new google.maps.LatLng(-20.274636854719642, -40.304203033447266);
 	var myOptions = {
 	  zoom: 16,
@@ -110,8 +111,8 @@
 	
 	} 
 	
-	function placeMarker(location,icon) {
-	  //alert(location + icon);
+	function placeMarker(location,icon, id, name_objeto) {
+	  //alert(location + icon + "   " + id  + "   " + name_objeto );
 	  var marker = new google.maps.Marker({		
 		  map: $map,
 		  position: location, 
@@ -122,12 +123,14 @@
 	  
 	  //http://jsfiddle.net/kjy112/3CvaD/
 	  marker['infowindow'] = new google.maps.InfoWindow({
-            content: html
+            content: "<div id='instancia"+name_objeto+"' class='form-actions'> Instância de " + name_objeto  +" </div>"
       });
 	  
 	  google.maps.event.addListener(marker, 'click', function() {
-	       this['infowindow'].open(map, this);
+	       this['infowindow'].open($map, this);
 	  });
+	  
+	  markers.push(marker);
 	}
 	
 	function gotoPoint(myPoint){

@@ -170,10 +170,11 @@
 				    );									
 				    
 				    var loc=overlay.getProjection().fromContainerPixelToLatLng(point);
-					var icon = $(this).attr('src')//jQuery(this).find('img').attr('src');
-					//alert(loc + icon + $(this).attr('src'));
-					placeMarker(loc,icon);
+					var icon = $(this).attr('src');//jQuery(this).find('img').attr('src');
+					var id = $(this).attr('id');
+					var name_objeto = $(this).attr('alt');
 					
+					placeMarker(loc,icon, id, name_objeto);
 				}
 			
 			});	
