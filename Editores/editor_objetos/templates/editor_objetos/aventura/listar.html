@@ -23,11 +23,15 @@
 				    {{ object.longitude }}</td>
 				<td>
 				{% csrf_token %} 
-					<a class="btn btn-block btn-small btn-danger" data-toggle="modal" onClick="openModal('{% url  aventura_delete_view object.pk %}','aventura')" href="#aventura">Deletar</a>
+					<a class="btn btn-block btn-small btn-danger" data-toggle="modal" 
+					onClick="openModal('{% url  aventura_delete_view object.pk %}','aventura')" 
+					href="#aventura">Deletar</a>
 				</td>
 				<td>
 				 <!-- botao editar - id da aventura é inserido na seçção -->
-				 	<a class="btn btn-block btn-small" data-toggle="modal" onClick="openModal('{% url  aventura_editar_view object.pk %}','aventura')" href="#aventura">Editar</a>		 
+				 	<a class="btn btn-block btn-small" data-toggle="modal"
+				 	onClick="openModal('{% url aventura_ativar_edicao_view object.pk %}','aventura')" 
+				 	href="#aventura">Ativar Autoria</a>		 
 				</td>
 			</tr>
 			{% empty %}

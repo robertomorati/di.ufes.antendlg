@@ -30,7 +30,7 @@
 		<title>{% if title %}{{ title }}{% else %}AntEnDLG - Ambiente de Autoria de Jogos Locativos de Decisão{% endif %}</title>
 	</head>
 	{% csrf_token %}
-	<body onload="refreshDiv('{% url gmaps_view %}','content'); addTabs('{% url tipo_objeto_get_view %}'); getAvatar({{ user.id }});">	
+	<body id="body" onload="refreshDiv('{% url gmaps_view %}','content'); addTabs('{% url tipo_objeto_get_view %}'); getAvatar({{ user.id }});">	
 		<div class="well well-small">
 			<div class="container-fluid">
 				<div class="row-fluid">
@@ -38,19 +38,27 @@
 						<img width="100%" class="avatar-frame"
 							src="{{ STATIC_URL }}img/logo7.png"/>
 					</div> 			
-				</div>
-					
+				</div>	
 					<div id="border">
-							<div class="navbar-inner " id="navbar-inner">
-					
-									<div class="span1" id="autor_avatar">
-									</div>
-						
-							<p class="lead">
-								{% if user.is_authenticated %}
-								   <p><strong>Usuário: {{ user.username }} </strong> <a class="btn btn-link"  href="{% url logout %}" style="color: black; float: right;"><i class="icon-off"></i>Logout</a></p>
-								{% endif %}
-							</p>
+						<div class="navbar-inner " id="navbar-inner">
+								<div class="span1" id="autor_avatar">
+								</div>
+								<p class="lead">
+									{% if user.is_authenticated %}
+									   <p>
+										   <strong>Usuário: {{ user.username }} </strong>
+										   <strong>
+											   <aventura_ativa style="color: black; text-align: middle;">
+											   	
+											   </aventura_ativa>
+										   </strong>
+										   	<a class="btn btn-link"  href="{% url logout %}" style="color: black; float: right;">
+										   		<i class="icon-off"></i>Logout
+										   	</a>
+									   	</p>
+									{% endif %}
+								</p>
+								 
 						</div>
 					</div>	
 				</div> 

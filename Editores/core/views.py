@@ -16,7 +16,7 @@ from django.views.generic import TemplateView, ListView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from editor_objetos.models import Objeto, TipoObjeto, Icone, Aventura
 from django.core import serializers
-from forms import AventuraForm
+from forms import AventuraForm, AventuraWithoutFieldsForm
 import json
 from django.core.context_processors import request
 from django.contrib.auth import login
@@ -234,7 +234,7 @@ class ObjetoGetJsonView(ListView):
 '''
 class GMapView(TemplateView):
     template_name = 'editor_objetos/gmap/gmap.html'
-    
+
     
 ''''
 ====================================================================
@@ -245,8 +245,7 @@ class GMapView(TemplateView):
 class AventuraListView(ListView):
     model = Aventura
     template_name = 'editor_objetos/aventura/listar.html' 
-    
-       
+        
     def get_queryset(self):
         #print self.request.session[SESSION_AVENTURA]
         object_list = Aventura.objects.all().filter(autor=self.kwargs['pk'])
@@ -264,9 +263,7 @@ class AventuraCreateView(CreateView):
     
     #Override no form. 
     def form_valid(self, form):
-        print self.kwargs['pk']
         form.instance.autor_id = self.kwargs['pk']
-        print form.instance.autor_id #id do autor da aventura
         self.object = form.save()    
         return HttpResponse(json.dumps({'response' : 'ok'}), content_type="application/json")
 
@@ -284,65 +281,26 @@ class AventuraUpdateView(UpdateView):
         self.object = form.save()    
         return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")
 
-# Atualização das posições geográficas da aventura
-class AventuraLocationUpdateView(UpdateView):
-    template_name = 'editor_objetos/aventura/update.html'
-    model = Aventura
-    
-    def get_success_url(self):
-        return reverse('aventura_list_view')
-    
-    #Override no form. 
-    def form_valid(self, form):
-        self.object = form.save()    
-        return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")
-    
-#Deleção da aventura
-class AventuraDeleteView(DeleteView):
-    template_name = 'editor_objetos/aventura/delete.html'
-    model = Aventura
-    
-    def delete(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        try:
-            self.object.delete()
-        except ValidationError as e:
-            messages.error(request, "".join(e.messages))
-            return HttpResponse(json.dumps({'response': 'exception delete'}), content_type="text")
-        return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")
-    
-    #Override para evitar que um autor secundario delete a aventura
-    #def delete(self, request, *args, **kwargs):
-    #    self.object = self.get_object()
-    #    try:
-    #        self.object.delete()
-    #    except ValidationError as e:
-    #        messages.error(request, "".join(e.messages))
-    #        return HttpResponse(json.dumps({'response': 'exception delete'}), content_type="text")
-    #    return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")
-        #return HttpResponseRedirect(self.get_success_url())
-    
-    #def get_success_url(self):
-    #    return reverse('aventura_list_view')  
-
-#Adiciona objeto da aventura na seção
-class AventuraEditarView(DeleteView):
+#Adiciona objeto da aventura na SESSION
+#class AventuraEditarView(DeleteView):
+class AventuraAtivarView(UpdateView):
     template_name = 'editor_objetos/aventura/message.html'
     model = Aventura
+    form_class = AventuraWithoutFieldsForm
     
     def get_success_url(self):
-        return reverse('aventura_editar_view')
-    
-    #override metodo delete para criar a sessão com o id da aventura
-    #solução "alternativa" e temporária
-    def delete(self, request, *args, **kwargs):
-        self.request.session[SESSION_AVENTURA] = self.get_object()
-        print  self.request.session[SESSION_AVENTURA].nome
+        return reverse('aventura_list_view')   
+
+    def form_valid(self, form):
+        
+        self.request.session[SESSION_AVENTURA] = self.object
+        nome = self.request.session[SESSION_AVENTURA].nome
         if self.request.session[SESSION_AVENTURA] == '-1':
             ValidationError
-            messages.error(request, "".join("Ocorreu um problema ao ativar a aventura! Tente novmaente!"))
+            messages.error(request, "".join("Ocorreu um problema ao ativar a aventura! Tente novamente!"))
             return HttpResponse(json.dumps({'response': 'exception delete'}), content_type="text")
-        return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")
+        return HttpResponse(json.dumps({'response': nome }), content_type="application/json")
+
     #def render_to_response(self, context, **response_kwargs):
         
     #    self.request.session[SESSION_AVENTURA] = self.kwargs['pk']
@@ -357,6 +315,31 @@ class AventuraEditarView(DeleteView):
     #    
     #    return object_list
         #return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")
+
+    
+#Deleção da aventura
+class AventuraDeleteView(DeleteView):
+    template_name = 'editor_objetos/aventura/delete.html'
+    model = Aventura
+    
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        
+        #verifica se a aventura está em autoria
+        if self.request.session[SESSION_AVENTURA].id == self.object.id:
+            ValidationError
+            msg = 'A aventura ' + self.object.nome + ' está em autoria. Para deleção é necessário que a aventura esteja com o modo de autoria desativado.'
+
+            messages.error(request, "".join(msg))
+            return HttpResponse(json.dumps({'response': 'ativa'}), content_type="text")
+        else:
+            try:
+                self.object.delete()
+            except ValidationError as e:
+                messages.error(request, "".join(e.messages))
+                return HttpResponse(json.dumps({'response': 'exception delete'}), content_type="text")
+        return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")
+
     
     
 #Retorna json contendo dados da aventura

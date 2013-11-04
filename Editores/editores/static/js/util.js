@@ -173,7 +173,7 @@
 					var icon = $(this).attr('src');//jQuery(this).find('img').attr('src');
 					var id = $(this).attr('id');
 					var name_objeto = $(this).attr('alt');
-					
+
 					placeMarker(loc,icon, id, name_objeto);
 				}
 			

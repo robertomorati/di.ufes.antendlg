@@ -23,6 +23,14 @@ class AventuraForm(forms.ModelForm):
         #def __init__(self, *args, **kwargs):
         #    super(AventuraForm, self).__init__(*args, **kwargs)
         #    self.fields['fim'].widget = forms.DateField(widget=SelectDateWidget(years=range(date.today().year, 2099)),)
+        
+'''
+Form utilizado para salvar aventura na session
+'''
+class AventuraWithoutFieldsForm(forms.ModelForm):
+    class Meta:
+        model = Aventura
+        exclude = ['nome','descricao','inicio','fim','longitude','autor','latitude',]
 
 '''
 Form para Login
