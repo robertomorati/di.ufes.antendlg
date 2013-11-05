@@ -61,7 +61,12 @@
 			            }
 		
 		            // For each place, get the icon, place name, and location.
-		            markers = [];
+		            //markers = [];
+		            
+		            //Algumas cidades apresentam problemas ao serem localizadas, retornando mais de um POS.
+		            //Desta forma desencadeia uma quantidade absurdade de mensagens para o usuário, devido a requisição de salva POS estar dentro do for.
+		            //Com o intuito de limitar a mensagem a aparecer somente uma vez, criamos a flagCount.
+		            var flagCount = 0;
 		            var bounds = new google.maps.LatLngBounds();
 		            for (var i = 0, place; place = places[i]; i++) {
 		              var image = {
@@ -103,22 +108,23 @@
 						    	 flagPosAventura = false;
 						     },
 						     error: function(xhr) {
+						    	  if(flagCount == 0){
 						        	alert("Erro ao atualizar posição geográfica da aventura. Certifique-se de que existe alguma aventura em modo de auntoria." +
 						        		  " Ou vá para o meno Configurações Aventura -> Editar Aventura e ative uma aaventura para ser autorada!");
+						        	flagCount += 1;
+						     		}
 						        }
 						 });
-			
-		              
-		              
 		              
 		            }
 		
 		
 		            $map.fitBounds(bounds);
 		            
-		      		if(flagPosAventura == true){  
+		      		if(flagPosAventura == true && flagCount == 0){  
 			            alert("A posição geográfica da aventura foi alterada com sucesso!");
-			            flagPosAventura = false;
+			            flagPosAventura = false; 
+			            flagCount += 1;
 			      	}
 	          });
            // [END region_getplaces]
