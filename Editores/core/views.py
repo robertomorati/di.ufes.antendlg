@@ -296,12 +296,12 @@ class AventuraAtivarView(UpdateView):
         
         self.request.session[SESSION_AVENTURA] = self.object
         nome = self.request.session[SESSION_AVENTURA].nome
-        id = self.request.session[SESSION_AVENTURA].id
+        id_av = self.request.session[SESSION_AVENTURA].id
         if self.request.session[SESSION_AVENTURA] == '-1':
             ValidationError
             messages.error(request, "".join("Ocorreu um problema ao ativar a aventura! Tente novamente!"))
             return HttpResponse(json.dumps({'response': 'exception delete'}), content_type="text")
-        return HttpResponse(json.dumps({'response': nome ,'id' : id }), content_type="application/json")
+        return HttpResponse(json.dumps({'response': nome ,'id' : id_av }), content_type="application/json")
 
 
 
