@@ -5,7 +5,7 @@
  */
 
 	var id_tipos;//variavel utilizada para armazenar tipos de objetos (id), para montar a Biblioteca de Objetos qndo a página carregar pela primeira vez.
-	var autor_avatar;
+	var autor_avatar;//sem uso
 
 
 	/**

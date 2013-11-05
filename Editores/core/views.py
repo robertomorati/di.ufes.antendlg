@@ -11,15 +11,16 @@ Convenção: NomeDaClasseAçao - TipoObjetoCreateView
 from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
-from django.http import HttpResponse
 from django.views.generic import TemplateView, ListView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from editor_objetos.models import Objeto, TipoObjeto, Icone, Aventura
 from django.core import serializers
 from forms import AventuraForm, AventuraWithoutFieldsForm
-import json
 from django.core.context_processors import request
-from django.contrib.auth import login
+from django.http import HttpResponse
+import json
+from core.ajax import AjaxableResponseMixin
+
 SESSION_AVENTURA = '_user_aventura_id'
 
 '''
@@ -295,28 +296,45 @@ class AventuraAtivarView(UpdateView):
         
         self.request.session[SESSION_AVENTURA] = self.object
         nome = self.request.session[SESSION_AVENTURA].nome
+        id = self.request.session[SESSION_AVENTURA].id
         if self.request.session[SESSION_AVENTURA] == '-1':
             ValidationError
             messages.error(request, "".join("Ocorreu um problema ao ativar a aventura! Tente novamente!"))
             return HttpResponse(json.dumps({'response': 'exception delete'}), content_type="text")
-        return HttpResponse(json.dumps({'response': nome }), content_type="application/json")
+        return HttpResponse(json.dumps({'response': nome ,'id' : id }), content_type="application/json")
 
-    #def render_to_response(self, context, **response_kwargs):
-        
-    #    self.request.session[SESSION_AVENTURA] = self.kwargs['pk']
-        
-    #    return HttpResponse(serializers.serialize('json', Aventura.objects.all().filter(id=self.kwargs['pk'])))
-         
-    #def get_queryset(self):
-    #    
-    #    object_list = Aventura.objects.all().filter(id=self.kwargs['pk'])
-    #    self.request.session[SESSION_AVENTURA] = self.kwargs['pk']
-    #    print self.request.session[SESSION_AVENTURA]
-    #    
-    #    return object_list
-        #return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")
 
+
+#Atualizar posição aventura
+class AventuraUpdatePositionView(AjaxableResponseMixin, UpdateView):
+    #template_name = 'editor_objetos/aventura/message.html'
+    model = Aventura
+    form_class = AventuraWithoutFieldsForm
     
+    def get_success_url(self):
+        return reverse('gmaps_view')
+    
+    def form_valid(self, form,*args, **kwargs):
+        # We make sure to call the parent's form_valid() method because
+        # it might do some processing (in the case of CreateView, it will
+        # call form.save() for example).,
+        # json print self.request.body
+        pos = json.loads(self.request.body)
+        form.instance.latitude = pos[0]['latitude']
+        form.instance.longitude = pos[0]['longitude']
+        self.object = form.save()
+        response = super(AjaxableResponseMixin, self).form_valid(form)
+        if self.request.is_ajax():
+            data = {
+                'pk': self.object.pk,
+            }
+            return self.render_to_json_response(data)
+        else:
+            return response
+    
+
+
+
 #Deleção da aventura
 class AventuraDeleteView(DeleteView):
     template_name = 'editor_objetos/aventura/delete.html'

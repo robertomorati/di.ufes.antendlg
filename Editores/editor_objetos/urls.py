@@ -9,7 +9,7 @@ from core.views import TipoObjetoUpdateView, TipoObjetoCreateView, TipoObjetoLis
 from core.views import ObjetoCreateView, ObjetoUpdateView, ObjetoListView, ObjetoDeleteView, ObjetoGetJsonView
 from core.views import IconeCreateView, IconeListView, IconeUpdateView, IconeDeleteView, IconeGetJsonView
 from core.views import GMapView
-from core.views import AventuraListView, AventuraCreateView, AventuraUpdateView, AventuraDeleteView, AventuraGetJsonView, AventuraAtivarView
+from core.views import AventuraListView, AventuraCreateView, AventuraUpdateView, AventuraDeleteView, AventuraGetJsonView, AventuraAtivarView, AventuraUpdatePositionView
 from django.contrib import admin
 admin.autodiscover()
 
@@ -43,6 +43,7 @@ urlpatterns = patterns('',
     url(r'^aventura/update_aventura/(?P<pk>\w+)/$', AventuraUpdateView.as_view(), name='aventura_update_view',),
     url(r'^aventura/delete_aventura/(?P<pk>\w+)/$', AventuraDeleteView.as_view(), name='aventura_delete_view',),
     url(r'^get_json_aventura/(?P<pk>\w+)/$', AventuraGetJsonView.as_view(), name='aventura_get_json_url_view'),
+    url(r'^set_json_aventura/(?P<pk>\w+)/$', AventuraUpdatePositionView.as_view(), name='aventura_set_json_view'),#atualiza posicao da aventura
    
      
     #urls para pagina do google maps
