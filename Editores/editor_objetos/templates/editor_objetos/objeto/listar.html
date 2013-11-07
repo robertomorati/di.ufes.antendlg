@@ -10,6 +10,7 @@
 			<th>Coletavel</th>
 			<th>Tipo Objeto</th>
 			<th>Ícone</th>
+			<th>Diálogo</th>
 		</tr>
 		<tbody>
 			{% for object in object_list %}
@@ -26,6 +27,8 @@
 				<td>
 				<img  class="avatar" src="/media/{{ object.icone_objeto }}" alt="avatar"/>
 				</td>
+				<td>{{ object.dialogo }}</td>
+				
 				<td>
 						{% csrf_token %}
 						<!--<input type="submit" class="btn btn-block btn-small btn-danger " value="Deletar">-->

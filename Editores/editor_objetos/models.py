@@ -2,37 +2,34 @@
 '''
 Created on 16/09/2013
 
-Models para o Editor de Objetos
+Models para o Ambiente de Autoria de DLG
 
 @author: Roberto Guimaraes Morati Junior
 '''
 
 from django.db import models
-#from south.creator.actions import DeleteField
-#from django.views.generic.edit import DeleteView
 from django.core.exceptions import ValidationError
 from datetime import date
 from django.contrib.auth.models import User 
-#from django.contrib.auth.models import User, make_password, is_password_usable, check_password
 from django.utils.translation import gettext as _
 #from imagekit.models import ImageSpecField
 
 '''
 Class TipoObjeto 
-Representa o tipo de um objeto, ou seja, o autor da aventura ao criar um objeto irá selecionar um tipo para o objeto.
-Por exemplo, o objetos Cascumpus é do tipo de objeto Monstro.
-@param tipo: tem o nome do tipo de objeto,
+
+Representa o tipo de um objeto, ou seja, o autor da aventura ao criar um objeto irá relacionar este objeto a um tipo.
+Por exemplo, o objeto Cascumpus é do tipo de objeto Monstro.
+
+@param tipo: representa o nome do tipo de objeto
 @param descricao: apresenta uma descrição do tipo de objeto
 @param posicoes_geograficas: remete a quantidade de posições geográficas que um objeto de um dado tipo poderá assumi. 
                              Por exemplo, objeto do tipo Limite do Labirinto, esse objeto pode assumir 4 posições geográficas. 
-                             Assim delimitando a área do geografica do jogo.
-@param dialogo:esse parametro indica se um objeto do tipo pode ou não ter um diálogo. 
+                             Assim delimitando a área do geografica do jogo, por meio de uma sugestão.
 '''
 class TipoObjeto(models.Model):
     tipo = models.CharField(max_length=30)
     descricao = models.CharField(max_length=100)
     posicoes_geograficas = models.IntegerField(max_length=3,default=1, help_text=u"Delimita a quantidade de posições geográficas da instância do objeto.")
-    dialogo = models.BooleanField(default=True, help_text=u"Delimita se a instancia de um objeto pode ter um dialogo.")
     
     #return o tipo
     def __unicode__(self):
@@ -58,6 +55,8 @@ class TipoObjeto(models.Model):
 
 '''
 Icone é uma imagem que representa o objeto durante o momento de autoria.
+Em outras palavras, quanto o objeto é arrastado para o mapa, a imagem do icone é copiada para o marcador do google maps.
+
 @param nome: é o nome da imagem de autoria.
 @param icone: é o diretorio para imagem do icone
 
@@ -86,9 +85,12 @@ class Icone (models.Model):
 
     
 '''
-Sugestao é um elemente de percepção para a instância do objeto. A sugestão indica para o jogador que o mesmo está próximo de um perigo, como o Cascumpus.
-@param tipo: a sugestão pode ser de três tipos: audio, como um rugido do Cascumpus; imagem: fumaça do fogo; 
-@param sugestao: é a sugestão armazenada.
+Sugestao é um elemente de percepção para a instância do objeto. 
+A sugestão indica para o jogador que o mesmo está próximo de um perigo. 
+Por exemplo, a proximidade com o Cascumpus pode ser indicada por um áudio de rugido.
+
+@param tipo: a sugestão pode ser de três tipos: áudio, como um rugido do Cascumpus; imagem: fumaça do fogo; e texto, uma mensagem.
+@param sugestao: url da sugestão.
 @param proximidade: é a distância que o jogador tem que estar da sugestão para que ele tenha percepção da mesma.   
 
 Pendências nessa classe: Identificar tipos de arquivos.
@@ -98,23 +100,29 @@ class Sugestao(models.Model):
     AUDIO = 1
     IMAGEM = 2 
     TIPO_IMAGEMS = (
-        (0, 'Imagem Autoria'),
-        (1, 'Imagem 2D'),
-        (2, 'Imagem 3D'),)
+        (0, 'Texto'),
+        (1, 'Áudio'),
+        (2, 'Imagem'),)
     tipo = models.CharField(max_length=1, choices=TIPO_IMAGEMS ,default=TEXTO)
-    sugestao = models.FileField(upload_to ='sugestao/', help_text="Sugestão para instância objeto.", blank=True,)
-    proximidade = models.IntegerField(max_length=3,default=1)    
+    sugestao = models.FileField(upload_to ='sugestao/', help_text="Sugestão para tomada de decisão.", )
+    proximidade = models.IntegerField(max_length=3,default=1)
     
+    def __unicode__(self):
+        return u'%s' % (self.sugestao) 
+   
+ 
 '''
-Objeto possui TipoObjeto e o Objeto, sendo instanciado na aventura quando arrastado para o mapa.
+Objeto tem um tipo de objeto. O objeto representa algo como, placa, fruta, perigo ou personagens que são instânciados na aventura.
+
 @param nome: nome do objeto criado
-@param descricao: qual o papel do objeto? 
-@param quantidade: quantida de instânciados que pode ter do respectivo objeto no mapa
-@param coletavel: informa se o objeto pode ser coletado na aventura pelo jogador
+@param descricao: descrição do objeto.
+@param quantidade: quantida de instânciados que pode ter do respectivo objeto no mapa.
+@param coletavel: informa se o objeto pode ser coletado na aventura pelo jogador.
 @param tipo_objeto: informa o tipo de objeto ao qual o objeto está vinculado
 @param incone_objeto: representa a imagem do objeto no momento de autoria    
+@param dialogo: representa possibilidade daquele objeto ter ou não um diálogo. 
     
-  Adicionar propriedade publico/privado.
+Pendências: Adicionar propriedade publico/privado.
 '''
 class Objeto (models.Model):
     nome = models.CharField(max_length=30)
@@ -123,6 +131,7 @@ class Objeto (models.Model):
     coletavel = models.BooleanField(default=False, help_text=u"Informa se o objeto pode ser coletado durante a aventura.")
     tipo_objeto = models.ForeignKey(TipoObjeto, related_name="objetos",)
     icone_objeto = models.ForeignKey(Icone, related_name="icones", default="", )
+    dialogo = models.BooleanField(default=True, help_text=u"Delimita se a instancia de um objeto pode ter um dialogo.")
     #img = models.ImageField(upload_to='../media/imagens/',verbose_name="Imagem Autoria")
     
     def _unicode_(self):
@@ -132,78 +141,15 @@ class Objeto (models.Model):
 
 '''
 Dialogo permite a criacao de um dialogo para o objeto do tipo personagem
-
 Pendências nessa classe: Tratamento do XML para representar o diálogo.
+Classe removida do modelo. 
+Não existe a necessidade do diálogo ser separado da instância do objeto.
 
 '''
-class Dialogo(models.Model):
-    dialogo = models.TextField('dialogo', blank=True)
-    descricao = models.CharField(max_length=100)
+#class Dialogo(models.Model):
+#    dialogo = models.TextField('dialogo', blank=True)
+#    descricao = models.CharField(max_length=100)
     
-'''
-Posições Geográficas para instâncias de objetos.
-@param latitude
-@param  longitude
-@param altitude: para objetos em 3D apresentados por meio da camera do dispositivo movel.
-
-'''
-class PosicaoGeografica(models.Model):
-    latitude = models.FloatField()
-    longitude = models.FloatField()
-    altitude = models.FloatField()
-    
-    
-'''
-InstanciaObjeto representa um objeto que é arrastado para o mapa da aventura
-@param nome:nome da instancia do objeto
-@param proximidade: distância que o jogador deve estar do objeto para que possa ver o mesmo
-@param visivel: este atributo permite indicar se determinado objeto deve estar visivel na aventura em um dado momento.
-@param encenacao: indica se o objeto pode ser controlado por outro jogador.
-@param dialogo: representa a relação da instancia do o seu dialogo.
-@param posicao_geografica: relacao da instancia com a sua posicao geografica.
-@param sugestao: descrito anteriormente.
-
-Pendencias: Rever o atributo sugestão; Adicionar relação com a aventura;
-'''
-class InstanciaObjeto(models.Model):
-    nome = models.CharField(max_length=30)
-    proximidade = models.IntegerField(max_length=3,default=1)
-    visivel = models.BooleanField(default=True, help_text=u"Informa se o objeto está visivel na aventura.")
-    encenacao = models.BooleanField(default=True, help_text=u"Indica se o objeto pode ser controlado por outro jogador.")
-    dialogo = models.ForeignKey(Dialogo, related_name="dialogo_objeto",)
-    posicao_geografica_ = models.ManyToManyField(PosicaoGeografica, related_name="pos_geo_inst_objeto",)
-    sugestao = models.ForeignKey(Sugestao, related_name="sugestao_objeto", blank=True, default="Selecione a sugestão." )
-    #sugestao_objeto =  models.ForeignKey(Sugestao, related_name="sugestao_instancia_objeto", )
-    
-    def _unicode_(self):
-        return u'%s' % (self.nome)
-
-    
-''''
-Não está sendo utilizado.
-Imagem é uma classe que representa a imagem para o objeto, no momento de autoria e do jogo
-'''
-class ImagemObjeto(models.Model):
-    imagem = models.ImageField(upload_to='/obejtos/imagens/', verbose_name="Imagem Autoria")
-    descricao = models.CharField(max_length=100)
-
-'''
-TipoImagem representa o tipo de imagem, sendo uma imagem para autoria. 2D ou 3D
-'''
-class TipoImagem(models.Model):
-    IMG_AUTORIA = 0
-    IMG_MAP = 1
-    IMG_CAM = 2 
-    TIPO_IMAGEMS = (
-        (0, 'Imagem Autoria'),
-        (1, 'Imagem 2D'),
-        (2, 'Imagem 3D'),)
-    tipo = models.CharField(max_length=1, choices=TIPO_IMAGEMS ,default=IMG_AUTORIA)
-    descricao = models.CharField(max_length=100)
-    
-    #def _unicode_(self):
-    #    return u'%s' % (self.tipo)    
-
 '''
 Autor - é o individuo que cria a aventura.
 O autor herda User do Django.
@@ -225,6 +171,15 @@ class Autor(User, models.Model):
 
 '''
 Aventura - representa um jogo criado. Por exemplo, o ALDloc II é uma aventura baseada na concepção do ALD em 3D.
+
+@param nome: nome da aventura
+@param descricao: o que é aa aventura?
+@param inicio: data de inicio da aventura
+@param fim: data de fim da aventura
+@param latitude:
+@param longitude: 
+       localidade da aventura
+@param autor: autor da aventura 
 '''
 class Aventura(models.Model):
     nome = models.CharField(max_length=50, verbose_name="Nome da aventura",)
@@ -245,13 +200,99 @@ class Aventura(models.Model):
 #            self.fields['fim'].widget = forms.DateField(widget=SelectDateWidget(years=range(date.today().year, 2099)),)
 #        class Meta:
 #            model = Aventura
-            
+    
+'''
+InstanciaObjeto representa um objeto que é arrastado para o mapa da aventura
+@param nome:nome da instancia do objeto
+@param proximidade: distância que o jogador deve estar do objeto para que possa ver o mesmo
+@param visivel: este atributo permite indicar se determinado objeto deve estar visivel na aventura, para o jogador.
+@param encenacao: indica se o objeto pode ser controlado por outro jogador ou por um agente.
+@param posicao_geografica: relacao da instancia com a sua posicao geografica. 
+       Como já visto em TipoObjeto, uma instância pode ter mais de uma POS, assim, mudando o tipo de marcador.
+@param sugestao: descrito anteriormente.
+
+Pendencias Finalizadas: Rever o atributo sugestão; Adicionar relação com a aventura;
+'''
+class InstanciaObjeto(models.Model):
+    DES = 0
+    AVATAR = 1
+    AGENTE = 2 
+    TIPO_ENCENACAO = (
+        (0, 'Desativado'),
+        (1, 'Avatar'),
+        (2, 'Agente'),)
+    nome = models.CharField(max_length=30)
+    proximidade = models.IntegerField(max_length=3,default=1)
+    visivel = models.BooleanField(default=True, help_text=u"Informa se o objeto está visivel na aventura.")
+    encenacao = models.CharField(max_length=1, choices=TIPO_ENCENACAO ,default=DES,help_text=u"Indica o tipo de encenação que é possível com a instância do objeto.")
+    objeto = models.ForeignKey(Objeto, related_name="instancias_objeto",blank=True,default="",)
+    sugestao = models.ForeignKey(Sugestao, related_name="sugestao_objeto", blank=True, default="", null=True, )
+    aventura = models.ForeignKey(Aventura, related_name="aventura_inst_obj", blank=True, default="", null=True,)
+    instancia_cont = models.IntegerField(max_length=3,default=0,)
+    dialogo = models.TextField('dialogo', blank=True)
+    #dialogo = models.ForeignKey(Dialogo, related_name="dialogo",blank=True,)
+    #posicao_geografica_ = models.ManyToManyField(PosicaoGeografica, related_name="pos_geo_inst_objeto",) 
+    #pos possui a instnacia do objeto, pois dependendo do tipo de objeto, esse poderá ter n POS
+    #sugestao_objeto =  models.ForeignKey(Sugestao, related_name="sugestao_instancia_objeto", )
+    
+    def _unicode_(self):
+        return u'%s' % (self.nome)
+
+'''
+Posições Geográficas para instâncias de objetos.
+@param latitude
+@param  longitude
+@param altitude: para objetos em 3D apresentados por meio da camera do dispositivo move, como por exemplo com o uso do Wikitude.
+@param instancia_objeto: representa a relação com a instancia que possui esta posicao. 
+
+'''
+class PosicaoGeografica(models.Model):
+    latitude = models.FloatField()
+    longitude = models.FloatField()
+    altitude = models.FloatField()
+    instancia_objeto = models.ForeignKey(InstanciaObjeto, related_name="pos_inst_objeto",blank=True,default="",)
+    #instancia_objeto = models.ManyToManyField(InstanciaObjeto, related_name="pos_inst_objeto",blank=True,) 
+    
+    
+''''
+Imagem é uma classe que representa a imagem para o objeto, no momento de autoria e do jogo.
+Classe removida.
+'''
+#class ImagemObjeto(models.Model):
+#    imagem = models.ImageField(upload_to='/obejtos/imagens/', verbose_name="Imagem Autoria")
+#    descricao = models.CharField(max_length=100)
+
+'''
+TipoImagem representa o tipo de imagem para a instância de objeto.
+           a imagem pode ser 2D ou 3D. 
+           2D - uso do google maps para jogar
+           3D - uso da camera do dispositivo móvel.
+@param tipo: tipo de imnagem cadastrada
+@param img: url da imagem 
+'''
+class TipoImagem(models.Model):
+    IMG_MAP = 0
+    IMG_CAM = 1 
+    TIPO_IMAGEMS = (
+        (0, 'Imagem 2D'),
+        (1, 'Imagem 3D'),)
+    tipo = models.CharField(max_length=1, choices=TIPO_IMAGEMS ,default=IMG_MAP)
+    img = models.FileField(upload_to ='imagens/img_play/',null=True, blank=True)
+    descricao = models.CharField(max_length=100, default="")
+    
+    #def _unicode_(self):
+    #    return u'%s' % (self.tipo)    
+
+
 '''
 NivelAutor: na aventura um autor pode ser o principal, com direito de excluir a aventura ou secundario, com direito de apenas editar a aventura
 
 @param autor: id do autor registrado em uma determinada aventura 
 @param aventura: aventura para qual o autor estar cadastrado
 @param nivel: nivel de autorização do autor para a aventura  
+
+Pedencia: Classe não utilizada no momento. 
+          Permitir a aventura ter autores secundarios e primarios. 
 '''
 class NivelAutor(models.Model):
     PRINCIPAL = 0

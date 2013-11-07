@@ -8,8 +8,9 @@ from django.conf.urls import patterns, url
 from core.views import TipoObjetoUpdateView, TipoObjetoCreateView, TipoObjetoListView, TipoObjetoDeleteView, TipoObjetoGetJsonView
 from core.views import ObjetoCreateView, ObjetoUpdateView, ObjetoListView, ObjetoDeleteView, ObjetoGetJsonView
 from core.views import IconeCreateView, IconeListView, IconeUpdateView, IconeDeleteView, IconeGetJsonView
-from core.views import GMapView
+from core.views import GMapView, MsgShowView, PosicaoGeograficaCreateView
 from core.views import AventuraListView, AventuraCreateView, AventuraUpdateView, AventuraDeleteView, AventuraGetJsonView, AventuraAtivarView, AventuraUpdatePositionView
+from core.views import InstanciaObjetoCreateView
 from django.contrib import admin
 admin.autodiscover()
 
@@ -47,9 +48,17 @@ urlpatterns = patterns('',
     url(r'^set_json_aventura/(?P<pk>\w+)/$', AventuraUpdatePositionView.as_view(), name='aventura_set_json_view'),
    
      
+    #views para instancia de objeto
+    url(r'^instancia_objeto/create_instancia/$', InstanciaObjetoCreateView.as_view(), name='instancia_objeto_view'),#cria a isntancia por meio de json
+ 
+    #urlviews para POS
+    url(r'^posicao_geografica/create_pos/$', PosicaoGeograficaCreateView.as_view(), name='posicao_geografica_create_view'),#cria a isntancia por meio de json
+    
     #urls para pagina do google maps
     url(r'^gmaps/$', GMapView.as_view(), name='gmaps_view'),
+    url(r'^gmap/msg/$', MsgShowView.as_view(), name='posicao_aventura_view'),#msg que posicao da aventura foi alterada
     #url(r'^gmaps/$', GMapView.as_view(), name='gmaps_view'), com id da aventura
+    
     
     
 )

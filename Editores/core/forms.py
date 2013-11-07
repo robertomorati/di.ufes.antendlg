@@ -5,7 +5,7 @@ Created on 23/10/2013
 @author: Roberto Gumarães  Morati Junior
 '''
 from django import forms
-from editor_objetos.models import Aventura, Autor
+from editor_objetos.models import Aventura, Autor, InstanciaObjeto, PosicaoGeografica
 from django.forms.extras.widgets import SelectDateWidget
 from datetime import date
 from django.utils.translation import ugettext_lazy as _
@@ -58,3 +58,19 @@ class AutorForm(forms.ModelForm):
         model = Autor
         #remove parametros desnecessarios
         exclude = ['is_staff','is_active','is_superuser','last_login','date_joined','groups','user_permissions','id_password1','id_password2']
+        
+'''
+Form utilizado para criar instancia do objeto
+'''
+class InstanciaObjetoCreateForm(forms.ModelForm):
+    class Meta:
+        model = InstanciaObjeto
+        exclude = ['nome','proximidade','encenacao','objeto','visivel','sugestao','num_instancia','aventura','instancia_cont',]
+
+'''
+Form utilizado para criar POS
+'''
+class   PosicaoGeograficaCreateForm(forms.ModelForm):
+    class Meta:
+        model = PosicaoGeografica
+        exclude = ['latitude','longitude','altitude','instancia_objeto',] 

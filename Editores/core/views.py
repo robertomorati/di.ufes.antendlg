@@ -13,15 +13,18 @@ from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.views.generic import TemplateView, ListView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from editor_objetos.models import Objeto, TipoObjeto, Icone, Aventura
+from editor_objetos.models import Objeto, TipoObjeto, Icone, Aventura, InstanciaObjeto, PosicaoGeografica
 from django.core import serializers
-from forms import AventuraForm, AventuraWithoutFieldsForm
+from forms import AventuraForm, AventuraWithoutFieldsForm, InstanciaObjetoCreateForm, PosicaoGeograficaCreateForm
 from django.core.context_processors import request
 from django.http import HttpResponse
 import json
 from core.ajax import AjaxableResponseMixin
 
 SESSION_AVENTURA = '_user_aventura_id'
+
+#assumindo que a criação de aventuras não seja colaborativa
+SESSION_INSTANCIA = '_instancia_aventura'
 
 '''
 ===================================================================
@@ -223,9 +226,111 @@ class ObjetoGetJsonView(ListView):
     model = Objeto
 
     def render_to_response(self, context, **response_kwargs):
-        return HttpResponse(serializers.serialize('json', Objeto.objects.all().filter(tipo_objeto=self.kwargs['pk']), fields=('pk','nome', 'icone_objeto')))
+        return HttpResponse(serializers.serialize('json', Objeto.objects.all().filter(tipo_objeto=self.kwargs['pk']), fields=('pk','nome', 'icone_objeto','dialogo',)))
     
+
+'''
+================================================================================
+                          Views para Instância do Objeto
+                    
+Instância do Objeto é criada no momento em que o objeto é arrastado para o mapa.
+=================================================================================
+'''
+
+#cria a instancia do objeto por meio de um POST com json
+class InstanciaObjetoCreateView(AjaxableResponseMixin, CreateView):  
+    #template_name = 'editor_objetos/instancia_objeto/create.html'
+    model = InstanciaObjeto
+    form_class = InstanciaObjetoCreateForm
     
+    def get_success_url(self):
+        return reverse('gmaps_view') 
+    
+    def form_valid(self, form,*args, **kwargs):
+        # We make sure to call the parent's form_valid() method because
+        # it might do some processing (in the case of CreateView, it will
+        # call form.save() for example).,
+        # json print self.request.body
+        pos = json.loads(self.request.body)
+        
+        #recupera quantidade do objeto
+        object_list = Objeto.objects.all().filter(pk=pos[0]['id_objeto'])
+        
+        qntde = 0
+        for obj in object_list:#always return one object, because the id/pk is unique
+            qntde = obj.quantidade
+        #utilizado no if de comparacao a seguir
+        #usa id_objeto e id_aventura para recuperar instâncias do objeto
+        #em seguida verifica a instancia com maior instancia_cont e verifica se é possível criar uma nova instância.
+        #recupero instancias do objeto de uma dada aventura
+        object_list = InstanciaObjeto.objects.all().filter(aventura_id=self.request.session[SESSION_AVENTURA].id, objeto_id=pos[0]['id_objeto'])
+        flag = False #permissão para criar outra instancia
+       
+        #permissao para criar mais instancias
+        qntde_new_inst_obj = 0
+        if not  object_list:
+            qntde_new_inst_obj = 1
+        else:
+            for obj in object_list:
+                if obj.instancia_cont == int(qntde):
+                    flag = True
+                if obj.instancia_cont >= qntde_new_inst_obj:
+                    qntde_new_inst_obj = obj.instancia_cont + 1;
+
+        #salva objeto
+        data_return = {'pk': 0,}
+        if flag == False:
+            form.instance.nome = pos[0]['nome']
+            form.instance.objeto_id = pos[0]['id_objeto']
+            form.instance.aventura_id =  self.request.session[SESSION_AVENTURA].id
+            form.instance.instancia_cont = qntde_new_inst_obj
+            self.object = form.save()
+            response = super(AjaxableResponseMixin, self).form_valid(form)
+            data_return = {'pk': self.object.id,}
+            
+            
+        #retorna data com id do objeto
+        if self.request.is_ajax():
+            return self.render_to_json_response(data_return)
+        else:
+            return response  
+        
+'''
+================================================================================
+                          Views para Posicao Geografica
+=================================================================================
+'''
+
+#cria a posicao geografica para um objeto
+class PosicaoGeograficaCreateView(AjaxableResponseMixin, CreateView):  
+    #template_name = 'editor_objetos/instancia_objeto/create.html'
+    model = PosicaoGeografica
+    form_class = PosicaoGeograficaCreateForm
+    
+    def get_success_url(self):
+        return reverse('gmaps_view') 
+
+    
+    def form_valid(self, form,*args, **kwargs):
+        # We make sure to call the parent's form_valid() method because
+        # it might do some processing (in the case of CreateView, it will
+        # call form.save() for example).,
+        # json print self.request.body
+        pos = json.loads(self.request.body)
+        form.instance.latitude = pos[0]['latitude']
+        form.instance.longitude = pos[0]['longitude']
+        form.instance.instancia_objeto_id = pos[0]['instancia_objeto_id']
+        form.instance.altitude = pos[0]['altitude']
+        self.object = form.save()
+        response = super(AjaxableResponseMixin, self).form_valid(form)
+        if self.request.is_ajax():
+            data = {
+                'pk': self.object.pk,
+            }
+            return self.render_to_json_response(data)
+        else:
+            return response 
+
     
 '''
 ====================================================================
@@ -235,7 +340,14 @@ class ObjetoGetJsonView(ListView):
 '''
 class GMapView(TemplateView):
     template_name = 'editor_objetos/gmap/gmap.html'
-
+ 
+#abre modal para informar ao usuário que a posição da aventura foi salva com sucesso   
+class MsgShowView(TemplateView):
+    template_name = 'editor_objetos/gmap/pos_aventura.html'
+    
+    #def get_success_url(self):
+        #return HttpResponseRedirect(self.get_success_url())
+        #return HttpResponse(json.dumps({'response' : 'ok'}), content_type="application/json")
     
 ''''
 ====================================================================
@@ -313,6 +425,7 @@ class AventuraUpdatePositionView(AjaxableResponseMixin, UpdateView):
     
     def get_success_url(self):
         return reverse('gmaps_view')
+
     
     def form_valid(self, form,*args, **kwargs):
         # We make sure to call the parent's form_valid() method because

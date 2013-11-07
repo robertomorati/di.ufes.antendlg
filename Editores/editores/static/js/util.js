@@ -139,6 +139,7 @@
 							for (i=0;i<data.length;i++){	
 								
 								//temporario, devido ao callback do getJson e problemas com retorno de valor pelo callback
+								//temporario se tornou utilizado :)
 								getUrlIcone(tipoObjeto,data, i);	
 							}	
 					    }
@@ -199,9 +200,10 @@
 				    			//div com o id do objeto...		não é possivel utilizar span2		    			
 				    	      '<img  class="draggable_objeto objeto img-circle" id="'+ dadosObjeto[i].pk + 
 				    	      '" src="/media/' + data[0].fields.icone + '" alt="'+ dadosObjeto[i].fields.nome  +
-				    	      '" title="' + dadosObjeto[i].fields.nome + '" data-toggle="tooltip"/>');
+				    	      '" title="' + dadosObjeto[i].fields.nome + '" dialogo="' + dadosObjeto[i].fields.dialogo +  
+				    	      '" data-toggle="tooltip"/>');
 				    	
-				    		   draggableObjeto();
+				    		   draggableObjeto();//add drag ao objeto
 				 
 					}).error(function( data, textStatus, jqXHR ){ /* assign handler */
 						alert("Erro ao recuperar objetos...Xiiii ;)");
