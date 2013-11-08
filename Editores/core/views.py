@@ -213,8 +213,17 @@ class ObjetoDeleteView(DeleteView):
 
     #Override no delete para retornar uma resposta json caso o objeto seja deletado com sucesso
     def delete(self, request, *args, **kwargs):
+        
+        object_list = InstanciaObjeto.objects.all().filter(objeto_id=self.kwargs['pk'])
         self.object = self.get_object()
-        self.object.delete()
+
+        if not object_list:   
+            self.object.delete()
+        else:
+            ValidationError
+            messages.error(request, "".join("Não é possível deletar o objeto " + self.object.nome) + ", pois existem instâncias deste objeto!")
+            return HttpResponse(json.dumps({'response': 'exception delete'}), content_type="text")
+    
         return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")
     
     def get_success_url(self):
@@ -251,8 +260,7 @@ class InstanciaObjetoCreateView(AjaxableResponseMixin, CreateView):
         # it might do some processing (in the case of CreateView, it will
         # call form.save() for example).,
         # json print self.request.body
-        pos = json.loads(self.request.body)
-        
+        pos = json.loads(self.request.body)#get json post
         #recupera quantidade do objeto
         object_list = Objeto.objects.all().filter(pk=pos[0]['id_objeto'])
         
@@ -294,7 +302,40 @@ class InstanciaObjetoCreateView(AjaxableResponseMixin, CreateView):
             return self.render_to_json_response(data_return)
         else:
             return response  
+    
+class InstanciaObjetoGetJsonView(ListView):
+    model = InstanciaObjeto
+
+    #funcao que retorna todas instâncias de objetos de uma dada aventura, com um campo adiciona com a url do icone (json)
+    def render_to_response(self, context, **response_kwargs):
         
+        #recupero instancias de uma dada aventura
+        flag = 0;
+        inst_object_list = InstanciaObjeto.objects.all().filter(aventura_id=self.kwargs['pk'])#id e nome
+        json_inst_objetos = '[';
+        for inst_obj in inst_object_list:
+            if flag == 0:
+                flag = 1;
+                json_inst_objetos += '{"id":"' + str(inst_obj.pk) + '"' + ',"nome":"' + inst_obj.nome + '"';#id e nome da instancia
+            else:
+                json_inst_objetos += ',{"id":"' + str(inst_obj.pk) + '"' + ',"nome":"' + inst_obj.nome + '"';#id e nome da instancia
+            objeto_list = Objeto.objects.all().filter(pk=inst_obj.objeto_id)#icone_objeto_id
+            pos_list = PosicaoGeografica.objects.all().filter(instancia_objeto_id=inst_obj.pk)
+            for pos in pos_list:
+                    json_inst_objetos += ',"lat":"' + str(pos.latitude) + '"' + ',"lng":"' +str(pos.longitude) + '"'+  ',"altd":"' + str(pos.altitude) + '"';
+            for obj in objeto_list:
+                icone_list = Icone.objects.all().filter(pk=obj.icone_objeto_id)
+                for icone in  icone_list:
+                    json_inst_objetos += ',"url_icone":"/media/' + str(icone.icone) + '"}';
+                
+                   
+        
+        json_inst_objetos += ']';
+
+        return HttpResponse(json_inst_objetos)
+
+
+   
 '''
 ================================================================================
                           Views para Posicao Geografica

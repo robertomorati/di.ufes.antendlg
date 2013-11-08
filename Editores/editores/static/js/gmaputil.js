@@ -1,10 +1,13 @@
 		
- 	    //Inicializa o Google Maps
+		var intancias_objetos_json;//utiliazdo para manter o map atualizado com as instâncias da aventura em execução
+ 	   
+		/**
+		 * Inicializa o Google Maps
+		 */
 		var $map;
         var $latlng;
         var overlay;
         var markers = [];
-        
         function initialize() {
         
 	        var $latlng = new google.maps.LatLng(-20.274636854719642, -40.304203033447266);
@@ -140,9 +143,8 @@
         overlay = new google.maps.OverlayView();
         overlay.draw = function() {};
         overlay.setMap($map);
-         
-
-
+        
+        loadInstâncias();
         
         } 
 	
@@ -199,7 +201,7 @@
 			    		  
 			    		  markers.push(marker);
 			    		 
-			    		 alert("criou instancia");
+			    		 //alert("criou instancia");
 			    		//cria posicao para a instância do objeto
 			    		json_pos = '[{"latitude":"' + lat + '"' + ',"longitude":"' + lng + '"' + ',"altitude":"' + '0.0' + '"' + ',"instancia_objeto_id":"' + data.pk + '"}]';
 			    		$.ajax({
@@ -223,6 +225,79 @@
 
 	}
 	
+	
+	
+	/**
+	 * Carrega instâncias do objeto
+	 * 
+	 * Momentos em que está função ocorre: 
+	 * -ativação de aventura;
+	 * -sair e voltar para o google maps;
+	 * -alterar o local da aventura;
+	 */
+	function loadInstâncias(){
+		
+		//verifica se existe alguma aventura ativa na barra do usuário
+		var aventura_id = '-1';
+		if($('body').find('aventura_ativa_id').attr('id')>0)
+			aventura_id = $('body').find('aventura_ativa_id').attr('id');
+
+		if(aventura_id != '-1'){
+    		urlView = '/editor_objetos/instancia_objeto/get_instancia/' + aventura_id  + '/';
+    		
+			//ajax to get all instances by aventura_id
+			$.ajax({
+	   		     type:"GET",
+	   		     url:urlView,
+	   		     success: function(data,status){
+	   		    	intancias_objetos_json = data;
+	   		    	var instancias = $.parseJSON(intancias_objetos_json);
+	   		    	placeListMakers(instancias);
+	   		     },
+			     error: function(xhr) {
+			        	alert("Erro ao recuperar lista de instâncias de objetios.");
+			     }
+			});
+		}
+		
+	}
+	
+	/**
+	 * Recebe ums lista de instâncias de objetos com respectivas urls dos icones de seus objetos e aplica no google maps
+	 * @param intancias_objetos_json
+	 */
+	function placeListMakers(instancias){
+		
+			
+			//loop para ler intancias_objetos_json
+			for (i=0;i<instancias.length;i++){
+				//alert(instancias[i].id + " " + instancias[i].nome + " " + instancias[i].url_icone + " " + instancias[i].lat + " " + instancias[i].lng + " " + instancias[i].altd);
+				//cria um novo marcador para a instância do objeto
+				 var location = new google.maps.LatLng(instancias[i].lat, instancias[i].lng);
+				 
+				 var marker = new google.maps.Marker({		
+					  map: $map,
+					  position: location, 
+					  draggable:true,	
+					  icon:	 instancias[i].url_icone,
+					  zIndex: 5
+				  });
+				  
+				  //http://jsfiddle.net/kjy112/3CvaD/
+				  marker['infowindow'] = new google.maps.InfoWindow({
+			            content: "<div id='instancia"+instancias[i].nome+"' class='form-actions'> Instância de " + instancias[i].nome  +" </div>"
+			            //construir dados 
+			      });
+				  
+				  google.maps.event.addListener(marker, 'click', function() {
+				       this['infowindow'].open($map, this);
+				  });
+				  
+				  markers.push(marker);
+			}
+		
+	}
+	
 	/**
 	 * Ao clicar na instâ, está função posiciona o mapa, o centro do mapa na instancia.
 	 * @param myPoint
@@ -233,7 +308,7 @@
 	}
 	
 	/**
-	 * Esta função ajusta o centro do mapa. Qual a necessidade disso?
+	 * Esta função ajusta o centro do mapa. Qual a necessidade disso? Veja a estrutura de camadas do google maps para melhor entender.
 	 * Com o mapa é deslocado para outra posição na pagina, ocorre um problema com a camada de coordenadas, afetando o dragdrop.
 	 * Assim, esta função corrige este problema.
 	 * 

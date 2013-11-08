@@ -5,7 +5,6 @@
  */
 
 	var id_tipos;//variavel utilizada para armazenar tipos de objetos (id), para montar a Biblioteca de Objetos qndo a página carregar pela primeira vez.
-	var autor_avatar;//sem uso
 
 
 	/**
@@ -49,12 +48,11 @@
 		        cache: false,
 		        async: false,
 		        success: function(response) {
-		        	
 		        	var obj = $.parseJSON(response);
 			        //recuperando tipo e id e montando o menu
 		        	for (i=0;i<obj.length;i++){
 		        		//adiciona os primeitos tipos
-			    		if(i < 2){	 
+			    		if(i < 2){	//trabalhar de acordo com a largura da tela...maybe hahaha!
 			    			$('#objetoTab').append(
 			    			// id="tipo' + obj[i].fields.tipo + '" class="panel-info"
 			    			$('<li id="loadObjetos' + obj[i].fields.tipo + '"><a href="#tipo' + obj[i].fields.tipo + '" data-toggle="tab">' + obj[i].fields.tipo + '</a></li>'));
@@ -256,7 +254,7 @@
 	 }*/
 	
 	 function teste(urlView) {
-	     alert(urlView);
+	     //alert(urlView);
 		$.getJSON(urlView, function(result) {
 			return result;
 		});
