@@ -356,7 +356,7 @@ class InstanciaObjetoUpdateView(UpdateView):
     #    return reverse('gmaps_view')
     
     def form_valid(self, form):
-    
+        
         self.object = form.save()  
         #return HttpResponseRedirect(self.get_success_url())
         return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")

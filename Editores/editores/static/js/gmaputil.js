@@ -15,7 +15,8 @@
         function initialize() {
         
         	//ponto inicial do mapa
-	        var $latlng = new google.maps.LatLng(-20.274636854719642, -40.304203033447266);
+	        var $latlng = new google.maps.LatLng(-30.068637, -51.120404);
+	        //var $latlng = new google.maps.LatLng(-20.274636854719642, -40.304203033447266);
 	        var myOptions = {
 	          zoom: 16,
 	          center: $latlng,
@@ -201,6 +202,29 @@
 		 });
 
 	}
+	
+	/**
+	 * 
+	 * 
+	 */
+	/*function atualizaPosicaoAventura(urlView) {
+		 $.ajax({
+		        type: 'GET',
+		        url: urlView,
+		        cache: false,
+		        async: false,
+		        success: function(response) {
+		        	var obj = $.parseJSON(response);
+		        	
+		        }
+		
+	        },
+	        error: function() {
+	        	alert("Erro ao recuperar tipos de objetos...Xiiii ;)");
+	        }
+		});
+	 }*/
+
 	
 	/**
 	 * Função para adicionar instância no mapa
