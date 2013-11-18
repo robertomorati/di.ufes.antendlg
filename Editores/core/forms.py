@@ -104,7 +104,8 @@ class InstanciaObjetoUpdateForm(forms.ModelForm):
         object_list = Objeto.objects.all().filter(pk=instance.objeto.id) 
         for obj in object_list:
             if obj.dialogo == False:
-                self.fields['dialogo'].widget = forms.HiddenInput()
+                #self.fields['dialogo'].widget = forms.HiddenInput()
+                self.fields.pop('dialogo')
             else:
                 dialogo = "<dialogo id_instancia='" + str(instance.id) + "' nome='"+ instance.nome +"'>\n"
                 #dialogo +="<npc tipo='dialogoInicial'>\n Digite a fala inicial do personagem aqui.\n </npc>"

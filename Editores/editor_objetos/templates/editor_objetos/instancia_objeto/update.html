@@ -19,7 +19,9 @@
 						</div>
 						<div class="span6">
 	                		<div class="form-group">		 			
+					 			{% if form.dialogo %}
 					 			{{ form.dialogo|as_bootstrap }}
+					 			{% endif %}
 						 		{{ form.visivel|as_bootstrap}}
 						 	</div>
 						</div>

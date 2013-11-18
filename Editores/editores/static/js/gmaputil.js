@@ -66,9 +66,9 @@
 	          google.maps.event.addListener(searchBox, 'places_changed', function() {
 			            var places = searchBox.getPlaces();
 			
-			            for (var i = 0, marker; marker = markers[i]; i++) {
+			            /*for (var i = 0, marker; marker = markers[i]; i++) {
 			              marker.setMap(null);
-			            }
+			            }*/
 		
 		            // For each place, get the icon, place name, and location.
 		            //markers = [];
@@ -79,13 +79,13 @@
 		            var flagCount = 0;
 		            var bounds = new google.maps.LatLngBounds();
 		            for (var i = 0, place; place = places[i]; i++) {
-		              var image = {
+		              /*var image = {
 		                url: place.icon,
 		                size: new google.maps.Size(71, 71),
 		                origin: new google.maps.Point(0, 0),
 		                anchor: new google.maps.Point(17, 34),
 		                scaledSize: new google.maps.Size(25, 25)
-		              };
+		              };*/
 		              
 		              // Create a marker for each place.
 		              // Removido, pois ao localizar um lugar está função atribui um marker desnecessário para o autor da aventura.
@@ -227,7 +227,8 @@
 			  zIndex: 5,
 		  });
 		  //http://jsfiddle.net/kjy112/3CvaD/
-		  marker['infowindow'] = new google.maps.InfoWindow({ 
+		  var nameInfo = 'infoWindow' + name_objeto;
+		  marker[nameInfo] = new google.maps.InfoWindow({ 
 			    maxWidth: 600,
 	      });
 		  
@@ -236,8 +237,8 @@
 	
 		       urlIO = '/editor_objetos/instancia_objeto/update_instancia/' +  marker.metadata.id + '/';
 		       
-		       this['infowindow'].open($map, this);
-		       info = this['infowindow'];
+		       this[nameInfo].open($map, this);
+		       info = this[nameInfo];
 		       var rmMaker = marker;
 		       //De acordo com "fontes" no stackoverflow, a forma mais eficiente para carregar o conteúdo na infowindow é por meio de ajax.
 		       $.ajax({	
