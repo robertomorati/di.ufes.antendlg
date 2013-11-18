@@ -30,6 +30,9 @@
 					// fecha o modal
 					//alert("Tipo Objeto Criado?");
 					$('#objeto').modal('hide');
+					$('#objetoTab').html('');
+			    	$('#pageTabContent').html('');
+			    	addTabs('{% url tipo_objeto_get_view %}');
 					refreshDiv('{% url tipo_objeto_list_view %}','content');
 				}
 			}

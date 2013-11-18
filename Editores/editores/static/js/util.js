@@ -41,7 +41,6 @@
 	  */
 	 var flag = 0;
 	 function addTabs(urlView) {
-
 		 $.ajax({
 		        type: 'GET',
 		        url: urlView,
@@ -60,6 +59,7 @@
 			    			
 			    	    }else{
 			    	    	//adiciona nome para o dropdown
+			    	    	
 			    	    	if(flag == 0){		  
 			    	    		$('#objetoTab')
 			    				.append(
@@ -81,6 +81,7 @@
 			    		//local para alocar os objetos
 			    		buildTabContent(obj[i].pk,obj[i].fields.tipo);
 		        	}
+		        	flag = 0;
 
 		        },
 		        error: function() {

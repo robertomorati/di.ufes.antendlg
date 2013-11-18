@@ -34,6 +34,9 @@
 			if (ct.indexOf('json') > -1) {
 				// fecha o modal
 				$('#objeto').modal('hide');
+				$('#objetoTab').html('');
+		    	$('#pageTabContent').html('');
+		    	addTabs('{% url tipo_objeto_get_view %}');
 				refreshDiv('{% url tipo_objeto_list_view %}','content');
 			}
 		}
