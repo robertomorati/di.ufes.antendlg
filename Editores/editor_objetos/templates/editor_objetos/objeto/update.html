@@ -29,8 +29,10 @@
 		function showResponse(responseText, statusText, xhr, $form) {
 			var ct = xhr.getResponseHeader("content-type") || "";
 			// se a resposta for um json, significa que o objeto foi criado com sucesso
+			
 			if (ct.indexOf('json') > -1) {
 				// fecha o modal
+			
 				$('#objeto').modal('hide');
 				refreshDiv('{% url objeto_list_view %}','content');
 			}

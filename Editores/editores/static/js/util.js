@@ -117,7 +117,7 @@
 	 function getObjetos(idTipo,tipoObjeto){
 		 //alert(idTipo + tipoObjeto);
 		 var urlView = '/editor_objetos/objeto/get_lista_objetos/';
-		 urlView += idTipo; //concatena url com tipo de objeto
+		 urlView += idTipo + '/'; //concatena url com tipo de objeto
 		 
 		 $.getJSON(
 				    urlView, 

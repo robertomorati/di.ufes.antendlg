@@ -15,9 +15,9 @@ from django.views.generic import TemplateView, ListView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from editor_objetos.models import Objeto, TipoObjeto, Icone, Aventura, InstanciaObjeto, PosicaoGeografica
 from django.core import serializers
-from forms import AventuraForm, AventuraWithoutFieldsForm, InstanciaObjetoCreateForm, PosicaoGeograficaCreateForm
+from forms import AventuraForm, AventuraWithoutFieldsForm, InstanciaObjetoCreateForm, PosicaoGeograficaCreateForm, InstanciaObjetoUpdateForm
 from django.core.context_processors import request
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 import json
 from core.ajax import AjaxableResponseMixin
 
@@ -265,6 +265,7 @@ class InstanciaObjetoCreateView(AjaxableResponseMixin, CreateView):
         object_list = Objeto.objects.all().filter(pk=pos[0]['id_objeto'])
         
         qntde = 0
+        #recupera quantidade
         for obj in object_list:#always return one object, because the id/pk is unique
             qntde = obj.quantidade
         #utilizado no if de comparacao a seguir
@@ -275,23 +276,32 @@ class InstanciaObjetoCreateView(AjaxableResponseMixin, CreateView):
         flag = False #permissão para criar outra instancia
        
         #permissao para criar mais instancias
-        qntde_new_inst_obj = 0
-        if not  object_list:
-            qntde_new_inst_obj = 1
-        else:
-            for obj in object_list:
-                if obj.instancia_cont == int(qntde):
-                    flag = True
-                if obj.instancia_cont >= qntde_new_inst_obj:
-                    qntde_new_inst_obj = obj.instancia_cont + 1;
-
+        #qntde_new_inst_obj = 0
+        #if not  object_list:
+        #    qntde_new_inst_obj = 1
+        #else:
+        #    for obj in object_list:
+        #        if obj.instancia_cont == int(qntde):
+        #            flag = True
+        #        if obj.instancia_cont >= qntde_new_inst_obj:
+        #            qntde_new_inst_obj = obj.instancia_cont + 1;
+        
+        #calcula a quantidade de instancias
+        qnt_total_instancias = 0;
+        for obj in object_list:
+            qnt_total_instancias += 1;
+            
+        if qnt_total_instancias >= int(qntde):
+            flag = True
+            
+        
         #salva objeto
         data_return = {'pk': 0,}
         if flag == False:
             form.instance.nome = pos[0]['nome']
             form.instance.objeto_id = pos[0]['id_objeto']
             form.instance.aventura_id =  self.request.session[SESSION_AVENTURA].id
-            form.instance.instancia_cont = qntde_new_inst_obj
+            #form.instance.instancia_cont = qntde_new_inst_obj
             self.object = form.save()
             response = super(AjaxableResponseMixin, self).form_valid(form)
             data_return = {'pk': self.object.id,}
@@ -334,15 +344,51 @@ class InstanciaObjetoGetJsonView(ListView):
 
         return HttpResponse(json_inst_objetos)
 
+class InstanciaObjetoUpdateView(UpdateView):
+    template_name = 'editor_objetos/instancia_objeto/update.html'
+    model = InstanciaObjeto
+    form_class = InstanciaObjetoUpdateForm
+    #success_url = "success-url"
+    
+    #def get_object(self):
+    #    return Objeto.objects.get(pk=self.request.GET.get('pk'))
+    #def get_success_url(self):
+    #    return reverse('gmaps_view')
+    
+    def form_valid(self, form):
+        self.object = form.save()    
+        #return HttpResponseRedirect(self.get_success_url())
+        return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")
+    
+class InstanciaObjetoDeleteView(DeleteView):
+    #template_name = 'editor_objetos/instancia_objeto/update.html'
+    model = InstanciaObjeto;
+    
+    #Override no delete para retornar uma resposta json caso o objeto seja deletado com sucesso
+    def delete(self, request, *args, **kwargs):
+ 
+        
+        self.object = self.get_object()
 
-   
+        #if not object_list:   
+        self.object.delete()
+        #else:
+        #    ValidationError
+        #    messages.error(request, "".join("Não é possível deletar o objeto " + self.object.nome) + ", pois existem instâncias deste objeto!")
+        #    return HttpResponse(json.dumps({'response': 'exception delete'}), content_type="text")
+    
+        return HttpResponse(json.dumps({'response': 'delete'}), content_type="application/json")
+    
+        #def get_success_url(self):
+        #    return reverse('gmaps_view') 
+    
 '''
 ================================================================================
                           Views para Posicao Geografica
 =================================================================================
 '''
 
-#cria a posicao geografica para um objeto
+#Cria a posição geográfica para o objeto
 class PosicaoGeograficaCreateView(AjaxableResponseMixin, CreateView):  
     #template_name = 'editor_objetos/instancia_objeto/create.html'
     model = PosicaoGeografica
@@ -372,7 +418,38 @@ class PosicaoGeograficaCreateView(AjaxableResponseMixin, CreateView):
         else:
             return response 
 
+#Atualiza a posicao geográfica do objeto
+class PosicaoGeograficaUpdateView(AjaxableResponseMixin, UpdateView):  
+    #template_name = 'editor_objetos/instancia_objeto/create.html'
+    model = PosicaoGeografica
+    form_class = PosicaoGeograficaCreateForm
     
+    def get_success_url(self):
+        return reverse('gmaps_view') 
+
+    
+    def form_valid(self, form,*args, **kwargs):
+        # We make sure to call the parent's form_valid() method because
+        # it might do some processing (in the case of CreateView, it will
+        # call form.save() for example).,
+        # json print self.request.body
+
+        pos = json.loads(self.request.body)
+
+        form.instance.latitude = pos[0]['latitude']
+        form.instance.longitude = pos[0]['longitude']
+        #form.instance.instancia_objeto_id = pos[0]['instancia_objeto_id']
+        form.instance.altitude = pos[0]['altitude']
+        self.object = form.save()
+        response = super(AjaxableResponseMixin, self).form_valid(form)
+        if self.request.is_ajax():
+            data = {
+                'pk': self.object.pk,
+            }
+            return self.render_to_json_response(data)
+        else:
+            return response    
+         
 '''
 ====================================================================
                         Views para GMapView

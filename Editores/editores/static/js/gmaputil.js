@@ -1,15 +1,20 @@
 		
-		var intancias_objetos_json;//utiliazdo para manter o map atualizado com as instâncias da aventura em execução
+		var intancias_objetos_json;//backup das instâncias do servidor para evitar requisições desnecessárias. 
  	   
 		/**
-		 * Inicializa o Google Maps
+		 * Função que inicializa o google maps v3
+		 * 
 		 */
 		var $map;
         var $latlng;
         var overlay;
         var markers = [];
+        //flag para evitar a chamada desnecessária do "ajax" que cria a POS da instância do objeto. Por exemplo, no momento que o objeto é arrastado.
+        var flagloadInstancias = false; 
+        var flagloadBackupInstances = false;
         function initialize() {
         
+        	//ponto inicial do mapa
 	        var $latlng = new google.maps.LatLng(-20.274636854719642, -40.304203033447266);
 	        var myOptions = {
 	          zoom: 16,
@@ -34,6 +39,7 @@
 	        $map = new google.maps.Map(document.getElementById("map-canvas"),myOptions);
         
 	        // This is needed to set the zoom after fitbounds, 
+	        //após localizar um novo local para a aventura, este "código" faz o "ajuste" do zoom
 	        google.maps.event.addListener($map, 'zoom_changed', function() {
 	                zoomChangeBoundsListener = google.maps.event.addListener($map, 'bounds_changed', function(event) {
 	                                if (this.getZoom() >= 15 && this.initialZoom == true) {
@@ -49,7 +55,8 @@
 	        var defaultBounds = new google.maps.LatLngBounds($latlng);
 	        $map.initialZoom = true;//position start
 	        $map.fitBounds(defaultBounds);
-	          
+
+	        
 	         // Create the search box and link it to the UI element.
 	         var input = document.getElementById('target');
 	         var searchBox = new google.maps.places.SearchBox(input);
@@ -79,7 +86,7 @@
 		                anchor: new google.maps.Point(17, 34),
 		                scaledSize: new google.maps.Size(25, 25)
 		              };
-		
+		              
 		              // Create a marker for each place.
 		              // Removido, pois ao localizar um lugar está função atribui um marker desnecessário para o autor da aventura.
 		             /* var marker = new google.maps.Marker({
@@ -93,25 +100,31 @@
 		
 		              bounds.extend(place.geometry.location);
 		              
-		              //atualizar posicao da aventura que estiver ativa
+		              //Atualiza a posição da aventura que estiver ativa
+		              
 				       jsonObj = '[{"latitude":"' + place.geometry.location.lat() + '"' + ',"longitude":"' + place.geometry.location.lng() + '"}]';
-				      //get id aventura ativa
+				      //Getting id aventura from bar user
 				       id_aventura = $('body').find('aventura_ativa_id').attr('id');
 				       
+				      //create url "to" update aventura
 				       var urlView = '/editor_objetos/set_json_aventura/';
-				       urlView += id_aventura + '/'; //concatena url com id da aventura
+				       urlView += id_aventura + '/'; 
 				       
 				       $.ajax({
-							 headers: { "X-CSRFToken": getCookie("csrftoken") },
+							 headers: { "X-CSRFToken": getCookie("csrftoken") },//token django
 						     type:"POST",
 						     url:urlView,
 						     data: jsonObj,
 						     success: function(data,status){	 
-						    	 //alert("Data: " + data + "\nStatus: " + status + "   "); 
-						    	 
+						    	 //matém o zoom 15...
 						      	 if(flagCount == 0){  
+						      		 	//recupera instâncias de objeto para aventura
+						      		 	flagloadInstancias = true;
+						      		 	flagloadBackupInstances = true;
+						      		 	loadInstancias();
 						      		    $map.setZoom(15);
-							            openModal('/editor_objetos/gmap/msg/','msg');//posicao_aventura_view nao foi "disp" para url
+						      		    //show user msg, says: "aventura com posição atualizada"
+							            openModal('/editor_objetos/gmap/msg/','msg');
 							            $('#msg').modal('show');
 							            flagCount += 1;
 							      }
@@ -120,7 +133,7 @@
 						     error: function(xhr) {
 						    	  if(flagCount == 0){
 						        	alert("Erro ao atualizar posição geográfica da aventura. Certifique-se de que existe alguma aventura em modo de auntoria." +
-						        		  " Ou vá para o meno Configurações Aventura -> Editar Aventura e ative uma aaventura para ser autorada!");
+						        		  " Ou vá para o meno Configurações Aventura -> Editar Aventura e ative uma aventura para ser 'autorada'!");
 						        	flagCount += 1;
 						     		}
 						        }
@@ -144,7 +157,8 @@
         overlay.draw = function() {};
         overlay.setMap($map);
         
-        loadInstâncias();
+        flagloadInstancias = true;
+        loadInstancias();
         
         } 
 	
@@ -159,12 +173,8 @@
 	 */
 	function placeMarker(location,icon, id, name_objeto) {
 
-	  //cria instância do objeto qndo o mesmo é arrastado para o mapa.
-	  var pos = "" + location;
-	  var res = pos.split(",");
-	  var lat = res[0].replace('(', '');
-	  var lng = res[1].replace(')', '');
-	  
+    
+	  //json para criação da instância do objeto
 	  var json_instancia_objeto = '[{"nome":"' + name_objeto + '"' + ',"id_objeto":"' + id +'"}]';
 	  urlView = '/editor_objetos/instancia_objeto/create_instancia/';
 	  
@@ -177,46 +187,13 @@
 		    	 if(data.pk == 0){
 		    		 alert("Impossível criar mais instâncias do objeto " + name_objeto + ". Quantidade de isntâncias no limite.");
 		    	 }else{
-		    		 
-			    		  //cria um novo marcador para a instância do objeto
-			    		  var marker = new google.maps.Marker({		
-			    			  map: $map,
-			    			  position: location, 
-			    			  draggable:true,	
-			    			  icon:	icon,
-			    			  zIndex: 5
-			    		  });
-			    		  
-			    		  //http://jsfiddle.net/kjy112/3CvaD/
-			    		  marker['infowindow'] = new google.maps.InfoWindow({
-			    	            content: "<div id='instancia"+name_objeto+"' class='form-actions'> Instância de " + name_objeto  +" </div>"
-			    	            //construir dados 
-			    	            
-			    	            
-			    	      });
-			    		  
-			    		  google.maps.event.addListener(marker, 'click', function() {
-			    		       this['infowindow'].open($map, this);
-			    		  });
-			    		  
-			    		  markers.push(marker);
-			    		 
-			    		 //alert("criou instancia");
-			    		//cria posicao para a instância do objeto
-			    		json_pos = '[{"latitude":"' + lat + '"' + ',"longitude":"' + lng + '"' + ',"altitude":"' + '0.0' + '"' + ',"instancia_objeto_id":"' + data.pk + '"}]';
-			    		$.ajax({
-					   			 headers: { "X-CSRFToken": getCookie("csrftoken") },
-					   		     type:"POST",
-					   		     url:'/editor_objetos/posicao_geografica/create_pos/',
-					   		     data: json_pos,
-					   		     success: function(data,status){
-					   		    	 	//pos salva
-					   		     },
-							     error: function(xhr) {
-							        	alert("Erro ao salvar posicao geografica do objeto.");
-							     }
-			    		});
-		    	}
+		    		    //cria uma nova instância, e atualiza o backup de instâncias
+		    		    flagloadBackupInstances = false;
+		    		    flagloadInstancias = false;
+		    		    loadInstancias();
+		    		 	placeInstancesGoogleMap(location,icon, data.pk, name_objeto);
+				    	
+		    	 	}//fim do else
 		     },
 		     error: function(xhr) {
 		        	alert("Erro criar instância do objeto.");
@@ -225,7 +202,139 @@
 
 	}
 	
+	/**
+	 * Função para adicionar instância no mapa
+	 * @param location
+	 * @param icon
+	 * @param id_instancia
+	 * @param name_objeto
+	 * @param interacoes
+	 */
+	function placeInstancesGoogleMap(location,icon, id_instancia, name_objeto){
+		
+		  //cria uma instância do objeto, quando o mesmo é arrastado para o mapa
+		  var pos = "" + location;
+		  var res = pos.split(",");
+		  var lat = res[0].replace('(', '');
+		  var lng = res[1].replace(')', '');
+		  
+		  //cria um novo marcador para a instância do objeto
+		  var marker = new google.maps.Marker({		
+			  map: $map,
+			  position: location,
+			  draggable:true,	
+			  icon:	icon,
+			  zIndex: 5,
+		  });
+		  //http://jsfiddle.net/kjy112/3CvaD/
+		  marker['infowindow'] = new google.maps.InfoWindow({ 
+			    maxWidth: 600,
+	      });
+		  
+		  var info;
+		  google.maps.event.addListener(marker, 'click', function() {
 	
+		       urlIO = '/editor_objetos/instancia_objeto/update_instancia/' +  marker.metadata.id + '/';
+		       
+		       this['infowindow'].open($map, this);
+		       info = this['infowindow'];
+		       var rmMaker = marker;
+		       //De acordo com "fontes" no stackoverflow, a forma mais eficiente para carregar o conteúdo na infowindow é por meio de ajax.
+		       $.ajax({	
+		    	    type: 'GET',
+		    	    url: urlIO,
+		    	    success: function(data){
+
+		    	  
+		    	    	google.maps.event.addListener(info, 'domready', function(event) {
+		    	    	  
+		    	    	  var options = {
+		    	  				target : '#contentInstance',
+		    	  				success : showResponse,
+		    	  				error: showsomething,
+		    	  				async: false 
+		    	  			};
+		    	    	  
+		    	  			// post-submit callback 
+		    	  			function showResponse(responseText, statusText, xhr, $form) {
+		    	  				
+		    	  				var ct = xhr.getResponseHeader("content-type") || "";
+		    	  				
+		    	  				if(responseText.response == "delete"){
+		    	  					info.close();//fecha infowindow
+		    	  					rmMaker.setMap(null);//remove marcador
+		    	  					flagloadBackupInstances = false;//atualizar backup de instâncias que estão sendo editadas
+		    	  					loadInstancias();
+		    	  				}else if (ct.indexOf('json') > -1) {
+		    	  					 info.close();//após atualizar fecha a infowindow
+		    	  				}
+		    	  			}
+		    	  			
+		    	  			function showsomething(){
+		    	  				alert("Ocorreu um erro ao recuperar o conteúdo da instância. Por gentileza, tente a operação novamente!");
+		    	  			}
+
+		    	  			$('#instancia_objeto_update_view').ajaxForm(options);
+		    	  			$('#instancia_objeto_delete_view').ajaxForm(options);
+		    	    	  
+		    	      });//fim do script para tratar o json
+		    	    	
+		    	       info.setContent(data);
+		    	       
+		    	    },
+				     error: function(xhr) {
+				        	alert("Ocorreu um erro ao carregar os dados da instância!");
+				     }
+		    	});
+		       
+		  });
+		  
+		  markers.push(marker);
+	     //add id da instância no marcado
+		  marker.metadata = {id: id_instancia};
+		
+		   //só cria posição caso for uma nova instância
+		   if(flagloadInstancias == false){
+				//cria posicao para a instância do objeto
+				json_pos = '[{"latitude":"' + lat + '"' + ',"longitude":"' + lng + '"' + ',"altitude":"' + '0.0' + '"' + ',"instancia_objeto_id":"' + id_instancia + '"}]';
+				$.ajax({
+			   			 headers: { "X-CSRFToken": getCookie("csrftoken") },
+			   		     type:"POST",
+			   		     url:'/editor_objetos/posicao_geografica/create_pos/',
+			   		     data: json_pos,
+			   		     success: function(data,status){
+			   		    	 //pos salva
+			   		     },
+					     error: function(xhr) {
+					        	alert("Erro ao salvar posicao geografica do objeto.");
+					     }
+				});//fim fo ajax
+		   }//fim do if
+		
+			 //qndo o marcador é largado novamente é feito o update.
+	         google.maps.event.addListener(marker, 'dragend', function() {
+	         var curLatLng = marker.getPosition();
+	       
+	         //json contendo nova pos
+	  		json_pos = '[{"latitude":"' + curLatLng.lat() + '"' + ',"longitude":"' + curLatLng.lng() + '"' + ',"altitude":"' + '0.0' + '"}]';
+	  		$.ajax({
+			   			 headers: { "X-CSRFToken": getCookie("csrftoken") },
+			   		     type:"POST",
+			   		     url:'/editor_objetos/posicao_geografica/update_pos/'+marker.metadata.id+'/',
+			   		     data: json_pos,
+			   		     success: function(data,status){
+			   		    	 	//pos atualizada
+			   		    	    //atualiza backup de instâncias
+			   		    	 	flagloadBackupInstances = false;
+			   		    	 	loadInstancias();
+			   		     },
+					     error: function(xhr) {
+					        	alert("Erro ao salvar posicao geografica do objeto.");
+					     }
+	  		});
+	      });// fim da  google.maps.event.addListener
+	         
+	}//fim da funcion
 	
 	/**
 	 * Carrega instâncias do objeto
@@ -233,9 +342,9 @@
 	 * Momentos em que está função ocorre: 
 	 * -ativação de aventura;
 	 * -sair e voltar para o google maps;
-	 * -alterar o local da aventura;
+	 * -criar nova instância, atualiza o backup
 	 */
-	function loadInstâncias(){
+	function loadInstancias(){
 		
 		//verifica se existe alguma aventura ativa na barra do usuário
 		var aventura_id = '-1';
@@ -245,58 +354,42 @@
 		if(aventura_id != '-1'){
     		urlView = '/editor_objetos/instancia_objeto/get_instancia/' + aventura_id  + '/';
     		
-			//ajax to get all instances by aventura_id
-			$.ajax({
-	   		     type:"GET",
-	   		     url:urlView,
-	   		     success: function(data,status){
-	   		    	intancias_objetos_json = data;
-	   		    	var instancias = $.parseJSON(intancias_objetos_json);
-	   		    	placeListMakers(instancias);
-	   		     },
-			     error: function(xhr) {
-			        	alert("Erro ao recuperar lista de instâncias de objetios.");
-			     }
-			});
+    		if(flagloadBackupInstances == false){
+ 
+				//ajax to get all instances by aventura_id
+				$.ajax({
+		   		     type:"GET",
+		   		     url:urlView,
+		   		     success: function(data,status){
+		   		    	 
+		   		    	flagloadBackupInstances = true;
+		   		    	intancias_objetos_json = data;//backup das instâncias
+		   		    
+		   		     
+		   		     },
+				     error: function(xhr) {
+				        	alert("Erro ao recuperar lista de instâncias de objetios.");
+				     }
+				});
+    		}//fim do if flagloadBackupInstances
+    		else{
+    			
+    			var instancias = $.parseJSON(intancias_objetos_json);
+    			for (i=0;i<instancias.length;i++){  	
+    				var loc = new google.maps.LatLng(instancias[i].lat, instancias[i].lng);
+    				placeInstancesGoogleMap(loc,instancias[i].url_icone, instancias[i].id, instancias[i].nome );
+    			}
+    			
+    		}
+		}else{
+			intancias_objetos_json = "";//limpa backup
 		}
 		
 	}
 	
-	/**
-	 * Recebe ums lista de instâncias de objetos com respectivas urls dos icones de seus objetos e aplica no google maps
-	 * @param intancias_objetos_json
-	 */
-	function placeListMakers(instancias){
-		
-			
-			//loop para ler intancias_objetos_json
-			for (i=0;i<instancias.length;i++){
-				//alert(instancias[i].id + " " + instancias[i].nome + " " + instancias[i].url_icone + " " + instancias[i].lat + " " + instancias[i].lng + " " + instancias[i].altd);
-				//cria um novo marcador para a instância do objeto
-				 var location = new google.maps.LatLng(instancias[i].lat, instancias[i].lng);
-				 
-				 var marker = new google.maps.Marker({		
-					  map: $map,
-					  position: location, 
-					  draggable:true,	
-					  icon:	 instancias[i].url_icone,
-					  zIndex: 5
-				  });
-				  
-				  //http://jsfiddle.net/kjy112/3CvaD/
-				  marker['infowindow'] = new google.maps.InfoWindow({
-			            content: "<div id='instancia"+instancias[i].nome+"' class='form-actions'> Instância de " + instancias[i].nome  +" </div>"
-			            //construir dados 
-			      });
-				  
-				  google.maps.event.addListener(marker, 'click', function() {
-				       this['infowindow'].open($map, this);
-				  });
-				  
-				  markers.push(marker);
-			}
-		
-	}
+	
+	
+	
 	
 	/**
 	 * Ao clicar na instâ, está função posiciona o mapa, o centro do mapa na instancia.
@@ -450,3 +543,61 @@ function createMarker(position) {
 	var marker = new google.maps.GMarker(myLatLng);
 	map.addOverlay(marker);
 }*/
+	
+   /**
+	 * Recebe ums lista de instâncias de objetos com respectivas urls dos icones de seus objetos e aplica no google maps
+	 * Função não está mais sendo utilizada.
+	 * @param intancias_objetos_json
+	 
+	function placeListMakers(instancias){
+		
+			
+			//loop para ler intancias_objetos_json
+			for (i=0;i<instancias.length;i++){
+				//alert(instancias[i].id + " " + instancias[i].nome + " " + instancias[i].url_icone + " " + instancias[i].lat + " " + instancias[i].lng + " " + instancias[i].altd);
+				//cria um novo marcador para a instância do objeto
+				 var location = new google.maps.LatLng(instancias[i].lat, instancias[i].lng);
+				 
+				 var marker = new google.maps.Marker({		
+					  map: $map,
+					  position: location, 
+					  draggable:true,	
+					  icon:	 instancias[i].url_icone,
+					  zIndex: 5
+				  });
+				  
+				  //http://jsfiddle.net/kjy112/3CvaD/
+				  marker['infowindow'] = new google.maps.InfoWindow({
+			            content: "<div id='instancia"+instancias[i].nome+"' class='form-actions'> Instância de " + instancias[i].nome  +" </div>"
+			            //construir dados 
+			      });
+				  
+				  google.maps.event.addListener(marker, 'click', function() {
+				       this['infowindow'].open($map, this);
+				  });
+				  
+				  markers.push(marker);
+				  marker.metadata = {id: instancias[i].id};
+		  	       
+				 google.maps.event.addListener(marker, 'dragend', function() {
+			            var curLatLng = marker.getPosition();
+			          
+			            //atualiza a posicao para novo drag drop
+			    		json_pos = '[{"latitude":"' + curLatLng.lat() + '"' + ',"longitude":"' + curLatLng.lng() + '"' + ',"altitude":"' + '0.0' + '"' + ',"instancia_objeto_id":"' + marker.metadata.id + '"}]';
+			    		$.ajax({
+					   			 headers: { "X-CSRFToken": getCookie("csrftoken") },
+					   		     type:"POST",
+					   		     url:'/editor_objetos/posicao_geografica/update_pos/',
+					   		     data: json_pos,
+					   		     success: function(data,status){
+					   		    	 	alert("eita");
+					   		     },
+							     error: function(xhr) {
+							        	alert("Erro ao salvar posicao geografica do objeto.");
+							     }
+			    		});
+			        });
+			}
+		
+	}//fim da placeListMakers
+	*/

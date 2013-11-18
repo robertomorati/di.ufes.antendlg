@@ -47,53 +47,6 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal('editor_objetos', ['Objeto'])
 
-        # Adding model 'InstanciaObjeto'
-        db.create_table('editor_objetos_instanciaobjeto', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('nome', self.gf('django.db.models.fields.CharField')(max_length=30)),
-            ('proximidade', self.gf('django.db.models.fields.IntegerField')(default=1, max_length=3)),
-            ('visivel', self.gf('django.db.models.fields.BooleanField')(default=True)),
-            ('encenacao', self.gf('django.db.models.fields.CharField')(default=0, max_length=1)),
-            ('objeto', self.gf('django.db.models.fields.related.ForeignKey')(default='', related_name='instancias_objeto', blank=True, to=orm['editor_objetos.Objeto'])),
-            ('sugestao', self.gf('django.db.models.fields.related.ForeignKey')(default='', related_name='sugestao_objeto', blank=True, to=orm['editor_objetos.Sugestao'])),
-            ('num_instancia', self.gf('django.db.models.fields.IntegerField')(default=1, max_length=3)),
-            ('dialogo', self.gf('django.db.models.fields.TextField')(blank=True)),
-        ))
-        db.send_create_signal('editor_objetos', ['InstanciaObjeto'])
-
-        # Adding model 'PosicaoGeografica'
-        db.create_table('editor_objetos_posicaogeografica', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('latitude', self.gf('django.db.models.fields.FloatField')()),
-            ('longitude', self.gf('django.db.models.fields.FloatField')()),
-            ('altitude', self.gf('django.db.models.fields.FloatField')()),
-        ))
-        db.send_create_signal('editor_objetos', ['PosicaoGeografica'])
-
-        # Adding M2M table for field instancia_objeto on 'PosicaoGeografica'
-        db.create_table('editor_objetos_posicaogeografica_instancia_objeto', (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('posicaogeografica', models.ForeignKey(orm['editor_objetos.posicaogeografica'], null=False)),
-            ('instanciaobjeto', models.ForeignKey(orm['editor_objetos.instanciaobjeto'], null=False))
-        ))
-        db.create_unique('editor_objetos_posicaogeografica_instancia_objeto', ['posicaogeografica_id', 'instanciaobjeto_id'])
-
-        # Adding model 'ImagemObjeto'
-        db.create_table('editor_objetos_imagemobjeto', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('imagem', self.gf('django.db.models.fields.files.ImageField')(max_length=100)),
-            ('descricao', self.gf('django.db.models.fields.CharField')(max_length=100)),
-        ))
-        db.send_create_signal('editor_objetos', ['ImagemObjeto'])
-
-        # Adding model 'TipoImagem'
-        db.create_table('editor_objetos_tipoimagem', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('tipo', self.gf('django.db.models.fields.CharField')(default=0, max_length=1)),
-            ('descricao', self.gf('django.db.models.fields.CharField')(max_length=100)),
-        ))
-        db.send_create_signal('editor_objetos', ['TipoImagem'])
-
         # Adding model 'Autor'
         db.create_table('editor_objetos_autor', (
             ('user_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['auth.User'], unique=True, primary_key=True)),
@@ -116,6 +69,40 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal('editor_objetos', ['Aventura'])
 
+        # Adding model 'InstanciaObjeto'
+        db.create_table('editor_objetos_instanciaobjeto', (
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('nome', self.gf('django.db.models.fields.CharField')(max_length=30)),
+            ('proximidade', self.gf('django.db.models.fields.IntegerField')(default=1, max_length=3)),
+            ('visivel', self.gf('django.db.models.fields.BooleanField')(default=True)),
+            ('encenacao', self.gf('django.db.models.fields.CharField')(default='DS', max_length=14, blank=True)),
+            ('objeto', self.gf('django.db.models.fields.related.ForeignKey')(default='', related_name='instancias_objeto', blank=True, to=orm['editor_objetos.Objeto'])),
+            ('sugestao', self.gf('django.db.models.fields.related.ForeignKey')(default='', related_name='sugestao_objeto', null=True, blank=True, to=orm['editor_objetos.Sugestao'])),
+            ('aventura', self.gf('django.db.models.fields.related.ForeignKey')(default='', related_name='aventura_inst_obj', null=True, blank=True, to=orm['editor_objetos.Aventura'])),
+            ('instancia_cont', self.gf('django.db.models.fields.IntegerField')(default=0, max_length=3)),
+            ('dialogo', self.gf('django.db.models.fields.TextField')(blank=True)),
+        ))
+        db.send_create_signal('editor_objetos', ['InstanciaObjeto'])
+
+        # Adding model 'PosicaoGeografica'
+        db.create_table('editor_objetos_posicaogeografica', (
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('latitude', self.gf('django.db.models.fields.FloatField')()),
+            ('longitude', self.gf('django.db.models.fields.FloatField')()),
+            ('altitude', self.gf('django.db.models.fields.FloatField')()),
+            ('instancia_objeto', self.gf('django.db.models.fields.related.ForeignKey')(default='', related_name='pos_inst_objeto', blank=True, to=orm['editor_objetos.InstanciaObjeto'])),
+        ))
+        db.send_create_signal('editor_objetos', ['PosicaoGeografica'])
+
+        # Adding model 'TipoImagem'
+        db.create_table('editor_objetos_tipoimagem', (
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('tipo', self.gf('django.db.models.fields.CharField')(default='0', max_length=1)),
+            ('img', self.gf('django.db.models.fields.files.FileField')(max_length=100, null=True, blank=True)),
+            ('descricao', self.gf('django.db.models.fields.CharField')(default='', max_length=100)),
+        ))
+        db.send_create_signal('editor_objetos', ['TipoImagem'])
+
         # Adding model 'NivelAutor'
         db.create_table('editor_objetos_nivelautor', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
@@ -136,26 +123,20 @@ class Migration(SchemaMigration):
         # Deleting model 'Objeto'
         db.delete_table('editor_objetos_objeto')
 
+        # Deleting model 'Autor'
+        db.delete_table('editor_objetos_autor')
+
+        # Deleting model 'Aventura'
+        db.delete_table('editor_objetos_aventura')
+
         # Deleting model 'InstanciaObjeto'
         db.delete_table('editor_objetos_instanciaobjeto')
 
         # Deleting model 'PosicaoGeografica'
         db.delete_table('editor_objetos_posicaogeografica')
 
-        # Removing M2M table for field instancia_objeto on 'PosicaoGeografica'
-        db.delete_table('editor_objetos_posicaogeografica_instancia_objeto')
-
-        # Deleting model 'ImagemObjeto'
-        db.delete_table('editor_objetos_imagemobjeto')
-
         # Deleting model 'TipoImagem'
         db.delete_table('editor_objetos_tipoimagem')
-
-        # Deleting model 'Autor'
-        db.delete_table('editor_objetos_autor')
-
-        # Deleting model 'Aventura'
-        db.delete_table('editor_objetos_aventura')
 
         # Deleting model 'NivelAutor'
         db.delete_table('editor_objetos_nivelautor')
@@ -222,22 +203,17 @@ class Migration(SchemaMigration):
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'nome': ('django.db.models.fields.CharField', [], {'max_length': '30'})
         },
-        'editor_objetos.imagemobjeto': {
-            'Meta': {'object_name': 'ImagemObjeto'},
-            'descricao': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'imagem': ('django.db.models.fields.files.ImageField', [], {'max_length': '100'})
-        },
         'editor_objetos.instanciaobjeto': {
             'Meta': {'object_name': 'InstanciaObjeto'},
+            'aventura': ('django.db.models.fields.related.ForeignKey', [], {'default': "''", 'related_name': "'aventura_inst_obj'", 'null': 'True', 'blank': 'True', 'to': "orm['editor_objetos.Aventura']"}),
             'dialogo': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'encenacao': ('django.db.models.fields.CharField', [], {'default': '0', 'max_length': '1'}),
+            'encenacao': ('django.db.models.fields.CharField', [], {'default': "'DS'", 'max_length': '14', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'instancia_cont': ('django.db.models.fields.IntegerField', [], {'default': '0', 'max_length': '3'}),
             'nome': ('django.db.models.fields.CharField', [], {'max_length': '30'}),
-            'num_instancia': ('django.db.models.fields.IntegerField', [], {'default': '1', 'max_length': '3'}),
             'objeto': ('django.db.models.fields.related.ForeignKey', [], {'default': "''", 'related_name': "'instancias_objeto'", 'blank': 'True', 'to': "orm['editor_objetos.Objeto']"}),
             'proximidade': ('django.db.models.fields.IntegerField', [], {'default': '1', 'max_length': '3'}),
-            'sugestao': ('django.db.models.fields.related.ForeignKey', [], {'default': "''", 'related_name': "'sugestao_objeto'", 'blank': 'True', 'to': "orm['editor_objetos.Sugestao']"}),
+            'sugestao': ('django.db.models.fields.related.ForeignKey', [], {'default': "''", 'related_name': "'sugestao_objeto'", 'null': 'True', 'blank': 'True', 'to': "orm['editor_objetos.Sugestao']"}),
             'visivel': ('django.db.models.fields.BooleanField', [], {'default': 'True'})
         },
         'editor_objetos.nivelautor': {
@@ -259,7 +235,7 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'PosicaoGeografica'},
             'altitude': ('django.db.models.fields.FloatField', [], {}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'instancia_objeto': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'related_name': "'pos_inst_objeto'", 'blank': 'True', 'to': "orm['editor_objetos.InstanciaObjeto']"}),
+            'instancia_objeto': ('django.db.models.fields.related.ForeignKey', [], {'default': "''", 'related_name': "'pos_inst_objeto'", 'blank': 'True', 'to': "orm['editor_objetos.InstanciaObjeto']"}),
             'latitude': ('django.db.models.fields.FloatField', [], {}),
             'longitude': ('django.db.models.fields.FloatField', [], {})
         },
@@ -272,9 +248,10 @@ class Migration(SchemaMigration):
         },
         'editor_objetos.tipoimagem': {
             'Meta': {'object_name': 'TipoImagem'},
-            'descricao': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
+            'descricao': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '100'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'tipo': ('django.db.models.fields.CharField', [], {'default': '0', 'max_length': '1'})
+            'img': ('django.db.models.fields.files.FileField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
+            'tipo': ('django.db.models.fields.CharField', [], {'default': "'0'", 'max_length': '1'})
         },
         'editor_objetos.tipoobjeto': {
             'Meta': {'object_name': 'TipoObjeto'},

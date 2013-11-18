@@ -8,53 +8,15 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Deleting model 'ImagemObjeto'
-        db.delete_table('editor_objetos_imagemobjeto')
-
-        # Adding field 'TipoImagem.img'
-        db.add_column('editor_objetos_tipoimagem', 'img',
-                      self.gf('django.db.models.fields.files.FileField')(max_length=100, null=True, blank=True),
-                      keep_default=False)
-
-        # Adding field 'PosicaoGeografica.instancia_objeto'
-        db.add_column('editor_objetos_posicaogeografica', 'instancia_objeto',
-                      self.gf('django.db.models.fields.related.ForeignKey')(default='', related_name='pos_inst_objeto', blank=True, to=orm['editor_objetos.InstanciaObjeto']),
-                      keep_default=False)
-
-        # Removing M2M table for field instancia_objeto on 'PosicaoGeografica'
-        db.delete_table('editor_objetos_posicaogeografica_instancia_objeto')
-
-        # Adding field 'InstanciaObjeto.aventura'
-        db.add_column('editor_objetos_instanciaobjeto', 'aventura',
-                      self.gf('django.db.models.fields.related.ForeignKey')(default='', related_name='aventura', blank=True, to=orm['editor_objetos.Aventura']),
-                      keep_default=False)
+        # Deleting field 'InstanciaObjeto.instancia_cont'
+        db.delete_column('editor_objetos_instanciaobjeto', 'instancia_cont')
 
 
     def backwards(self, orm):
-        # Adding model 'ImagemObjeto'
-        db.create_table('editor_objetos_imagemobjeto', (
-            ('imagem', self.gf('django.db.models.fields.files.ImageField')(max_length=100)),
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('descricao', self.gf('django.db.models.fields.CharField')(max_length=100)),
-        ))
-        db.send_create_signal('editor_objetos', ['ImagemObjeto'])
-
-        # Deleting field 'TipoImagem.img'
-        db.delete_column('editor_objetos_tipoimagem', 'img')
-
-        # Deleting field 'PosicaoGeografica.instancia_objeto'
-        db.delete_column('editor_objetos_posicaogeografica', 'instancia_objeto_id')
-
-        # Adding M2M table for field instancia_objeto on 'PosicaoGeografica'
-        db.create_table('editor_objetos_posicaogeografica_instancia_objeto', (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('posicaogeografica', models.ForeignKey(orm['editor_objetos.posicaogeografica'], null=False)),
-            ('instanciaobjeto', models.ForeignKey(orm['editor_objetos.instanciaobjeto'], null=False))
-        ))
-        db.create_unique('editor_objetos_posicaogeografica_instancia_objeto', ['posicaogeografica_id', 'instanciaobjeto_id'])
-
-        # Deleting field 'InstanciaObjeto.aventura'
-        db.delete_column('editor_objetos_instanciaobjeto', 'aventura_id')
+        # Adding field 'InstanciaObjeto.instancia_cont'
+        db.add_column('editor_objetos_instanciaobjeto', 'instancia_cont',
+                      self.gf('django.db.models.fields.IntegerField')(default=0, max_length=3),
+                      keep_default=False)
 
 
     models = {
@@ -120,15 +82,14 @@ class Migration(SchemaMigration):
         },
         'editor_objetos.instanciaobjeto': {
             'Meta': {'object_name': 'InstanciaObjeto'},
-            'aventura': ('django.db.models.fields.related.ForeignKey', [], {'default': "''", 'related_name': "'aventura'", 'blank': 'True', 'to': "orm['editor_objetos.Aventura']"}),
+            'aventura': ('django.db.models.fields.related.ForeignKey', [], {'default': "''", 'related_name': "'aventura_inst_obj'", 'null': 'True', 'blank': 'True', 'to': "orm['editor_objetos.Aventura']"}),
             'dialogo': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'encenacao': ('django.db.models.fields.CharField', [], {'default': '0', 'max_length': '1'}),
+            'encenacao': ('django.db.models.fields.CharField', [], {'default': "'DS'", 'max_length': '14', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'nome': ('django.db.models.fields.CharField', [], {'max_length': '30'}),
-            'num_instancia': ('django.db.models.fields.IntegerField', [], {'default': '1', 'max_length': '3'}),
             'objeto': ('django.db.models.fields.related.ForeignKey', [], {'default': "''", 'related_name': "'instancias_objeto'", 'blank': 'True', 'to': "orm['editor_objetos.Objeto']"}),
             'proximidade': ('django.db.models.fields.IntegerField', [], {'default': '1', 'max_length': '3'}),
-            'sugestao': ('django.db.models.fields.related.ForeignKey', [], {'default': "''", 'related_name': "'sugestao_objeto'", 'blank': 'True', 'to': "orm['editor_objetos.Sugestao']"}),
+            'sugestao': ('django.db.models.fields.related.ForeignKey', [], {'default': "''", 'related_name': "'sugestao_objeto'", 'null': 'True', 'blank': 'True', 'to': "orm['editor_objetos.Sugestao']"}),
             'visivel': ('django.db.models.fields.BooleanField', [], {'default': 'True'})
         },
         'editor_objetos.nivelautor': {
@@ -166,7 +127,7 @@ class Migration(SchemaMigration):
             'descricao': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '100'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'img': ('django.db.models.fields.files.FileField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
-            'tipo': ('django.db.models.fields.CharField', [], {'default': '0', 'max_length': '1'})
+            'tipo': ('django.db.models.fields.CharField', [], {'default': "'0'", 'max_length': '1'})
         },
         'editor_objetos.tipoobjeto': {
             'Meta': {'object_name': 'TipoObjeto'},

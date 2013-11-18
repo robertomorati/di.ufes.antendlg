@@ -82,7 +82,6 @@ class Icone (models.Model):
             return storage.delete(path)
         raise ValidationError(u"Não é possível remover este ícone pois existem objetos relacionados à ele!")
 
-
     
 '''
 Sugestao é um elemente de percepção para a instância do objeto. 
@@ -214,21 +213,20 @@ InstanciaObjeto representa um objeto que é arrastado para o mapa da aventura
 Pendencias Finalizadas: Rever o atributo sugestão; Adicionar relação com a aventura;
 '''
 class InstanciaObjeto(models.Model):
-    DES = 0
-    AVATAR = 1
-    AGENTE = 2 
+    DESABILITADO = 'DS'
+    AVATAR = 'AV'
+    AGENTE = 'AG' 
     TIPO_ENCENACAO = (
-        (0, 'Desativado'),
-        (1, 'Avatar'),
-        (2, 'Agente'),)
+        (DESABILITADO, 'Desabilitado'),
+        (AVATAR, 'Avatar'),
+        (AGENTE, 'Agente'),)
     nome = models.CharField(max_length=30)
     proximidade = models.IntegerField(max_length=3,default=1)
     visivel = models.BooleanField(default=True, help_text=u"Informa se o objeto está visivel na aventura.")
-    encenacao = models.CharField(max_length=1, choices=TIPO_ENCENACAO ,default=DES,help_text=u"Indica o tipo de encenação que é possível com a instância do objeto.")
+    encenacao = models.CharField(max_length=14, choices=TIPO_ENCENACAO ,blank=True,default=DESABILITADO,help_text=u"Indica o tipo de encenação que é possível com a instância do objeto.")
     objeto = models.ForeignKey(Objeto, related_name="instancias_objeto",blank=True,default="",)
     sugestao = models.ForeignKey(Sugestao, related_name="sugestao_objeto", blank=True, default="", null=True, )
     aventura = models.ForeignKey(Aventura, related_name="aventura_inst_obj", blank=True, default="", null=True,)
-    instancia_cont = models.IntegerField(max_length=3,default=0,)
     dialogo = models.TextField('dialogo', blank=True)
     #dialogo = models.ForeignKey(Dialogo, related_name="dialogo",blank=True,)
     #posicao_geografica_ = models.ManyToManyField(PosicaoGeografica, related_name="pos_geo_inst_objeto",) 
@@ -244,7 +242,6 @@ Posições Geográficas para instâncias de objetos.
 @param  longitude
 @param altitude: para objetos em 3D apresentados por meio da camera do dispositivo move, como por exemplo com o uso do Wikitude.
 @param instancia_objeto: representa a relação com a instancia que possui esta posicao. 
-
 '''
 class PosicaoGeografica(models.Model):
     latitude = models.FloatField()
@@ -271,11 +268,11 @@ TipoImagem representa o tipo de imagem para a instância de objeto.
 @param img: url da imagem 
 '''
 class TipoImagem(models.Model):
-    IMG_MAP = 0
-    IMG_CAM = 1 
+    IMG_MAP = '0'
+    IMG_CAM = '1' 
     TIPO_IMAGEMS = (
-        (0, 'Imagem 2D'),
-        (1, 'Imagem 3D'),)
+        ('0', 'Imagem 2D'),
+        ('1', 'Imagem 3D'),)
     tipo = models.CharField(max_length=1, choices=TIPO_IMAGEMS ,default=IMG_MAP)
     img = models.FileField(upload_to ='imagens/img_play/',null=True, blank=True)
     descricao = models.CharField(max_length=100, default="")

@@ -153,3 +153,14 @@ color: black;
  	 .border-radius(4px);
 }
 
+
+div.infowindow {
+    max-height:250px;
+    overflow:scroll;
+}
+
+
+.centered
+{
+    text-align:center;
+}
