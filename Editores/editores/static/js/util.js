@@ -210,7 +210,9 @@ function refreshDiv(urlView,idDiv) {
 				var id = $(this).attr('id');
 				var name_objeto = $(this).attr('alt');
 
+				//essa função delega o tipo marker ou Polygon.
 				createInstance(loc,icon, id, name_objeto);
+				
 			}
 		
 		});	

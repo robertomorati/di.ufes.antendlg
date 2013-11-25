@@ -8,7 +8,7 @@ from django.conf.urls import patterns, url
 from core.views import TipoObjetoUpdateView, TipoObjetoCreateView, TipoObjetoListView, TipoObjetoDeleteView, TipoObjetoGetJsonView
 from core.views import ObjetoCreateView, ObjetoUpdateView, ObjetoListView, ObjetoDeleteView, ObjetoGetJsonView
 from core.views import IconeCreateView, IconeListView, IconeUpdateView, IconeDeleteView, IconeGetJsonView
-from core.views import GMapView, MsgShowView, PosicaoGeograficaCreateView, PosicaoGeograficaUpdateView
+from core.views import GMapView, MsgShowView, PosicaoGeograficaCreateView, PosicaoGeograficaUpdateView, PosicaoGeograficaGetJsonView, PosicaoGeograficaDeleteView
 from core.views import AventuraListView, AventuraCreateView, AventuraUpdateView, AventuraDeleteView, AventuraGetJsonView, AventuraAtivarView, AventuraUpdatePositionView
 from core.views import InstanciaObjetoCreateView, InstanciaObjetoGetJsonView, InstanciaObjetoUpdateView, InstanciaObjetoDeleteView
 from django.contrib import admin
@@ -52,11 +52,15 @@ urlpatterns = patterns('',
     url(r'^instancia_objeto/create_instancia/$', InstanciaObjetoCreateView.as_view(), name='instancia_objeto_view'),#cria a isntancia por meio de json
     url(r'^instancia_objeto/get_instancia/(?P<pk>\w+)/$', InstanciaObjetoGetJsonView.as_view(), name='instancia_objeto_getjson_view'),#cria a isntancia por meio de json
     url(r'^instancia_objeto/update_instancia/(?P<pk>\w+)/$', InstanciaObjetoUpdateView.as_view(), name='instancia_objeto_update_view'),
-     url(r'^instancia_objeto/delete_instancia/(?P<pk>\w+)/$', InstanciaObjetoDeleteView.as_view(), name='instancia_objeto_delete_view'),
+    url(r'^instancia_objeto/delete_instancia/(?P<pk>\w+)/$', InstanciaObjetoDeleteView.as_view(), name='instancia_objeto_delete_view'),
     
     #urlviews para POS
-    url(r'^posicao_geografica/create_pos/$', PosicaoGeograficaCreateView.as_view(), name='posicao_geografica_create_view'),#cria a isntancia por meio de json
-    url(r'^posicao_geografica/update_pos/(?P<pk>\w+)/$', PosicaoGeograficaUpdateView.as_view(), name='posicao_geografica_update_view'),#cria a isntancia por meio de json
+    url(r'^posicao_geografica/create_pos/$', PosicaoGeograficaCreateView.as_view(), name='posicao_geografica_create_view'),
+    url(r'^posicao_geografica/update_pos/(?P<pk>\w+)/$', PosicaoGeograficaUpdateView.as_view(), name='posicao_geografica_update_view'),
+    url(r'^posicao_geografica/get_json_pos/(?P<pk>\w+)/$', PosicaoGeograficaGetJsonView.as_view(), name='posicao_geografica_get_json_view'),
+    url(r'^posicao_geografica/delete_pos/(?P<pk>\w+)/$', PosicaoGeograficaDeleteView.as_view(), name='posicao_geografica_get_json_view'),
+    
+    
 
     #urls para pagina do google maps
     url(r'^gmaps/$', GMapView.as_view(), name='gmaps_view'),

@@ -265,16 +265,18 @@ class InstanciaObjetoCreateView(AjaxableResponseMixin, CreateView):
         object_list = Objeto.objects.all().filter(pk=pos[0]['id_objeto'])
         
         qntde = 0
+        id_tipo = 0
         #recupera quantidade
         for obj in object_list:#always return one object, because the id/pk is unique
             qntde = obj.quantidade
+            id_tipo = obj.tipo_objeto_id
         #utilizado no if de comparacao a seguir
         #usa id_objeto e id_aventura para recuperar instâncias do objeto
         #em seguida verifica a instancia com maior instancia_cont e verifica se é possível criar uma nova instância.
         #recupero instancias do objeto de uma dada aventura
         object_list = InstanciaObjeto.objects.all().filter(aventura_id=self.request.session[SESSION_AVENTURA].id, objeto_id=pos[0]['id_objeto'])
         flag = False #permissão para criar outra instancia
-       
+        
         #permissao para criar mais instancias
         #qntde_new_inst_obj = 0
         #if not  object_list:
@@ -304,7 +306,14 @@ class InstanciaObjetoCreateView(AjaxableResponseMixin, CreateView):
             #form.instance.instancia_cont = qntde_new_inst_obj
             self.object = form.save()
             response = super(AjaxableResponseMixin, self).form_valid(form)
-            data_return = {'pk': self.object.id,}
+            
+            object_list = TipoObjeto.objects.all().filter(pk=id_tipo)
+           
+            qntde_pos = 1
+            for obj in object_list:
+                qntde_pos = obj.posicoes_geograficas
+                
+            data_return = {'pk': self.object.id,'qntde_pos':qntde_pos,}
             
             
         #retorna data com id do objeto
@@ -321,9 +330,14 @@ class InstanciaObjetoGetJsonView(ListView):
         
         #recupero instancias de uma dada aventura
         flag = 0;
+        flagTwo = 0;
         inst_object_list = InstanciaObjeto.objects.all().filter(aventura_id=self.kwargs['pk'])#id e nome
         json_inst_objetos = '[';
-        for inst_obj in inst_object_list:
+        #qntde_pos = 0;
+        json_inst_pos = '';
+        for inst_obj in inst_object_list:     
+            #inst_object_list = InstanciaObjeto.objects.all().filter(aventura_id=self.kwargs['pk'])
+            #objeto_list = Objeto.objects.all().filter(pk=inst_obj.objeto_id)#icone_objeto_id
             if flag == 0:
                 flag = 1;
                 json_inst_objetos += '{"id":"' + str(inst_obj.pk) + '"' + ',"nome":"' + inst_obj.nome + '"';#id e nome da instancia
@@ -331,17 +345,31 @@ class InstanciaObjetoGetJsonView(ListView):
                 json_inst_objetos += ',{"id":"' + str(inst_obj.pk) + '"' + ',"nome":"' + inst_obj.nome + '"';#id e nome da instancia
             objeto_list = Objeto.objects.all().filter(pk=inst_obj.objeto_id)#icone_objeto_id
             pos_list = PosicaoGeografica.objects.all().filter(instancia_objeto_id=inst_obj.pk)
-            for pos in pos_list:
-                    json_inst_objetos += ',"lat":"' + str(pos.latitude) + '"' + ',"lng":"' +str(pos.longitude) + '"'+  ',"altd":"' + str(pos.altitude) + '"';
             for obj in objeto_list:
                 icone_list = Icone.objects.all().filter(pk=obj.icone_objeto_id)
                 for icone in  icone_list:
-                    json_inst_objetos += ',"url_icone":"/media/' + str(icone.icone) + '"}';
-                
-                   
+                    json_inst_objetos += ',"url_icone":"/media/' + str(icone.icone) + '"';
+                tipo_list = TipoObjeto.objects.all().filter(pk=obj.tipo_objeto_id)
+                for tipo in tipo_list:
+                    json_inst_pos += ',"posicoes_geograficas":"' + str(tipo.posicoes_geograficas) + '"';
+            #for pos in pos_list:
+            #    qntde_pos = qntde_pos+1;
+            json_inst_pos += ',"pos":[';
+            for pos in pos_list:
+                if flagTwo == 0:
+                    flagTwo = 1;
+                    #json_inst_pos += "{'lat':'" + str(pos.latitude) + "'" + ",'lng':'" +str(pos.longitude) + "'"+  ",'altd':'" + str(pos.altitude) + "'}"; 
+                    json_inst_pos += '{"id_pos":"' + str(pos.pk) + '"' +  ',"lat":"'  + str(pos.latitude) + '"' + ',"lng":"' +str(pos.longitude) + '"'+  ',"altd":"' + str(pos.altitude) + '"}';    
+                else:
+                    json_inst_pos += ',{"id_pos":"' + str(pos.pk) + '"' +  ',"lat":"'  +  str(pos.latitude) + '"' + ',"lng":"' +str(pos.longitude) + '"'+  ',"altd":"' + str(pos.altitude) + '"}';      
+            json_inst_pos += ']}';
+            json_inst_objetos += str(json_inst_pos); #"}"
+            json_inst_pos = "";
+            flagTwo = 0;
+             
         
         json_inst_objetos += ']';
-
+        
         return HttpResponse(json_inst_objetos)
 
 class InstanciaObjetoUpdateView(UpdateView):
@@ -411,6 +439,7 @@ class PosicaoGeograficaCreateView(AjaxableResponseMixin, CreateView):
         form.instance.altitude = pos[0]['altitude']
         self.object = form.save()
         response = super(AjaxableResponseMixin, self).form_valid(form)
+            
         if self.request.is_ajax():
             data = {
                 'pk': self.object.pk,
@@ -434,7 +463,6 @@ class PosicaoGeograficaUpdateView(AjaxableResponseMixin, UpdateView):
         # it might do some processing (in the case of CreateView, it will
         # call form.save() for example).,
         # json print self.request.body
-
         pos = json.loads(self.request.body)
 
         form.instance.latitude = pos[0]['latitude']
@@ -450,7 +478,42 @@ class PosicaoGeograficaUpdateView(AjaxableResponseMixin, UpdateView):
             return self.render_to_json_response(data)
         else:
             return response    
-         
+        
+#Retorna json contendo dados da posicao de uma instância, ou conjunto de posicoes
+class PosicaoGeograficaGetJsonView(ListView):
+    model = PosicaoGeografica
+    
+    def render_to_response(self, context, **response_kwargs):
+        return HttpResponse(serializers.serialize('json', PosicaoGeografica.objects.all().filter(instancia_objeto_id=self.kwargs['pk'])))#utiliza o id da instância
+
+#delete posicao geográfica de um marcador
+class PosicaoGeograficaDeleteView(DeleteView):
+    model = PosicaoGeografica;
+    
+    def delete(self, request, *args, **kwargs):
+ 
+        self.object = self.get_object()
+        #verifica a quantidade de marcadores da instância.
+        #caso a quantidade seja <= 1 a instância também é deletada.
+        
+       
+        
+        objetct_markers_list = PosicaoGeografica.objects.all().filter(instancia_objeto_id = self.object.instancia_objeto_id)
+        
+        qnde_markers = 0;
+        for obj in objetct_markers_list:
+            qnde_markers = qnde_markers + 1;
+            
+        data = 0;
+        if qnde_markers <= 1:
+            data = 1;
+        #objetct_instance_list = InstanciaObjeto.objects.all().filter(pk=)
+        
+       
+        self.object.delete()
+   
+        return HttpResponse(json.dumps({'response': data}), content_type="application/json")
+    
 '''
 ====================================================================
                         Views para GMapView
