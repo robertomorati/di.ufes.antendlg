@@ -897,8 +897,7 @@ function loadInstancias(){
 			
 
 			for (var i=0;i<instancias.length;i++){
-				if(instancias[i].pos.length > 1){
-					
+				if(instancias[i].posicoes_geograficas > 1){
 					placeInstancesPolygonGoogleMaps("", instancias[i].url_icone, instancias[i].id, instancias[i].nome, instancias[i].posicoes_geograficas, instancias[i].pos);
 				
 				}else{
