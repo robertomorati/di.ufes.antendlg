@@ -313,7 +313,7 @@ class InstanciaObjetoCreateView(AjaxableResponseMixin, CreateView):
             for obj in object_list:
                 qntde_pos = obj.posicoes_geograficas
                 
-            data_return = {'pk': self.object.id,'qntde_pos':qntde_pos,}
+            data_return = {'pk': self.object.id,'qntde_pos':qntde,}
             
             
         #retorna data com id do objeto
