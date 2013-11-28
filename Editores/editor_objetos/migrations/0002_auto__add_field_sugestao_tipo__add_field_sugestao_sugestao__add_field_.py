@@ -8,15 +8,31 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Deleting field 'InstanciaObjeto.instancia_cont'
-        db.delete_column('editor_objetos_instanciaobjeto', 'instancia_cont')
+        # Adding field 'Sugestao.tipo'
+        db.add_column('editor_objetos_sugestao', 'tipo',
+                      self.gf('django.db.models.fields.CharField')(default='STX', max_length=10),
+                      keep_default=False)
+
+        # Adding field 'Sugestao.sugestao'
+        db.add_column('editor_objetos_sugestao', 'sugestao',
+                      self.gf('django.db.models.fields.files.FileField')(default='', max_length=100),
+                      keep_default=False)
+
+        # Adding field 'Sugestao.proximidade'
+        db.add_column('editor_objetos_sugestao', 'proximidade',
+                      self.gf('django.db.models.fields.IntegerField')(default=1, max_length=3),
+                      keep_default=False)
 
 
     def backwards(self, orm):
-        # Adding field 'InstanciaObjeto.instancia_cont'
-        db.add_column('editor_objetos_instanciaobjeto', 'instancia_cont',
-                      self.gf('django.db.models.fields.IntegerField')(default=0, max_length=3),
-                      keep_default=False)
+        # Deleting field 'Sugestao.tipo'
+        db.delete_column('editor_objetos_sugestao', 'tipo')
+
+        # Deleting field 'Sugestao.sugestao'
+        db.delete_column('editor_objetos_sugestao', 'sugestao')
+
+        # Deleting field 'Sugestao.proximidade'
+        db.delete_column('editor_objetos_sugestao', 'proximidade')
 
 
     models = {
@@ -119,8 +135,8 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'Sugestao'},
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'proximidade': ('django.db.models.fields.IntegerField', [], {'default': '1', 'max_length': '3'}),
-            'sugestao': ('django.db.models.fields.files.FileField', [], {'max_length': '100'}),
-            'tipo': ('django.db.models.fields.CharField', [], {'default': '0', 'max_length': '1'})
+            'sugestao': ('django.db.models.fields.files.FileField', [], {'default': "''", 'max_length': '100'}),
+            'tipo': ('django.db.models.fields.CharField', [], {'default': "'STX'", 'max_length': '10'})
         },
         'editor_objetos.tipoimagem': {
             'Meta': {'object_name': 'TipoImagem'},

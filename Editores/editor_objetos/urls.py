@@ -11,6 +11,8 @@ from core.views import IconeCreateView, IconeListView, IconeUpdateView, IconeDel
 from core.views import GMapView, MsgShowView, PosicaoGeograficaCreateView, PosicaoGeograficaUpdateView, PosicaoGeograficaGetJsonView, PosicaoGeograficaDeleteView
 from core.views import AventuraListView, AventuraCreateView, AventuraUpdateView, AventuraDeleteView, AventuraGetJsonView, AventuraAtivarView, AventuraUpdatePositionView
 from core.views import InstanciaObjetoCreateView, InstanciaObjetoGetJsonView, InstanciaObjetoUpdateView, InstanciaObjetoDeleteView
+from core.views import SugestaoListView, SugestaoCreateView, SugestaoUpdateView, SugestaoDeleteView
+from core.views import TipoImagemListView, TipoImagemCreateView, TipoImagemUpdateView, TipoImagemDeleteView
 from django.contrib import admin
 admin.autodiscover()
 
@@ -60,6 +62,19 @@ urlpatterns = patterns('',
     url(r'^posicao_geografica/get_json_pos/(?P<pk>\w+)/$', PosicaoGeograficaGetJsonView.as_view(), name='posicao_geografica_get_json_view'),
     url(r'^posicao_geografica/delete_pos/(?P<pk>\w+)/$', PosicaoGeograficaDeleteView.as_view(), name='posicao_geografica_get_json_view'),
     
+    #urls para sugestões
+    url(r'^sugestoes/$', SugestaoListView.as_view(), name='sugestao_list_view'),
+    url(r'^sugestoes/criar_sugestoes/$', SugestaoCreateView.as_view(), name='sugestao_create_view'),
+    url(r'^sugestoes/update_sugestoes/(?P<pk>\w+)/$', SugestaoUpdateView.as_view(), name='sugestao_update_view'),
+    url(r'^sugestoes/delete_sugestoes/(?P<pk>\w+)/$', SugestaoDeleteView.as_view(), name='sugestao_delete_view'),
+    
+    
+    #urls para TipoImagem
+    url(r'^tipo_imagem/$', TipoImagemListView.as_view(), name='tipo_imagem_list_view'),
+    url(r'^tipo_imagem/criar_tipo_imagem/$', TipoImagemCreateView.as_view(), name='tipo_imagem_create_view'),
+    url(r'^tipo_imagem/update_tipo_imagem/(?P<pk>\w+)/$', TipoImagemUpdateView.as_view(), name='tipo_imagem_update_view'),
+    url(r'^tipo_imagem/delete_tipo_imagem/(?P<pk>\w+)/$', TipoImagemDeleteView.as_view(), name='tipo_imagem_delete_view'),
+
     
 
     #urls para pagina do google maps

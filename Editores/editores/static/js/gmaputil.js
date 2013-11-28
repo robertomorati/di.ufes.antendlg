@@ -1,29 +1,35 @@
 /**
  * Created on --/10/2013
  * 
+ * Arquivo responsável por:
+ * 			; Inicializar o google maps - v3;
+ * 			; Validar se a aventura está ativa;
+ * 			; Fazer pesistência das intâncias dos objetos no google maps;
+ * 			; Operações (CRUD) nas intâncias por meio de ajax com informações trocadas por meio de json;
+ * 
  * @author: Roberto Guimaraes Morati Junior
  */		
 
 /**
- * Flags criadas para tratas casos especificos relacionados as instâncias.
+ * Flags criadas para tratar casos especificos relacionados as instâncias.
  **/
-var flagloadInstancias = false; //Flag para evitar a execução do "ajax" quee cria a primeira posição geográfica do objeto.
+var flagloadInstancias = false; //Flag para evitar a execução do "ajax" que cria a primeira posição geográfica do objeto.
 var flagloadBackupInstances = false;//Flag para controlar o backup de instâncias. Assim, evita requisições desnecessárias.	 
 
-var flagLoadBackupInstancesMoreOfPos = false;
+var flagLoadBackupInstancesMoreOfPos = false;//Flag para tratar o backup de instâncias que possuem mais de uma posição geográfica.
 
 var intancias_objetos_json;//armazena instâncias de objetos.
-var singleClickMouse = false;
+var singleClickMouse = false;//Flag para tratar o click simples e duplo em marcadores do Polygon. Uso somente em instâncias com mais de uma POS.
 
 
 
 /**
- * Função que verifica se a aventura está ativa. Caso a mesma esteja ativa, a posição do mapa é direcionado para a localização da aventura.
+ * Função que verifica se a aventura está ativa. 
+ * Caso a mesma esteja ativa, a posição do mapa é direcionado para a localização da aventura. Caso a aventura tenha uma localização.
  */
-var $latlng;
+var $latlng;//posição do mapa
 function carregaPos (){
-    //var $latlng = new google.maps.LatLng(-20.274636854719642, -40.304203033447266); UFES
-	var id = aventuraAtiva()
+	var id = aventuraAtiva();
 	if(id != '-1'){
 		 
 		 var urlView = '/editor_objetos/get_json_aventura/' + id +'/';
@@ -37,9 +43,9 @@ function carregaPos (){
 		        	if(obj[0].fields.latitude != '' && obj[0].fields.longitude != ''){
 		        		$latlng = new google.maps.LatLng(obj[0].fields.latitude, obj[0].fields.longitude);
 		        	}else{
-		        		$latlng = new google.maps.LatLng(-30.068637, -51.120404);
+		        		$latlng = new google.maps.LatLng(-20.274636854719642, -40.304203033447266);
 		        	}
-		        	initialize();
+		        	initialize();//inicializa o google maps
 	        },
 	        error: function() {
 	        	alert("Erro ao recuperar tipos de objetos...Xiiii ;)");
@@ -47,20 +53,21 @@ function carregaPos (){
 		});	
 	}else{
 		$latlng = new google.maps.LatLng(-30.068637, -51.120404);
-		initialize();
+		initialize();//inicializa o google maps em uma posição padrão
 	}
 
 }
 
 /**
- * Função que inicializa o google maps -v3
+ * Função que inicializa o gllge maps. 
+ * API v3 está sendo utilizada, sendo tal em HTML 5.
  * 
  */
 var $map;//google maps
 var overlay;
-
 function initialize() {
 
+	//opções iniciais de configuração do mapa ao para ser iniciado
     var myOptions = {
       zoom: 16,
       center: $latlng,
@@ -80,10 +87,10 @@ function initialize() {
             streetViewControl: true,
 
     };
-
+    
     $map = new google.maps.Map(document.getElementById("map-canvas"),myOptions);
 
-    //Localiza novo local para aventura e faz ajuste do zoom
+    //ajusta o zoom após o local da aventura ser localizado
     google.maps.event.addListener($map, 'zoom_changed', function() {
             zoomChangeBoundsListener = google.maps.event.addListener($map, 'bounds_changed', function(event) {
                             if (this.getZoom() >= 15 && this.initialZoom == true) {
@@ -99,7 +106,7 @@ function initialize() {
     $map.initialZoom = true;//position start
     $map.fitBounds(defaultBounds);
 
-     // Create the search box and link it to the UI element.
+     //Create the search box and link it to the UI element.
      var input = document.getElementById('target');
      var searchBox = new google.maps.places.SearchBox(input);
        // [START region_getplaces]
@@ -152,13 +159,13 @@ function initialize() {
 		       var urlView = '/editor_objetos/set_json_aventura/';
 		       urlView += id_aventura + '/'; 
 		       
+		       //atualiza a localização da aventura
 		       $.ajax({
 					 headers: { "X-CSRFToken": getCookie("csrftoken") },//token django
 				     type:"POST",
 				     url:urlView,
 				     data: jsonObj,
-				     success: function(data,status){	 
-				    	 
+				     success: function(data,status){	  	 
 				    	 //uso da flag
 				      	 if(flagCount == 0){  
 				      		 	//recupera instâncias de objeto para aventura
@@ -356,6 +363,13 @@ function placeInstancesPolygonGoogleMaps(location,icon, id_instancia, name_objet
 	
  }
     
+/**
+ * 
+ * @param marker - marcador a ser deletado
+ * @param markers - lista de marcadores da instância Polygon
+ * @param path - path do MVCArray
+ * @param poly - Polygon que representa instâncias com mais de uma POS
+ */
  function deleteMarkerPolygon(marker,markers,path,poly ){
 	 
 	 var urlIO = '/editor_objetos/posicao_geografica/delete_pos/' +  marker.get("id_pos") + '/';
@@ -402,6 +416,17 @@ function placeInstancesPolygonGoogleMaps(location,icon, id_instancia, name_objet
 
  }
 
+ /**
+  * 
+  * @param poly - Polygon que representa instâncias com mais de uma POS
+  * @param loc - posição geográfica
+  * @param id_instancia - identificação da instância.
+  * @param path - MVCArray
+  * @param j - interação do loop que chama createMakerLoaded
+  * @param markers - lista de marcadores da instância Polygon
+  * @param pos - posicoes para carregar o marcador
+  *  
+  */
 function createMakerLoaded(poly,loc,id_instancia,path,j,markers,pos){
 	
 	 var marker = new google.maps.Marker({
@@ -525,7 +550,15 @@ function createMarkerToPolygon(poly,event,path,markers){
 	}
 }
 
-
+/**
+ * 
+ * @param poly - Polygon Instance 
+ * @param marker - marcador a receber infowindow
+ * @param iconTime - icone de tempo para carregamento dos dados da instância
+ * @param markers - lista de marcadores
+ * @param path - MVCArray
+ * @param nome_marker - nome do marcador
+ */
 function infoWindowMarkersPolygon(poly,marker,iconTime,markers,path,nome_marker){
 	
 			var iconTime = "" + '<i class=" icon-download-alt"></i>';
@@ -608,23 +641,15 @@ function infoWindowMarkersPolygon(poly,marker,iconTime,markers,path,nome_marker)
 
 /**
  * Atualiza a posição de um marcador do Polygon
- * @param marker
- * @param markers
- * @param path
+ * @param marker - marcador
+ * @param markers - lista de marcadores
+ * @param path - path do MVCArray
  */
 function updataPosMarkerPolygon(marker,markers,path) {
 	
+	//atualiza a aresta que liga os marcadores
 	for (var i = 0, I = markers.length; i < I && markers[i] != marker; ++i);
 	path.setAt(i, marker.getPosition());
-	
-	/*for(var j=0;j< markers.length; j++){
-		if(markers[j].get("id_pos") == marker.get("id_pos")){
-			alert(j);
-			marker
-			path.setAt(j, marker.getPosition());
-		}
-	}*/
-	  
 	
 	 var pos = "" + marker.getPosition();
 	 var res = pos.split(",");
@@ -634,26 +659,28 @@ function updataPosMarkerPolygon(marker,markers,path) {
 	json_pos = '[{"latitude":"' + lat + '"' + ',"longitude":"' + lng + '"' + ',"altitude":"' + '0.0' + '"}]';
 	
 	//atualiza posicao daquela instancia
-	    $.ajax({
- 			 headers: { "X-CSRFToken": getCookie("csrftoken") },
- 		     type:"POST",
- 		     url:'/editor_objetos/posicao_geografica/update_pos/'+ marker.get("id_pos")+'/',
- 		     data: json_pos,
- 		     success: function(data,status){
- 		    	 	//pos atualizada
- 		    	    //atualiza backup de instâncias
-	 				flagLoadBackupInstancesMoreOfPos = false;
-	 				loadInstancias();
- 		     },
-		     error: function(xhr) {
-		        	alert("Erro ao salvar posicao geografica do objeto.");
-		     }
-		}); 
+    $.ajax({
+		 headers: { "X-CSRFToken": getCookie("csrftoken") },
+	     type:"POST",
+	     url:'/editor_objetos/posicao_geografica/update_pos/'+ marker.get("id_pos")+'/',
+	     data: json_pos,
+	     success: function(data,status){
+	    	 	//pos atualizada
+	    	    //atualiza backup de instâncias
+ 				flagLoadBackupInstancesMoreOfPos = false;
+ 				loadInstancias();
+	     },
+	     error: function(xhr) {
+	        	alert("Erro ao salvar posicao geografica do objeto.");
+	     }
+	}); 
 }
 
 /**
- *  Função que resgistra posição geográfica para marcador
- * @param marker 
+ *  Função que atualiza a posição geográfica de um marcador de um Polygon
+ *  O marker do Polygon possui uma estrutura de representação de dados diferente do Maker que representa uma instância com uma POS
+ *  
+ * @param marker - marcador do Polygon
  */
 function createPosMarkerPolygon(marker){
 	
@@ -827,6 +854,7 @@ function placeInstancesGoogleMaps(location,icon, id_instancia, name_objeto){
  * Função que atualiza a posição de uma instância que possua POS igual a 1.
  * 
  * @param json_pos - nova posicao do marcador
+ * @param - marcador a ter sua POS atualizada
  */
 function updatePosMarker(json_pos,marker){
 		
@@ -891,7 +919,6 @@ function loadInstancias(){
 			});
 			
 		}else{
-			//carrega instancias <ALT>
 			
 			var instancias = $.parseJSON(intancias_objetos_json);
 			
@@ -904,12 +931,6 @@ function loadInstancias(){
 					var loc = new google.maps.LatLng(instancias[i].pos[0].lat, instancias[i].pos[0].lng);
 					placeInstancesGoogleMaps(loc,instancias[i].url_icone, instancias[i].id, instancias[i].nome);
 				}
-				//var pos = $.parseJSON(instancias[0].pos[0]);
-				
-					//var loc = new google.maps.LatLng(instancias[i].lat, instancias[i].lng);
-					//placeInstancesGoogleMaps(loc,instancias[i].url_icone, instancias[i].id, instancias[i].nome);
-					
-				
 			}
 			
 		}
@@ -920,7 +941,7 @@ function loadInstancias(){
 }
 	
 /**
- * Função para verificar se uma aventura está ativa
+ * Função para verificar se existe aventura ativa para o usuário logado
  */
 function aventuraAtiva(){
 	
@@ -931,19 +952,6 @@ function aventuraAtiva(){
 	
 	return aventura_id;
 }
-
-
-
-
-
-/**
- * Ao clicar em uma instância, está função posiciona o mapa no centro da instancia.
- * @param myPoint
- *//*
-function gotoPoint(myPoint){
-    map.setCenter(new google.maps.LatLng(marker[myPoint-1].position.lat(), marker[myPoint-1].position.lng()));
-    marker[myPoint-1]['infowindow'].open($map, marker[myPoint-1]);
-}*/
 
 /**
  * Esta função ajusta o centro do mapa. Qual a necessidade disso? Veja a estrutura de camadas do google maps para melhor entender.
@@ -1001,31 +1009,6 @@ function offsetCenter(latlng,offsetx,offsety) {
 	map.setCenter(newCenter);
 
 }
-
-/**
- *Não está sendo utilizada.
- * @param address
- */
-function codeAddress(address) {
-    geocoder = new google.maps.Geocoder();
-    geocoder.geocode({
-        'address': address
-    }, function(results, status) {
-        if (status == google.maps.GeocoderStatus.OK) {
-            var myOptions = {
-                zoom: 8,
-                center: results[0].geometry.location,
-                mapTypeId: google.maps.MapTypeId.ROADMAP
-            }
-            map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
-
-            var marker = new google.maps.Marker({
-                map: map,
-                position: results[0].geometry.location
-            });
-        }
-    });
-}
     
 /**
  * Django
@@ -1057,6 +1040,43 @@ function getCookie(c_name)
 /*********************************************************************************************
  *                                  Código Antigo											 *
  ********************************************************************************************/	    
+
+
+
+/**
+ *Não está sendo utilizada.
+ * @param address
+ */
+function codeAddress(address) {
+    geocoder = new google.maps.Geocoder();
+    geocoder.geocode({
+        'address': address
+    }, function(results, status) {
+        if (status == google.maps.GeocoderStatus.OK) {
+            var myOptions = {
+                zoom: 8,
+                center: results[0].geometry.location,
+                mapTypeId: google.maps.MapTypeId.ROADMAP
+            }
+            map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
+
+            var marker = new google.maps.Marker({
+                map: map,
+                position: results[0].geometry.location
+            });
+        }
+    });
+}
+
+/**
+ * Ao clicar em uma instância, está função posiciona o mapa no centro da instancia.
+ * @param myPoint
+ *//*
+function gotoPoint(myPoint){
+    map.setCenter(new google.maps.LatLng(marker[myPoint-1].position.lat(), marker[myPoint-1].position.lng()));
+    marker[myPoint-1]['infowindow'].open($map, marker[myPoint-1]);
+}*/
+
 //google.maps.event.addDomListener(window, 'load', initialize);
 
 /*

@@ -5,11 +5,19 @@ Created on 23/10/2013
 @author: Roberto Gumarães  Morati Junior
 '''
 from django import forms
-from editor_objetos.models import Aventura, Autor, PosicaoGeografica, InstanciaObjeto, Objeto
+from editor_objetos.models import Aventura, Autor, PosicaoGeografica, InstanciaObjeto, Objeto, Sugestao
 from django.forms.extras.widgets import SelectDateWidget
 from datetime import date
 from django.utils.translation import ugettext_lazy as _
 
+
+
+'''
+Form para Update Objeto
+'''
+#class UpdateObjetoForm(forms.ModelForm):
+#    def label_from_instance(obj):
+            
 
 '''
 Form para Objeto
@@ -115,4 +123,4 @@ class InstanciaObjetoUpdateForm(forms.ModelForm):
                 #dialogo +="\n<avatar tipo='negacao'>\nDigite a fala do jogador aqui.\n</avatar>"       
                 dialogo +="\n</dialogo>" 
                 self.initial ={'nome':instance.nome, 'dialogo': dialogo,'proximidade': instance.proximidade,
-                               'encenacao':instance.encenacao,'sugestao':instance.sugestao,'visivel':instance.visivel}
+                               'encenacao':instance.encenacao,'sugestao':instance.sugestao_objeto,'visivel':instance.visivel}

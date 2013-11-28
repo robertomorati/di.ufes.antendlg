@@ -43,7 +43,6 @@
 		function showResponse(responseText, statusText, xhr, $form) {
 		
 			var ct = xhr.getResponseHeader("content-type") || "";
-			// se a resposta for um json, significa que o objeto foi criado com sucesso
 			 if (ct == 'application/json') {
 				
 				// fecha o modal

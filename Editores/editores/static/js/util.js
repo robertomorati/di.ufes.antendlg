@@ -48,19 +48,22 @@ function refreshDiv(urlView,idDiv) {
 	        async: false,
 	        success: function(response) {
 	        	var obj = $.parseJSON(response);
+	        	var buffer = "";
 		        //Recupera tipo e id para montar o menu
 	        	for (i=0;i<obj.length;i++){
 	        		
 	        		//adiciona primeiros tipos.
 		    		if(i < 2){	//é interessante trabalhar com a largura da tela.
 		    			//create the menu with two types
+		    			buffer = obj[i].fields.tipo;
+			    		buffer = buffer.replace(/\s/g, '');
 		    			$('#objetoTab').append(
-		    			$('<li id="loadObjetos' + obj[i].fields.tipo + '"><a href="#tipo' + obj[i].fields.tipo + '" data-toggle="tab">' + obj[i].fields.tipo + '</a></li>'));
-		    			$('#tipo' + obj[i].fields.tipo).tab('show');
+		    			$('<li id="loadObjetos' + buffer + '"><a href="#tipo' + obj[i].fields.tipo + '" data-toggle="tab">' + buffer + '</a></li>'));
+		    			$('#tipo' + buffer).tab('show');
 		    			
 		    	    }else{
 		    	    	//cria a tab outrosObjetos para adicionar os outros tipos
-		    	    	if(flag == 0){		  
+		    	    	if(flag == 0){	
 		    	    		$('#objetoTab')
 		    				.append(
 		    						$(  "<li id='outrosObjetos' class='dropdown' >" +
@@ -72,17 +75,21 @@ function refreshDiv(urlView,idDiv) {
 		    	    	}
 		    	    	
 		    	    	flag = 1;//impede a criação de outras  tabs - outrosObjetos
-		    	    	
+		    			buffer = obj[i].fields.tipo;
+			    		buffer = buffer.replace(/\s/g, '');
 		    	    	//adiciona os tipos de objetos
 		    	    	$('#outros').append(
 		    	    			//id="tipo' + obj[i].fields.tipo + '"
-		    	    			$('<li id="loadObjetos' + obj[i].fields.tipo + '""><a href="#tipo' + obj[i].fields.tipo + '" data-toggle="tab">' + obj[i].fields.tipo + '</a></li>'));
-		    	    			$('#tipo' + obj[i].fields.tipo).tab('show');
+		    	    			$('<li id="loadObjetos' +buffer + '""><a href="#tipo' + buffer + '" data-toggle="tab">' + obj[i].fields.tipo + '</a></li>'));
+		    	    			$('#tipo' + buffer).tab('show');
 		    		
 		    	    }//end else
 		    				
 		    		//construção do "espaço para alocar os tipos de objetos"
-		    		buildTabContent(obj[i].pk,obj[i].fields.tipo);
+		    		buffer = obj[i].fields.tipo;
+		    		buffer = buffer.replace(/\s/g, '');
+		    		buildTabContent(obj[i].pk,buffer);
+		    		buffer = "";
 	        	}
 	        	flag = 0;//flag recebe 0, pois o autor pode criar novos tipos, assim, sendo necessário atualizar a estrutura da "biblioteca de objetos"
 

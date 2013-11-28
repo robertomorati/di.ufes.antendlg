@@ -13,13 +13,14 @@ from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.views.generic import TemplateView, ListView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from editor_objetos.models import Objeto, TipoObjeto, Icone, Aventura, InstanciaObjeto, PosicaoGeografica
+from editor_objetos.models import Objeto, TipoObjeto, Icone, Aventura, InstanciaObjeto, PosicaoGeografica, Sugestao, TipoImagem
 from django.core import serializers
 from forms import AventuraForm, AventuraWithoutFieldsForm, InstanciaObjetoCreateForm, PosicaoGeograficaCreateForm, InstanciaObjetoUpdateForm
 from django.core.context_processors import request
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse
 import json
 from core.ajax import AjaxableResponseMixin
+import os
 
 SESSION_AVENTURA = '_user_aventura_id'
 
@@ -139,7 +140,8 @@ class IconeUpdateView(UpdateView): #não entendi pq havia usado herança multipl
     
     #Override no form. 
     def form_valid(self, form):
-        self.object = form.save()    
+        #self.object = form.save()    
+        self.object.save()
         return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")
 
 #Deleção do icone
@@ -369,7 +371,7 @@ class InstanciaObjetoGetJsonView(ListView):
              
         
         json_inst_objetos += ']';
-        print json_inst_objetos
+        
         return HttpResponse(json_inst_objetos)
 
 class InstanciaObjetoUpdateView(UpdateView):
@@ -573,8 +575,14 @@ class AventuraUpdateView(UpdateView):
     
     #Override no form. 
     def form_valid(self, form):
-        self.object = form.save()    
-        return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")
+        self.object = form.save()   
+        #atualiza sessao
+        self.request.session[SESSION_AVENTURA] = self.object
+        
+        nome = self.request.session[SESSION_AVENTURA].nome
+        id_av = self.request.session[SESSION_AVENTURA].id
+       
+        return HttpResponse(json.dumps({'response': nome ,'id' : id_av }), content_type="application/json")
 
 #Adiciona objeto da aventura na SESSION
 #class AventuraEditarView(DeleteView):
@@ -639,7 +647,13 @@ class AventuraDeleteView(DeleteView):
         self.object = self.get_object()
         
         #verifica se a aventura está em autoria
-        if self.request.session[SESSION_AVENTURA].id == self.object.id:
+        id_av = ''
+        if self.request.session[SESSION_AVENTURA] == '-1':#sem aventura
+            id_av = self.request.session[SESSION_AVENTURA]
+        else:
+            id_av = self.request.session[SESSION_AVENTURA].id
+
+        if id_av == self.object.id:
             ValidationError
             msg = 'A aventura ' + self.object.nome + ' está em autoria. Para deleção é necessário que a aventura esteja com o modo de autoria desativado.'
 
@@ -661,3 +675,257 @@ class AventuraGetJsonView(ListView):
     
     def render_to_response(self, context, **response_kwargs):
         return HttpResponse(serializers.serialize('json', Aventura.objects.all().filter(pk=self.kwargs['pk'])))
+    
+    
+''''
+====================================================================
+                        Views para Sugestao
+====================================================================
+'''
+#Lista todas sugestões
+class SugestaoListView(ListView):
+    template_name = 'editor_objetos/sugestao/listar.html'
+    model = Sugestao
+
+#criação de sugestão
+class SugestaoCreateView(CreateView):
+    template_name = 'editor_objetos/sugestao/create.html'
+    model = Sugestao
+   
+    #redireciona a requisição
+    def get_success_url(self):
+        return reverse('sugestao_list_view')
+    
+    #Override no form
+    def form_valid(self, form):
+        #arquivos devem ser txt, jpeg, png ou fbx (extensões de objetos 3D para Wikitude SDK Android para AR)
+        tipo = form.cleaned_data['tipo']#recupera tipo de sugestao
+        arquivo = form.cleaned_data['sugestao']#recupera file
+        if arquivo:
+            if tipo == 'STX':
+                #valida arquivo de texto para salvar sugestao
+                if not os.path.splitext(arquivo.name)[1] in [".txt"]:
+                    ValidationError
+                    msg = "O arquivo deve ser *.txt...."
+                    messages.error(self.request, "".join(msg))
+                    return HttpResponse(json.dumps({'response': 'exception create'}), content_type="text")
+                elif not arquivo.content_type == 'text/plain':
+                    ValidationError
+                    msg = "Não é um arquivo de texto válido!"
+                    messages.error(self.request, "".join(msg))
+                    return HttpResponse(json.dumps({'response': 'exception create'}), content_type="text")
+            elif tipo == 'SAU':
+                #valida arquivo de audio para salvar sugestao
+                #if not file.content-type in ["audio/mpeg","audio/..."]:
+                if not os.path.splitext(arquivo.name)[1] in [".mp3"]:
+                    ValidationError
+                    msg = "O arquivo deve ser *.mp3...."
+                    messages.error(self.request, "".join(msg))
+                    return HttpResponse(json.dumps({'response': 'exception create'}), content_type="text")
+                elif not arquivo.content_type == 'audio/mp3':
+                    ValidationError
+                    msg = "Não é um arquivo de áudio válido!"
+                    messages.error(self.request, "".join(msg))
+                    return HttpResponse(json.dumps({'response': 'exception create'}), content_type="text")
+            elif tipo == 'SIMG':
+                #valida imagem para salvar
+                if not os.path.splitext(arquivo.name)[1] in [".png",".jpeg",".jpg"]:
+                    ValidationError
+                    msg = "O arquivo deve ser *.png ou *.jpeg...."
+                    messages.error(self.request, "".join(msg))
+                    return HttpResponse(json.dumps({'response': 'exception create'}), content_type="text")
+                elif not arquivo.content_type == 'image/png':
+                    if not arquivo.content_type == 'image/jpeg':
+                        ValidationError
+                        msg = "Não é um arquivo de imagem válido!"
+                        messages.error(self.request, "".join(msg))
+                        return HttpResponse(json.dumps({'response': 'exception create'}), content_type="text")
+
+        #file = self.cleaned_data.get('audio_file',False)
+        #print file 
+        self.object = form.save()   
+        return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")
+
+#update sugestao
+class SugestaoUpdateView(UpdateView):
+    template_name = 'editor_objetos/sugestao/update.html'
+    model = Sugestao
+    
+    #redireciona a requisição
+    def get_success_url(self):
+        return reverse('sugestao_list_view')
+    
+    #Override no form
+    def form_valid(self, form):
+        #arquivos devem ser txt, jpeg, png ou fbx (extensões de objetos 3D para Wikitude SDK Android para AR)
+        tipo = form.cleaned_data['tipo']#recupera tipo de sugestao
+        arquivo = form.cleaned_data['sugestao']#recupera file
+        
+        if hasattr(arquivo,"content_type"):
+            if tipo == 'STX':
+                #valida arquivo de texto para salvar sugestao
+                if not os.path.splitext(arquivo.name)[1] in [".txt"]:
+                    ValidationError
+                    msg = "O arquivo deve ser *.txt...."
+                    messages.error(self.request, "".join(msg))
+                    return HttpResponse(json.dumps({'response': 'exception create'}), content_type="text")
+                elif not arquivo.content_type == 'text/plain':
+                    ValidationError
+                    msg = "Não é um arquivo de texto válido!"
+                    messages.error(self.request, "".join(msg))
+                    return HttpResponse(json.dumps({'response': 'exception create'}), content_type="text")
+            elif tipo == 'SAU':
+                #valida arquivo de audio para salvar sugestao
+                #if not file.content-type in ["audio/mpeg","audio/..."]:
+                if not os.path.splitext(arquivo.name)[1] in [".mp3"]:
+                    ValidationError
+                    msg = "O arquivo deve ser *.mp3...."
+                    messages.error(self.request, "".join(msg))
+                    return HttpResponse(json.dumps({'response': 'exception create'}), content_type="text")
+                elif not arquivo.content_type == 'audio/mp3':
+                    ValidationError
+                    msg = "Não é um arquivo de áudio válido!"
+                    messages.error(self.request, "".join(msg))
+                    return HttpResponse(json.dumps({'response': 'exception create'}), content_type="text")
+            elif tipo == 'SIMG':
+                #valida imagem para salvar
+                if not os.path.splitext(arquivo.name)[1] in [".png",".jpeg",".jpg"]:
+                    ValidationError
+                    msg = "O arquivo deve ser *.png ou *.jpeg...."
+                    messages.error(self.request, "".join(msg))
+                    return HttpResponse(json.dumps({'response': 'exception create'}), content_type="text")
+                elif not arquivo.content_type == 'image/png':
+                    if not arquivo.content_type == 'image/jpeg':
+                        ValidationError
+                        msg = "Não é um arquivo de imagem válido!"
+                        messages.error(self.request, "".join(msg))
+                        return HttpResponse(json.dumps({'response': 'exception create'}), content_type="text")
+
+        #self.object = form.save() 
+        self.object.save()  
+        return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")
+
+#delete sugestao
+class SugestaoDeleteView(DeleteView):
+    template_name = 'editor_objetos/sugestao/delete.html'
+    model = Sugestao
+    
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        try:
+            self.object.delete()
+        except ValidationError as e:
+            messages.error(request, "".join(e.messages))
+            return HttpResponse(json.dumps({'response': 'exception delete'}), content_type="text")
+        return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")
+        #return HttpResponseRedirect(self.get_success_url())
+    
+    def get_success_url(self):
+        return reverse('sugestao_list_view') 
+    
+    
+''''
+====================================================================
+                        Views para TipoImagem
+====================================================================
+'''
+#listagem das imagens
+class TipoImagemListView(ListView):
+    template_name = 'editor_objetos/tipo_imagem/listar.html'
+    model = TipoImagem
+
+    
+#create TipoImagem
+class TipoImagemCreateView(CreateView):
+    template_name = 'editor_objetos/tipo_imagem/create.html'
+    model = TipoImagem
+    
+    #Override no form
+    def form_valid(self, form):
+        #arquivos devem ser txt, jpeg, png ou fbx (extensões de objetos 3D para Wikitude SDK Android para AR)
+        tipo = form.cleaned_data['tipo']#recupera tipo de imagem
+        arquivo = form.cleaned_data['img_play']#recupera file
+        if arquivo:
+            if tipo == 'IC':
+                if not os.path.splitext(arquivo.name)[1] in [".fbx"]:
+                    ValidationError
+                    msg = "O arquivo deve ser *.fbx...."
+                    messages.error(self.request, "".join(msg))
+                    return HttpResponse(json.dumps({'response': 'exception create'}), content_type="text")
+                elif not arquivo.content_type == 'application/octet-stream':
+                    ValidationError
+                    msg = "Para imagens para serem visualizadas câmera, a mesma deve ser de extensão fbx!"
+                    messages.error(self.request, "".join(msg))
+                    return HttpResponse(json.dumps({'response': 'exception create'}), content_type="text")
+            elif tipo == 'IM':
+                if not os.path.splitext(arquivo.name)[1] in [".png",".jpeg",".jpg"]:
+                    ValidationError
+                    msg = "O arquivo deve ser *.png ou *.jpeg...."
+                    messages.error(self.request, "".join(msg))
+                    return HttpResponse(json.dumps({'response': 'exception create'}), content_type="text")
+                elif not arquivo.content_type == 'image/png':
+                    if not arquivo.content_type == 'image/jpeg':
+                        ValidationError
+                        msg = "Não é um arquivo de imagem válido!"
+                        messages.error(self.request, "".join(msg))
+                        return HttpResponse(json.dumps({'response': 'exception create'}), content_type="text")
+
+        self.object = form.save()   
+        return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")
+
+#atualiza imagem  
+class TipoImagemUpdateView(UpdateView):
+    template_name = 'editor_objetos/tipo_imagem/update.html'
+    model = TipoImagem
+    
+    def get_success_url(self):
+        return reverse('tipo_imagem_list_view')
+    
+    def form_valid(self, form):
+        #arquivos devem ser txt, jpeg, png ou fbx (extensões de objetos 3D para Wikitude SDK Android para AR)
+        tipo = form.cleaned_data['tipo']#recupera tipo de imagem
+        arquivo = form.cleaned_data['img_play']#recupera file
+        if hasattr(arquivo,"content_type"):
+            if tipo == 'IC':
+                if not os.path.splitext(arquivo.name)[1] in [".fbx"]:
+                    ValidationError
+                    msg = "O arquivo deve ser *.fbx...."
+                    messages.error(self.request, "".join(msg))
+                    return HttpResponse(json.dumps({'response': 'exception create'}), content_type="text")
+                elif not arquivo.content_type == 'application/octet-stream':
+                    ValidationError
+                    msg = "Para imagens para serem visualizadas câmera, a mesma deve ser de extensão fbx!"
+                    messages.error(self.request, "".join(msg))
+                    return HttpResponse(json.dumps({'response': 'exception create'}), content_type="text")
+            elif tipo == 'IM':
+                if not os.path.splitext(arquivo.name)[1] in [".png",".jpeg",".jpg"]:
+                    ValidationError
+                    msg = "O arquivo deve ser *.png ou *.jpeg...."
+                    messages.error(self.request, "".join(msg))
+                    return HttpResponse(json.dumps({'response': 'exception create'}), content_type="text")
+                elif not arquivo.content_type == 'image/png':
+                    if not arquivo.content_type == 'image/jpeg':
+                        ValidationError
+                        msg = "Não é um arquivo de imagem válido!"
+                        messages.error(self.request, "".join(msg))
+                        return HttpResponse(json.dumps({'response': 'exception create'}), content_type="text")
+
+        self.object = form.save()   
+        return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")
+
+#delete imagem
+class TipoImagemDeleteView(DeleteView):
+    template_name = 'editor_objetos/tipo_imagem/delete.html'
+    model = TipoImagem
+    
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        try:
+            self.object.delete()
+        except ValidationError as e:
+            messages.error(request, "".join(e.messages))
+            return HttpResponse(json.dumps({'response': 'exception delete'}), content_type="text")
+        return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")
+    
+    def get_success_url(self):
+        return reverse('sugestao_list_view') 

@@ -70,6 +70,7 @@ class Icone (models.Model):
     #retorna o icone (dir)
     def __unicode__(self):
         return u'%s' % (self.icone)
+        #return u'<img class="avatar" src="%s" alt="avatar">' % (self.icone)
 
     #def get_attribute_icone(self):
     #    return u'%s' % (self.icone)
@@ -81,6 +82,15 @@ class Icone (models.Model):
             super(Icone, self).delete(*args, **kwargs)
             return storage.delete(path)
         raise ValidationError(u"Não é possível remover este ícone pois existem objetos relacionados à ele!")
+    
+    #deleta imagem antiga
+    def save(self, *args, **kwargs):
+        try:
+            this = Icone.objects.get(id=self.id)
+            if this.icone != self.icone:
+                this.icone.delete(save=False)
+        except: pass # when new photo then we do nothing, normal case          
+        super(Icone, self).save(*args, **kwargs)
 
     
 '''
@@ -95,21 +105,39 @@ Por exemplo, a proximidade com o Cascumpus pode ser indicada por um áudio de ru
 Pendências nessa classe: Identificar tipos de arquivos.
 '''
 class Sugestao(models.Model):
-    TEXTO = 0
-    AUDIO = 1
-    IMAGEM = 2 
-    TIPO_IMAGEMS = (
-        (0, 'Texto'),
-        (1, 'Áudio'),
-        (2, 'Imagem'),)
-    tipo = models.CharField(max_length=1, choices=TIPO_IMAGEMS ,default=TEXTO)
-    sugestao = models.FileField(upload_to ='sugestao/', help_text="Sugestão para tomada de decisão.", )
+    TEXTO = 'STX'
+    AUDIO = 'SAU'
+    IMAGEM = 'SIMG' 
+    TIPO_SUGESTAO = (
+        (TEXTO, 'Texto'),
+        (AUDIO, 'Áudio'),
+        (IMAGEM, 'Imagem'),)
+    nome = models.CharField(max_length=30,default="", )
+    tipo = models.CharField(max_length=10, choices=TIPO_SUGESTAO ,default=TEXTO)
+    sugestao = models.FileField(upload_to ='sugestao/', help_text="Sugestão para tomada de decisão.",default="", )
     proximidade = models.IntegerField(max_length=3,default=1)
     
     def __unicode__(self):
         return u'%s' % (self.sugestao) 
    
- 
+    #verifica se sugestao nao esta sendo utilizado por alguma instancia
+    def delete(self, *args, **kwargs):
+        if not self.sugestoes.all():
+            storage, path = self.sugestao.storage, self.sugestao.path
+            super(Sugestao, self).delete(*args, **kwargs)
+            return storage.delete(path)
+        raise ValidationError(u"Não é possível remover esta sugestão pois existem instâncias de objetos que fazem uso da mesma!")
+    
+    #deleta o arquivo antigo
+    def save(self, *args, **kwargs):
+        # delete old file when replacing by updating the file
+        try:
+            this = Sugestao.objects.get(id=self.id)
+            if this.sugestao != self.sugestao:
+                this.sugestao.delete(save=False)
+        except: pass # when new photo then we do nothing, normal case          
+        super(Sugestao, self).save(*args, **kwargs)
+    
 '''
 Objeto tem um tipo de objeto. O objeto representa algo como, placa, fruta, perigo ou personagens que são instânciados na aventura.
 
@@ -190,16 +218,55 @@ class Aventura(models.Model):
     autor = models.ForeignKey(User, related_name="Autor",default="", blank=True,)
     #autores = models.ManyToManyField(Autor, related_name="autores_aventura",)
     
-    #def set_auto(self, id):
-    #    self.autor = id
 
-#class AventuraForm(forms.ModelForm):
-#        def __init__(self, *args, **kwargs):
-#            super(AventuraForm, self).__init__(*args, **kwargs)
-#            self.fields['fim'].widget = forms.DateField(widget=SelectDateWidget(years=range(date.today().year, 2099)),)
-#        class Meta:
-#            model = Aventura
+
+'''
+TipoImagem representa o tipo de imagem para a instância de objeto.
+           a imagem pode ser 2D ou 3D. 
+           2D - uso do google maps para jogar
+           3D - uso da camera do dispositivo móvel.
+@param tipo: tipo de imnagem cadastrada
+@param img: url da imagem 
+'''
+class TipoImagem(models.Model):
+    IMG_MAP = 'IM'
+    IMG_CAM = 'IC' 
+    TIPO_IMAGEMS = (
+        (IMG_MAP, 'Imagem Google Maps'),
+        (IMG_CAM, 'Imagem Câmera'),)
+    nome = models.CharField(max_length=50, verbose_name="Nome da Imagem",null=True, blank=True)
+    tipo = models.CharField(max_length=10, choices=TIPO_IMAGEMS ,default=IMG_MAP)
+    img_play = models.FileField(_("Imagem"), upload_to ='imagens/img_play/',null=True, blank=True)
+    descricao = models.CharField(max_length=100, default="")
     
+    def _unicode_(self):
+        return u'%s' % (self.nome) 
+    
+        #verifica se sugestao nao esta sendo utilizado por alguma instancia
+    def delete(self, *args, **kwargs): 
+        if self.tipo == 'IM':
+            if not self.imagem_mapa.all():#two times
+                storage, path = self.img_play.storage, self.img_play.path
+                super(TipoImagem, self).delete(*args, **kwargs)
+                return storage.delete(path)
+        elif self.tipo == 'IC':
+            if not self.imagem_camera.all():#two times
+                storage, path = self.img_play.storage, self.img_play.path
+                super(TipoImagem, self).delete(*args, **kwargs)
+                return storage.delete(path)
+        raise ValidationError(u"Não é possível remover está imagem pois existem instâncias de objetos que fazem uso da mesma!")
+    
+    #deleta o arquivo antigo
+    def save(self, *args, **kwargs):
+        # delete old file when replacing by updating the file
+        try:
+            this = TipoImagem.objects.get(id=self.id)
+            if this.img_play != self.img_play:
+                this.img_play.delete(save=False)
+        except: pass # when new photo then we do nothing, normal case          
+        super(TipoImagem, self).save(*args, **kwargs)   
+
+
 '''
 InstanciaObjeto representa um objeto que é arrastado para o mapa da aventura
 @param nome:nome da instancia do objeto
@@ -225,9 +292,12 @@ class InstanciaObjeto(models.Model):
     visivel = models.BooleanField(default=True, help_text=u"Informa se o objeto está visivel na aventura.")
     encenacao = models.CharField(max_length=14, choices=TIPO_ENCENACAO ,blank=True,default=DESABILITADO,help_text=u"Indica o tipo de encenação que é possível com a instância do objeto.")
     objeto = models.ForeignKey(Objeto, related_name="instancias_objeto",blank=True,default="",)
-    sugestao = models.ForeignKey(Sugestao, related_name="sugestao_objeto", blank=True, default="", null=True, )
+    sugestao_objeto = models.ForeignKey(Sugestao, related_name="sugestoes", blank=True, default="", null=True, )
     aventura = models.ForeignKey(Aventura, related_name="aventura_inst_obj", blank=True, default="", null=True,)
     dialogo = models.TextField('dialogo', blank=True)
+    imagem_mapa = models.ForeignKey(TipoImagem,related_name="imagem_mapa", blank=True, default="", null=True, )
+    imagem_camera = models.ForeignKey(TipoImagem,related_name="imagem_camera", blank=True, default="", null=True, )
+    
     #dialogo = models.ForeignKey(Dialogo, related_name="dialogo",blank=True,)
     #posicao_geografica_ = models.ManyToManyField(PosicaoGeografica, related_name="pos_geo_inst_objeto",) 
     #pos possui a instnacia do objeto, pois dependendo do tipo de objeto, esse poderá ter n POS
@@ -259,26 +329,6 @@ Classe removida.
 #    imagem = models.ImageField(upload_to='/obejtos/imagens/', verbose_name="Imagem Autoria")
 #    descricao = models.CharField(max_length=100)
 
-'''
-TipoImagem representa o tipo de imagem para a instância de objeto.
-           a imagem pode ser 2D ou 3D. 
-           2D - uso do google maps para jogar
-           3D - uso da camera do dispositivo móvel.
-@param tipo: tipo de imnagem cadastrada
-@param img: url da imagem 
-'''
-class TipoImagem(models.Model):
-    IMG_MAP = '0'
-    IMG_CAM = '1' 
-    TIPO_IMAGEMS = (
-        ('0', 'Imagem 2D'),
-        ('1', 'Imagem 3D'),)
-    tipo = models.CharField(max_length=1, choices=TIPO_IMAGEMS ,default=IMG_MAP)
-    img = models.FileField(upload_to ='imagens/img_play/',null=True, blank=True)
-    descricao = models.CharField(max_length=100, default="")
-    
-    #def _unicode_(self):
-    #    return u'%s' % (self.tipo)    
 
 
 '''
