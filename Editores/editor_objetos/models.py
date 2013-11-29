@@ -72,8 +72,8 @@ class Icone (models.Model):
         return u'%s' % (self.icone)
         #return u'<img class="avatar" src="%s" alt="avatar">' % (self.icone)
 
-    #def get_attribute_icone(self):
-    #    return u'%s' % (self.icone)
+    def get_nome_icone(self):
+        return u'%s' % (self.nome)
     
     #verifica se ícone nao esta sendo utilizado por algum objeto
     def delete(self, *args, **kwargs):
@@ -118,7 +118,7 @@ class Sugestao(models.Model):
     proximidade = models.IntegerField(max_length=3,default=1)
     
     def __unicode__(self):
-        return u'%s' % (self.sugestao) 
+        return u'%s' % (self.nome) 
    
     #verifica se sugestao nao esta sendo utilizado por alguma instancia
     def delete(self, *args, **kwargs):
@@ -234,15 +234,18 @@ class TipoImagem(models.Model):
     TIPO_IMAGEMS = (
         (IMG_MAP, 'Imagem Google Maps'),
         (IMG_CAM, 'Imagem Câmera'),)
-    nome = models.CharField(max_length=50, verbose_name="Nome da Imagem",null=True, blank=True)
+    nome_img = models.CharField(max_length=30, verbose_name="Nome da Imagem",default="",)
     tipo = models.CharField(max_length=10, choices=TIPO_IMAGEMS ,default=IMG_MAP)
     img_play = models.FileField(_("Imagem"), upload_to ='imagens/img_play/',null=True, blank=True)
     descricao = models.CharField(max_length=100, default="")
     
-    def _unicode_(self):
-        return u'%s' % (self.nome) 
+    def __unicode__(self):
+        return u'%s' % (self.nome_img)
     
-        #verifica se sugestao nao esta sendo utilizado por alguma instancia
+    def get_nome_tipo_imagem(self):
+        return u'%s' % (self.nome_img)
+    
+    #verifica se sugestao nao esta sendo utilizado por alguma instancia
     def delete(self, *args, **kwargs): 
         if self.tipo == 'IM':
             if not self.imagem_mapa.all():#two times
@@ -265,6 +268,8 @@ class TipoImagem(models.Model):
                 this.img_play.delete(save=False)
         except: pass # when new photo then we do nothing, normal case          
         super(TipoImagem, self).save(*args, **kwargs)   
+    
+ 
 
 
 '''
@@ -303,7 +308,7 @@ class InstanciaObjeto(models.Model):
     #pos possui a instnacia do objeto, pois dependendo do tipo de objeto, esse poderá ter n POS
     #sugestao_objeto =  models.ForeignKey(Sugestao, related_name="sugestao_instancia_objeto", )
     
-    def _unicode_(self):
+    def __unicode__(self):
         return u'%s' % (self.nome)
 
 '''
@@ -339,14 +344,14 @@ NivelAutor: na aventura um autor pode ser o principal, com direito de excluir a 
 @param nivel: nivel de autorização do autor para a aventura  
 
 Pedencia: Classe não utilizada no momento. 
-          Permitir a aventura ter autores secundarios e primarios. 
-'''
+
 class NivelAutor(models.Model):
-    PRINCIPAL = 0
-    SECUNDARIO = 1
+    PRINCIPAL = 'Principal'
+    SECUNDARIO = 'Secundário'
     NIVEL_AUTOR = (
-        (0, 'Principal'),
-        (1, 'Secundário'),)
-    #autor = models.ForeignKey(Autor, related_name="autor", blank=False,)
-    #aventura =  models.ForeignKey(Aventura, related_name="aventura", blank=False,)
-    #nivel = models.CharField(max_length=1, choices=NIVEL_AUTOR ,default=PRINCIPAL)
+        (PRINCIPAL, 'Principal'),
+        (SECUNDARIO, 'Secundário'),)
+    autor = models.ForeignKey(Autor, related_name="autor", blank=True, default="", null=True, )
+    aventura =  models.ForeignKey(Aventura, related_name="aventura", blank=True, default="", null=True, )
+    nivel = models.CharField(max_length=1, choices=NIVEL_AUTOR ,default=PRINCIPAL)
+'''

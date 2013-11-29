@@ -128,6 +128,8 @@ MIDDLEWARE_CLASSES = (
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
+CODEMIRROR_PATH = r"javascript/codemirror"
+
 ROOT_URLCONF = 'editores.urls'
 
 # Python dotted path to the WSGI application used by Django's runserver.

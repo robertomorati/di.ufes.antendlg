@@ -4,19 +4,30 @@ Created on 23/10/2013
 
 @author: Roberto Gumarães  Morati Junior
 '''
-from django import forms
-from editor_objetos.models import Aventura, Autor, PosicaoGeografica, InstanciaObjeto, Objeto, Sugestao
-from django.forms.extras.widgets import SelectDateWidget
+from django import forms 
+from editor_objetos.models import Aventura, Autor, PosicaoGeografica, InstanciaObjeto, Objeto, TipoImagem, Icone
+from django.forms.extras.widgets import SelectDateWidget 
+from django.forms.models import ModelChoiceField
 from datetime import date
 from django.utils.translation import ugettext_lazy as _
 
 
-
 '''
-Form para Update Objeto
+Form para Update Objeto - Customizando selec icone
 '''
-#class UpdateObjetoForm(forms.ModelForm):
-#    def label_from_instance(obj):
+class IconeModelChoiceField(ModelChoiceField):
+    def label_from_instance(self, obj):
+        return obj.get_nome_icone()
+     
+class UpdateObjetoForm(forms.ModelForm):
+    class Meta:
+        model = Objeto
+        
+    def __init__(self,  *args, **kwargs):
+        super(UpdateObjetoForm, self).__init__(*args, **kwargs)
+        self.fields['icone_objeto'] = IconeModelChoiceField(queryset=Icone.objects.filter(),)
+        #forms.ModelChoiceField(queryset=TipoImagem.objects.filter(tipo='IM'))
+       
             
 
 '''
@@ -95,6 +106,10 @@ class   PosicaoGeograficaCreateForm(forms.ModelForm):
 '''
 Form para Update Instancia de Objeto
 '''
+class InstanciaObjetoModelChoiceField(ModelChoiceField):
+    def label_from_instance(self, obj):
+        return obj.get_nome_tipo_imagem()
+
 class InstanciaObjetoUpdateForm(forms.ModelForm):  
     class Meta: 
         model = InstanciaObjeto
@@ -108,19 +123,26 @@ class InstanciaObjetoUpdateForm(forms.ModelForm):
     #torna o campo field oculto
     def __init__(self,  *args, **kwargs):
         super(InstanciaObjetoUpdateForm, self).__init__(*args, **kwargs)
-        instance = kwargs.get('instance', None)  
-        object_list = Objeto.objects.all().filter(pk=instance.objeto.id) 
+        instance = kwargs.get('instance', None)
+        
+        #get_nome_tipo_imagem
+        self.fields['imagem_mapa'] = InstanciaObjetoModelChoiceField(queryset=TipoImagem.objects.filter(tipo='IC'),)
+        self.fields['imagem_camera'] = InstanciaObjetoModelChoiceField(queryset=TipoImagem.objects.filter(tipo='IM'),)
+
+        object_list = Objeto.objects.all().filter(pk=instance.objeto.id)
+        dialog_tam = int(len(instance.dialogo))
         for obj in object_list:
             if obj.dialogo == False:
                 #self.fields['dialogo'].widget = forms.HiddenInput()
                 self.fields.pop('dialogo')
             else:
-                dialogo = "<dialogo id_instancia='" + str(instance.id) + "' nome='"+ instance.nome +"'>\n"
-                #dialogo +="<npc tipo='dialogoInicial'>\n Digite a fala inicial do personagem aqui.\n </npc>"
-                #dialogo +="<avatar tipo='confirmacao'>\nDigite a fala do jogador aqui.\n"
-                #dialogo +='<npc tipo="dialogoFinal">\nApós uma fala do jogador, o dialogo entre o mesmo e o npc pode acabar. Assim, tem-se dialogoFinal\n</npc>'
-                #'\n</avatar>'
-                #dialogo +="\n<avatar tipo='negacao'>\nDigite a fala do jogador aqui.\n</avatar>"       
-                dialogo +="\n</dialogo>" 
-                self.initial ={'nome':instance.nome, 'dialogo': dialogo,'proximidade': instance.proximidade,
-                               'encenacao':instance.encenacao,'sugestao':instance.sugestao_objeto,'visivel':instance.visivel}
+                if dialog_tam > 80:#xml editado tem tamanho superior a 80
+                    dialogo = "<dialogo id_instancia='" + str(instance.id) + "' nome='"+ instance.nome +"'>\n"
+                    #dialogo +="<npc tipo='dialogoInicial'>\n Digite a fala inicial do personagem aqui.\n </npc>"
+                    #dialogo +="<avatar tipo='confirmacao'>\nDigite a fala do jogador aqui.\n"
+                    #dialogo +='<npc tipo="dialogoFinal">\nApós uma fala do jogador, o dialogo entre o mesmo e o npc pode acabar. Assim, tem-se dialogoFinal\n</npc>'
+                    #'\n</avatar>'
+                    #dialogo +="\n<avatar tipo='negacao'>\nDigite a fala do jogador aqui.\n</avatar>"       
+                    dialogo +="\n</dialogo>" 
+                    self.initial ={'nome':instance.nome, 'dialogo': dialogo,'proximidade': instance.proximidade,
+                                   'encenacao':instance.encenacao,'sugestao':instance.sugestao_objeto,'visivel':instance.visivel}

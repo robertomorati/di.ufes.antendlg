@@ -15,7 +15,7 @@ from django.views.generic import TemplateView, ListView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from editor_objetos.models import Objeto, TipoObjeto, Icone, Aventura, InstanciaObjeto, PosicaoGeografica, Sugestao, TipoImagem
 from django.core import serializers
-from forms import AventuraForm, AventuraWithoutFieldsForm, InstanciaObjetoCreateForm, PosicaoGeograficaCreateForm, InstanciaObjetoUpdateForm
+from forms import AventuraForm, AventuraWithoutFieldsForm, InstanciaObjetoCreateForm, PosicaoGeograficaCreateForm, InstanciaObjetoUpdateForm, UpdateObjetoForm
 from django.core.context_processors import request
 from django.http import HttpResponse
 import json
@@ -197,6 +197,7 @@ class ObjetoCreateView(CreateView):
 class ObjetoUpdateView(UpdateView): 
     template_name = 'editor_objetos/objeto/update.html'
     model = Objeto
+    form_class = UpdateObjetoForm
 
     #def get_object(self):
     #    return Objeto.objects.get(pk=self.request.GET.get('pk'))
@@ -258,6 +259,7 @@ class InstanciaObjetoCreateView(AjaxableResponseMixin, CreateView):
         return reverse('gmaps_view') 
     
     def form_valid(self, form,*args, **kwargs):
+        print form
         # We make sure to call the parent's form_valid() method because
         # it might do some processing (in the case of CreateView, it will
         # call form.save() for example).,
