@@ -22,7 +22,6 @@ from django.http import HttpResponse
 import json
 from core.ajax import AjaxableResponseMixin
 import os
-from rest_framework.urls import template_name
 
 SESSION_AVENTURA = '_user_aventura_id'
 
