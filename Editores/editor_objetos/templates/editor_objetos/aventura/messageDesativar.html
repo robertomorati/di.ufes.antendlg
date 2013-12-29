@@ -1,0 +1,71 @@
+
+<!-- {% load bootstrap_toolkit %} -->
+{% block content %} 
+
+	  <form id="aventura_desativar_edicao_view" class="form-actions" method="post" tabindex="-1"  action="{% url aventura_desativar_edicao_view object.pk %}">
+		  <div class="modal-header">
+		    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" action=""></button>
+		    <h3 id="myModalLabel">Desativação da Aventura para Autoria</h3>
+		  </div>
+		  <div class="modal-body">
+		  		 {% if messages %}
+					<div class="alert alert-error" width="30">
+						<button type="button" class="close" data-dismiss="alert">
+							<span class="badge badge-important">x</span>
+						</button>
+						<ul class="messages">
+							{% for message in messages %}
+								<li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li> 
+							{% endfor %}
+						</ul>
+					</div>
+				 {% endif %}    
+				 {% csrf_token %}
+			     {{ form|as_bootstrap }}
+				 <p>A autoria para a aventura  {{ object.nome }} está desativada.</p>
+				 <p><strong>Autor:  {{ user.username }}</strong></p>
+		  </div>
+		  <div class="modal-footer">
+		    <button type="submit" class="btn btn-primary">Ok</button>
+		  </div>
+	  </form>
+
+
+	<script type="text/javascript">
+		
+		var options = {
+				
+			target : '#aventura',
+			success : showResponse
+		};
+		
+		// post-submit callback 
+		function showResponse(responseText, statusText, xhr, $form) {
+		
+			var ct = xhr.getResponseHeader("content-type") || "";
+			 if (ct == 'application/json') {
+				
+				// fecha o modal
+				$('#aventura').modal('hide');
+				
+				//add nome da aventura que esta em autoria
+				$('body').find('aventura_ativa').empty().append("");
+				$('body').find('aventura_ativa').append('<aventura_ativa_id id="-1" ></aventura_ativa_id>');
+				
+
+				//refreshDiv('{% url aventura_list_view user.id %}','content');
+				 intancias_objetos_json = "";//limpa persistencia de instancias
+				 flagloadBackupInstances = true;
+				 flagLoadBackupInstancesMoreOfPos  = true;
+			}else if (ct == 'text'){
+				$('body').find('aventura_ativa').empty();
+				openModal('{% url aventura_desativar_edicao_view object.pk %}','aventura');
+			}
+		}
+		
+		$('#aventura_desativar_edicao_view').ajaxForm(options);
+	</script>
+{% endblock %}
+
+
+

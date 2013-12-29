@@ -10,7 +10,7 @@ from core.views import ObjetoCreateView, ObjetoUpdateView, ObjetoListView, Objet
 from core.views import IconeCreateView, IconeListView, IconeUpdateView, IconeDeleteView, IconeGetJsonView
 from core.views import GMapView, MsgShowView, PosicaoGeograficaCreateView, PosicaoGeograficaUpdateView, PosicaoGeograficaGetJsonView, PosicaoGeograficaDeleteView
 from core.views import AventuraListView, AventuraCreateView, AventuraUpdateView, AventuraDeleteView, AventuraGetJsonView, AventuraAtivarView, AventuraUpdatePositionView
-from core.views import InstanciaObjetoCreateView, InstanciaObjetoGetJsonView, InstanciaObjetoUpdateView, InstanciaObjetoDeleteView
+from core.views import InstanciaObjetoCreateView, InstanciaObjetoGetJsonView, InstanciaObjetoUpdateView, InstanciaObjetoDeleteView, AventuraDesativarView
 from core.views import SugestaoListView, SugestaoCreateView, SugestaoUpdateView, SugestaoDeleteView
 from core.views import TipoImagemListView, TipoImagemCreateView, TipoImagemUpdateView, TipoImagemDeleteView
 from django.contrib import admin
@@ -42,6 +42,7 @@ urlpatterns = patterns('',
     #urls para aventura
     url(r'^aventura/(?P<pk>\w+)/$', AventuraListView.as_view(), name='aventura_list_view'),
     url(r'^aventura/ativar_aventura/(?P<pk>\w+)/$', AventuraAtivarView.as_view(), name='aventura_ativar_edicao_view',),#editar remete a criação da aventura
+    url(r'^aventura/desativar_aventura/(?P<pk>\w+)/$', AventuraDesativarView.as_view(), name='aventura_desativar_edicao_view',),#editar remete a criação da aventura
     url(r'^aventura/criar_aventura/(?P<pk>\w+)/$', AventuraCreateView.as_view(), name='aventura_create_view'),
     url(r'^aventura/update_aventura/(?P<pk>\w+)/$', AventuraUpdateView.as_view(), name='aventura_update_view',),
     url(r'^aventura/delete_aventura/(?P<pk>\w+)/$', AventuraDeleteView.as_view(), name='aventura_delete_view',),

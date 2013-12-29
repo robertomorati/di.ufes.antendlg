@@ -20,6 +20,9 @@ urlpatterns = patterns('',
     #Pages project
     url(r'^autendlg/', login_required(IndexView.as_view()), name="index"),
     url(r'^editor_objetos/', include('editor_objetos.urls')),
+    url(r'^editor_enredos/', include('editor_enredos.urls')),
+    url(r'^editor_missoes/', include('editor_missoes.urls')),
+    url(r'^editor_joradores/', include('editor_jogadores.urls')),
     
     # Serve static content.
     url(r'^media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': MEDIA_ROOT}),

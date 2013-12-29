@@ -117,8 +117,10 @@
 											style="height: 0px;">
 											<div class="accordion-inner">
 												<ul id="ulNoMaker">
-													<li><i class="icon-edit"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="">Editar Missão</a></li>
-													<li><i class="icon-list-alt"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="">Editar Condições</a></li>					
+													<li><i class="icon-edit"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url missao_list_view %}">Editar Missão</a></li>
+													<li><i class="icon-list-alt"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url condicao_objeto_list_view %}">Editar Condições entre Instâncias</a></li>
+													<li><i class="icon-list-alt"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url condicao_jogador_list_view %}">Editar Condições com Jogadores</a></li>
+													<li><i class="icon-list-alt"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url condicao_dialogo_list_view %}">Editar Condições com Diálogos</a></li>					
 												</ul>
 											</div>
 										</div>
@@ -134,7 +136,8 @@
 											style="height: 0px;">
 											<div class="accordion-inner">
 												<ul id="ulNoMaker">
-													<li><i class="icon-edit"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="">Em desenvolvimento...</a></li>
+													<li><i class="icon-edit"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url avatar_list_view %}">Editar Avatares</a></li>
+													<li><i class="icon-edit"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url avatar_list_instances_view %}">Editar Papeis</a></li>					
 												</ul>
 											</div>
 										</div>
@@ -166,7 +169,7 @@
 											style="height: 0px;">
 											<div class="accordion-inner">
 												<ul id="ulNoMaker">
-													<li><i class="icon-edit"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="">Em desenvolvimento...</a></li>
+													<li><i class="icon-edit"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url enredo_list_view %}">Editar Enredos</a></li>
 												</ul>
 											</div>
 										</div>

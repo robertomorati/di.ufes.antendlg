@@ -158,6 +158,9 @@ INSTALLED_APPS = (
     'PIL',
     'imagekit',
     'south',
+    'editor_enredos',
+    'editor_missoes',
+    'editor_jogadores',
     #'rest_framework',
     #'django_cleanup', # remove old files
     # Uncomment the next line to enable the admin:
@@ -217,3 +220,4 @@ LOGGING = {
         },
     }
 }
+

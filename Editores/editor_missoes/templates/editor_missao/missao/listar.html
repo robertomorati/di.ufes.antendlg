@@ -1,0 +1,44 @@
+<div class="form-actions">
+	<h3>
+		<strong>Missoes</strong>
+	</h3>
+	<table class="table table-bordered">
+		<tr>
+			<th>Nome</th>
+			<th>Descricao</th>
+			<th>Tempo</th>
+			<th>Enredo</th>
+		</tr>
+		<tbody>
+				{% for object in object_list %}
+				<tr class="success">
+					<td>
+						<!-- Modal para atualização de objetos   --> <a data-toggle="modal"
+						onClick="openModal('{% url  missao_update_view object.pk %}','missao')"
+						href="#missao">{{ object.nome }}</a> 
+					</td>
+					<td>{{ object.descricao }}</td>
+					<td>{{ object.tempo }}</td>		
+					<td>{{ object.enredo_missao }}</td>
+					<td>
+							{% csrf_token %}
+							<!--<input type="submit" class="btn btn-block btn-small btn-danger " value="Deletar">-->
+							<a class="btn btn-block btn-small btn-danger" data-toggle="modal"
+								onClick="openModal('{% url  missao_delete_view object.pk %}','missao')"
+								href="#missao">Deletar</a>
+					</td>
+				</tr>
+				{% empty %}
+				<tr>
+					<td colspan="6"><i style="margin-right: 10px;"
+						class="icon-warning-sign"></i><strong>Atenção!</strong>Não existem
+						missoes para a aventura atual, ou, não existe aventura ativa.</td>
+				</tr>
+				{% endfor %}
+		</tbody>
+	</table>
+	<!-- Modal para criação de objetos -->
+	<a role="button" onClick="openModal('{% url missao_create_view %}','missao')" class="btn btn-small btn-primary" data-toggle="modal" href="#missao">Criar Missão</a>
+	<div id="missao" class="modal hide fade"></div>
+</div>
+

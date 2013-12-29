@@ -786,8 +786,14 @@ function placeInstancesGoogleMaps(location,icon, id_instancia, name_objeto){
 	    	  					loadInstancias();//update isntances
 	    	  					
 	    	  				}else if (ct.indexOf('json') > -1) {
-	    	  					 info.close();//após atualizar fecha a infowindow
+	    	  					info.close();//após atualizar fecha a infowindow
+	    	  					
+	    	  					info.setContent(data);//atualiza conteúdo;
+	    	  				}else{
+	    	  					//alert("Dados?" + responseText.response + " " + ct);
 	    	  				}
+	    	  				
+	    	  				
 	    	  			}
 	    	  			
 	    	  			function showsomething(){

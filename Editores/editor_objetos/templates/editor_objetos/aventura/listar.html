@@ -33,6 +33,13 @@
 				 	onClick="openModal('{% url aventura_ativar_edicao_view object.pk %}','aventura')" 
 				 	href="#aventura">Ativar Autoria</a>		 
 				</td>
+				<td>
+				 <!-- botao editar - id da aventura é inserido na seçção -->
+				 	<a class="btn btn-warning btn-small" data-toggle="modal"
+				 	onClick="openModal('{% url aventura_desativar_edicao_view object.pk %}','aventura')" 
+				 	href="#aventura">Desativar Autoria</a>		 
+				</td>
+				
 			</tr>
 			{% empty %}
 			<tr>

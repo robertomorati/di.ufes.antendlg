@@ -1,0 +1,49 @@
+<div class="form-actions">
+	<h3>
+		<strong>Avatares</strong>
+	</h3>
+	<table class="table table-bordered">
+		<tr>
+			<th>Nome</th>
+			<th>Avatar</th>
+			<th>Publico</th> 
+		</tr>
+		<tbody>
+			{% for object in object_list %}
+			<tr class="success">
+				<td>
+					<!-- Modal para atualização de objetos   --> <a data-toggle="modal"
+					onClick="openModal('{% url  avatar_update_view object.pk %}','avatares')"
+					href="#avatares">{{ object.nome }}</a> 
+				</td>
+				<td><img  class="avatar" src="{{ object.avatar.url }}" alt="avatar"/></td>
+				<td>
+				{% if not object.publico %}
+					Não
+					{% else  %}
+					Sim
+					{% endif %}
+				</td>		
+				<td>
+						{% csrf_token %}
+						<!--<input type="submit" class="btn btn-block btn-small btn-danger " value="Deletar">-->
+						<a class="btn btn-block btn-small btn-danger" data-toggle="modal"
+							onClick="openModal('{% url  avatar_delete_view object.pk %}','avatares')"
+							href="#avatares">Deletar</a>
+				</td>
+			</tr>
+			{% empty %}
+			<tr>
+				<td colspan="6"><i style="margin-right: 10px;"
+					class="icon-warning-sign"></i><strong>Atenção!</strong>Não existem
+					avatares cadastrados, ou, não existe aventura sendo editada.</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+
+	<a role="button" onClick="openModal('{% url avatar_create_view %}','avatares')" class="btn btn-small btn-primary" data-toggle="modal" href="#avatares">Criar Avatar</a>
+
+	<div id="avatares" class="modal hide fade"></div>
+</div>
+

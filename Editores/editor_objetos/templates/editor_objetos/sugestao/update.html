@@ -49,7 +49,7 @@
 				$('#sugestao').modal('hide');
 				refreshDiv('{% url sugestao_list_view %}','content');
 			}else{
-				openModal('{% url sugestao_create_view %}','sugestao');
+				openModal('{% url sugestao_update_view  object.pk %}','sugestao');
 			}
 		}
 		
