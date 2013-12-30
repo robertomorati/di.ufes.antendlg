@@ -1,14 +1,14 @@
 {% block content %}
 
 <div class="form-actions">
-		<h3><strong>Aventuras</strong></h3>
+		<h3><strong>Adventures</strong></h3>
 	<table class="table table-bordered">
 		<tr>
-			<th>Tipo</th>
-			<th>Descrição</th>
-			<th>Data Inicio</th>
-			<th>Data Fim</th>
-			<th>Localização</th>
+			<th>Name</th>
+			<th>Description</th>
+			<th>Start Date</th>
+			<th>End Date</th>
+			<th>Location</th>
 		</tr>
 		<tbody>
 			{% for object in object_list %}
@@ -25,19 +25,19 @@
 				{% csrf_token %} 
 					<a class="btn btn-block btn-small btn-danger" data-toggle="modal" 
 					onClick="openModal('{% url  aventura_delete_view object.pk %}','aventura')" 
-					href="#aventura">Deletar</a>
+					href="#aventura">Delete</a>
 				</td>
 				<td>
 				 <!-- botao editar - id da aventura é inserido na seçção -->
 				 	<a class="btn btn-block btn-small" data-toggle="modal"
 				 	onClick="openModal('{% url aventura_ativar_edicao_view object.pk %}','aventura')" 
-				 	href="#aventura">Ativar Autoria</a>		 
+				 	href="#aventura">Activate Authoring</a>		 
 				</td>
 				<td>
 				 <!-- botao editar - id da aventura é inserido na seçção -->
 				 	<a class="btn btn-warning btn-small" data-toggle="modal"
 				 	onClick="openModal('{% url aventura_desativar_edicao_view object.pk %}','aventura')" 
-				 	href="#aventura">Desativar Autoria</a>		 
+				 	href="#aventura">Deactivate Authoring</a>		 
 				</td>
 				
 			</tr>
@@ -54,8 +54,7 @@
 	<!--  Modal para criação de aventuras - a criação de aventura se dará somente no inicio, por enquanto -->
 	<a role="button"
 		onClick="openModal('{% url aventura_create_view user.id %}','aventura')"
-		class="btn btn-small btn-primary" data-toggle="modal" href="#aventura">Criar
-		Aventura</a> 
+		class="btn btn-small btn-primary" data-toggle="modal" href="#aventura">Create Adventure</a> 
 
 
 	<!-- Div para guardar a modal -->
