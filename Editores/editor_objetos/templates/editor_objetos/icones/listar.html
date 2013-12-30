@@ -8,11 +8,11 @@
 	
 	
 	<div class="form-actions">
-		<h2>Ícones</h2> 
+		<h2>Icons</h2> 
 		<table class="table table-bordered" enctype="multipart/form-data">
 			<tr >
-				<th>Nome</th>
-				<th>Ícone</th>
+				<th>Name</th>
+				<th>Icon</th>
 			</tr>
 			<tbody>
 				{% for object in object_list %}
@@ -33,13 +33,13 @@
 				{% empty %}
 				<tr>
 					<td colspan="6"><i style="margin-right: 10px;"
-						class="icon-warning-sign"></i><strong>Atenção!</strong>Não existem ícones criados.</td>
+						class="icon-warning-sign"></i><strong>Attention!</strong>There are no registered icons.</td>
 				</tr>
 				{% endfor %}
 			</tbody>
 		</table>
 		<!-- Modal para criação de ícones -->
-		<a role="button" onClick="openModal('{% url  icone_create_view %}','icone')" class="btn btn-small btn-primary" data-toggle="modal" href="#icone">Criar Ícone</a>
+		<a role="button" onClick="openModal('{% url  icone_create_view %}','icone')" class="btn btn-small btn-primary" data-toggle="modal" href="#icone">Create Icon</a>
 		<!-- div para modal de criação; atualização e deleção -->
 		<div id="icone" class="modal hide fade"></div>
 	</div>

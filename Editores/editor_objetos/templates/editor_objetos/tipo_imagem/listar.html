@@ -1,13 +1,13 @@
 <div class="form-actions">
 	<h3>
-		<strong>Imagens para Vizualiar Instâncias de Objetos na Aventura  </strong>
+		<strong>Images for Vizualiar Object Instances in Aventura  </strong>
 	</h3>
 	<table class="table table-bordered">
 		<tr>
-			<th>Nome</th>
-			<th>Tipo</th>
-			<th>Imagem</th>
-			<th>Descrição</th>
+			<th>Name</th>
+			<th>Type</th>
+			<th>Image</th>
+			<th>Description</th>
 		</tr>
 		<tbody>
 			{% for object in object_list %}
@@ -25,20 +25,19 @@
 						<!--<input type="submit" class="btn btn-block btn-small btn-danger " value="Deletar">-->
 						<a class="btn btn-block btn-small btn-danger" data-toggle="modal"
 							onClick="openModal('{% url  tipo_imagem_delete_view object.pk %}','tipo_imagem')"
-							href="#tipo_imagem">Deletar</a>
+							href="#tipo_imagem">Delete</a>
 				</td>
 			</tr>
 			{% empty %}
 			<tr>
 				<td colspan="6"><i style="margin-right: 10px;"
-					class="icon-warning-sign"></i><strong>Atenção!</strong>Não existem
-					imagens cadastradas.</td>
+					class="icon-warning-sign"></i><strong>Attention!</strong>There are no registered images.</td>
 			</tr>
 			{% endfor %}
 		</tbody>
 	</table>
 	<!-- Modal para criação de objetos -->
-	<a role="button" onClick="openModal('{% url tipo_imagem_create_view %}','tipo_imagem')" class="btn btn-small btn-primary" data-toggle="modal" href="#tipo_imagem">Criar</a>
+	<a role="button" onClick="openModal('{% url tipo_imagem_create_view %}','tipo_imagem')" class="btn btn-small btn-primary" data-toggle="modal" href="#tipo_imagem">Create</a>
 	<!-- Modal para criação de ícones 
 		<a role="button" onClick="openModal('{% url  objeto_create_view %}','objeto')" class="btn btn-small btn-primary" data-toggle="modal" href="#objeto">Criar Ícone</a>
 	-->

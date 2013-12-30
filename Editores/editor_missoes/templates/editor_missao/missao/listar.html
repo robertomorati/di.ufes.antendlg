@@ -1,13 +1,13 @@
 <div class="form-actions">
 	<h3>
-		<strong>Missoes</strong>
+		<strong>Missions</strong>
 	</h3>
 	<table class="table table-bordered">
 		<tr>
-			<th>Nome</th>
-			<th>Descricao</th>
-			<th>Tempo</th>
-			<th>Enredo</th>
+			<th>Name</th>
+			<th>Description</th>
+			<th>Time</th>
+			<th>Story</th>
 		</tr>
 		<tbody>
 				{% for object in object_list %}
@@ -25,20 +25,19 @@
 							<!--<input type="submit" class="btn btn-block btn-small btn-danger " value="Deletar">-->
 							<a class="btn btn-block btn-small btn-danger" data-toggle="modal"
 								onClick="openModal('{% url  missao_delete_view object.pk %}','missao')"
-								href="#missao">Deletar</a>
+								href="#missao">Delete</a>
 					</td>
 				</tr>
 				{% empty %}
 				<tr>
 					<td colspan="6"><i style="margin-right: 10px;"
-						class="icon-warning-sign"></i><strong>Atenção!</strong>Não existem
-						missoes para a aventura atual, ou, não existe aventura ativa.</td>
+						class="icon-warning-sign"></i><strong>Attention!</strong>There are no exist missions or there is no adventure being edited.</td>
 				</tr>
 				{% endfor %}
 		</tbody>
 	</table>
 	<!-- Modal para criação de objetos -->
-	<a role="button" onClick="openModal('{% url missao_create_view %}','missao')" class="btn btn-small btn-primary" data-toggle="modal" href="#missao">Criar Missão</a>
+	<a role="button" onClick="openModal('{% url missao_create_view %}','missao')" class="btn btn-small btn-primary" data-toggle="modal" href="#missao">Create Mission</a>
 	<div id="missao" class="modal hide fade"></div>
 </div>
 

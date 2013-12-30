@@ -1,12 +1,12 @@
 <div class="form-actions">
 	<h3>
-		<strong>Avatares</strong>
+		<strong>Avatars</strong>
 	</h3>
 	<table class="table table-bordered">
 		<tr>
-			<th>Nome</th>
+			<th>Name</th>
 			<th>Avatar</th>
-			<th>Publico</th> 
+			<th>Public</th> 
 		</tr>
 		<tbody>
 			{% for object in object_list %}
@@ -29,14 +29,13 @@
 						<!--<input type="submit" class="btn btn-block btn-small btn-danger " value="Deletar">-->
 						<a class="btn btn-block btn-small btn-danger" data-toggle="modal"
 							onClick="openModal('{% url  avatar_delete_view object.pk %}','avatares')"
-							href="#avatares">Deletar</a>
+							href="#avatares">Delete</a>
 				</td>
 			</tr>
 			{% empty %}
 			<tr>
 				<td colspan="6"><i style="margin-right: 10px;"
-					class="icon-warning-sign"></i><strong>Atenção!</strong>Não existem
-					avatares cadastrados, ou, não existe aventura sendo editada.</td>
+					class="icon-warning-sign"></i><strong>Attention!</strong>There are no registered avatars, or there is no adventure being edited.</td>
 			</tr>
 			{% endfor %}
 		</tbody>

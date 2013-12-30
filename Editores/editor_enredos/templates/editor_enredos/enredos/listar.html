@@ -1,13 +1,13 @@
 <div class="form-actions">
 	<h3>
-		<strong>Enredos</strong>
+		<strong>Storys</strong>
 	</h3>
 	<table class="table table-bordered">
 		<tr>
-			<th>Nome</th>
-			<th>Tipo</th>
-			<th>Enredo</th>
-			<th>Descrição</th>
+			<th>Name</th>
+			<th>Type</th>
+			<th>Story</th>
+			<th>Description</th>
 		</tr>
 		<tbody>
 			{% for object in object_list %}
@@ -25,20 +25,19 @@
 						<!--<input type="submit" class="btn btn-block btn-small btn-danger " value="Deletar">-->
 						<a class="btn btn-block btn-small btn-danger" data-toggle="modal"
 							onClick="openModal('{% url  enredo_delete_view object.pk %}','enredo')"
-							href="#enredo">Deletar</a>
+							href="#enredo">Delete</a>
 				</td>
 			</tr>
 			{% empty %}
 			<tr>
 				<td colspan="6"><i style="margin-right: 10px;"
-					class="icon-warning-sign"></i><strong>Atenção!</strong>Não existem
-					enredos cadastrados.</td>
+					class="icon-warning-sign"></i><strong>Attention!</strong>There are not registered sotrys.</td>
 			</tr>
 			{% endfor %}
 		</tbody>
 	</table>
 	<!-- Modal para criação de objetos -->
-	<a role="button" onClick="openModal('{% url enredo_create_view %}','enredo')" class="btn btn-small btn-primary" data-toggle="modal" href="#enredo">Criar Enredo</a>
+	<a role="button" onClick="openModal('{% url enredo_create_view %}','enredo')" class="btn btn-small btn-primary" data-toggle="modal" href="#enredo">Create Story</a>
 	<!-- Modal para criação de ícones 
 		<a role="button" onClick="openModal('{% url  objeto_create_view %}','objeto')" class="btn btn-small btn-primary" data-toggle="modal" href="#objeto">Criar Ícone</a>
 	-->

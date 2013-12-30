@@ -1,13 +1,13 @@
 <div class="form-actions">
 	<h3>
-		<strong>Sugestões</strong>
+		<strong>Suggestions</strong>
 	</h3>
 	<table class="table table-bordered">
 		<tr>
-			<th>Nome</th>
-			<th>Tipo</th>
-			<th>Sugestão</th>
-			<th>Proximidade</th>
+			<th>Name</th>
+			<th>Type</th>
+			<th>Suggetion</th>
+			<th>Proximity</th>
 		</tr>
 		<tbody>
 			{% for object in object_list %}
@@ -25,20 +25,19 @@
 						<!--<input type="submit" class="btn btn-block btn-small btn-danger " value="Deletar">-->
 						<a class="btn btn-block btn-small btn-danger" data-toggle="modal"
 							onClick="openModal('{% url  sugestao_delete_view object.pk %}','sugestao')"
-							href="#sugestao">Deletar</a>
+							href="#sugestao">Delete</a>
 				</td>
 			</tr>
 			{% empty %}
 			<tr>
 				<td colspan="6"><i style="margin-right: 10px;"
-					class="icon-warning-sign"></i><strong>Atenção!</strong>Não existem
-					sugestões.</td>
+					class="icon-warning-sign"></i><strong>Attention!</strong>There are no suggetions.</td>
 			</tr>
 			{% endfor %}
 		</tbody>
 	</table>
 	<!-- Modal para criação de objetos -->
-	<a role="button" onClick="openModal('{% url sugestao_create_view %}','sugestao')" class="btn btn-small btn-primary" data-toggle="modal" href="#sugestao">Criar Sugestão</a>
+	<a role="button" onClick="openModal('{% url sugestao_create_view %}','sugestao')" class="btn btn-small btn-primary" data-toggle="modal" href="#sugestao">Create Suggestion</a>
 	<!-- Modal para criação de ícones 
 		<a role="button" onClick="openModal('{% url  objeto_create_view %}','objeto')" class="btn btn-small btn-primary" data-toggle="modal" href="#objeto">Criar Ícone</a>
 	-->

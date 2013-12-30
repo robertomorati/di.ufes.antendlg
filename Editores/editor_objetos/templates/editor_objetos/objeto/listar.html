@@ -1,16 +1,16 @@
 <div class="form-actions">
 	<h3>
-		<strong>Objetos</strong>
+		<strong>Object</strong>
 	</h3>
 	<table class="table table-bordered">
 		<tr>
-			<th>Nome</th>
-			<th>Descrição</th>
-			<th>Quantidade</th>
-			<th>Coletavel</th>
-			<th>Tipo Objeto</th>
-			<th>Ícone</th>
-			<th>Diálogo</th>
+			<th>Name</th>
+			<th>Description</th>
+			<th>Amount</th>
+			<th>Collect</th>
+			<th>Object Type</th>
+			<th>Icon</th>
+			<th>Dialogue</th>
 		</tr>
 		<tbody>
 			{% for object in object_list %}
@@ -24,9 +24,9 @@
 				<td>{{ object.quantidade }}</td>
 				<td>
 					{% if not object.coletavel %}
-					Não
+					No
 					{% else  %}
-					Sim
+					Yes
 					{% endif %}
 				</td>
 				<td>{{ object.tipo_objeto }}</td>
@@ -35,9 +35,9 @@
 				</td>
 				<td>
 					{% if not object.dialogo %}
-					Não
+					No
 					{% else  %}
-					Sim
+					Yes
 					{% endif %}
 				</td>
 				
@@ -46,20 +46,19 @@
 						<!--<input type="submit" class="btn btn-block btn-small btn-danger " value="Deletar">-->
 						<a class="btn btn-block btn-small btn-danger" data-toggle="modal"
 							onClick="openModal('{% url  objeto_delete_view object.pk %}','objeto')"
-							href="#objeto">Deletar</a>
+							href="#objeto">Delete</a>
 				</td>
 			</tr>
 			{% empty %}
 			<tr>
 				<td colspan="6"><i style="margin-right: 10px;"
-					class="icon-warning-sign"></i><strong>Atenção!</strong>Não existem
-					objetos criados.</td>
+					class="icon-warning-sign"></i><strong>Atention!</strong>There are no registered objects.</td>
 			</tr>
 			{% endfor %}
 		</tbody>
 	</table>
 	<!-- Modal para criação de objetos -->
-	<a role="button" onClick="openModal('{% url  objeto_create_view %}','objeto')" class="btn btn-small btn-primary" data-toggle="modal" href="#objeto">Criar Objeto</a>
+	<a role="button" onClick="openModal('{% url  objeto_create_view %}','objeto')" class="btn btn-small btn-primary" data-toggle="modal" href="#objeto">Create Object</a>
 	<!-- Modal para criação de ícones 
 		<a role="button" onClick="openModal('{% url  objeto_create_view %}','objeto')" class="btn btn-small btn-primary" data-toggle="modal" href="#objeto">Criar Ícone</a>
 	-->

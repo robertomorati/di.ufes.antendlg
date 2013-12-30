@@ -1,12 +1,12 @@
 <div class="form-actions">
 	<h3>
-		<strong>Avatares</strong>
+		<strong>Avatars</strong>
 	</h3>
 	<table class="table table-bordered">
 		<tr>
-			<th>Nome</th>
+			<th>Name</th>
 			<th>Avatar</th>
-			<th>Papel</th> 
+			<th>Role</th> 
 		</tr>
 		<tbody>
 			{% for object in object_list %}
@@ -19,7 +19,7 @@
 				<td><img  class="avatar" src="{{ object.avatar.url }}" alt="avatar"/></td>		
 				<td>
 				{% if not object.inst_objeto %}
-					Nenhum
+					Nothing
 			    {% else  %}
 					{{ object.inst_objeto}}
 			    {% endif %}
@@ -28,8 +28,7 @@
 			{% empty %}
 			<tr>
 				<td colspan="6"><i style="margin-right: 10px;"
-					class="icon-warning-sign"></i><strong>Atenção!</strong>Não existem
-					avatares cadastrados para serem editados, ou, não existe aventura sendo editada.</td>
+					class="icon-warning-sign"></i><strong>Atenção!</strong>There are no registered avatars, or there is no adventure being edited.</td>
 			</tr>
 			{% endfor %}
 		</tbody>

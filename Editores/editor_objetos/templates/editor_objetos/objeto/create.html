@@ -4,15 +4,15 @@
 	  <form id="objeto_create_view" class="form-actions" method="post" action="{% url objeto_create_view %}">
 		  <div class="modal-header">
 		    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" action="">×</button>
-		    <h3 id="myModalLabel">Criar Objeto</h3>
+		    <h3 id="myModalLabel">Create Object</h3>
 		  </div>
 		  <div class="modal-body">  
 				 {% csrf_token %}
 				 {{ form|as_bootstrap }}
 		  </div>
 		  <div class="modal-footer">
-		    <button class="btn" data-dismiss="modal" aria-hidden="true">Cancelar</button>
-		    <button type="submit" class="btn btn-primary">Salvar Objeto</button>
+		    <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+		    <button type="submit" class="btn btn-primary">Saveo</button>
 		  </div>
 	  </form>
 

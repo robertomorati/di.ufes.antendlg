@@ -18,17 +18,17 @@
 						</ul>
 					</div>
 			<div class="modal-footer">
-				<button class="btn" data-dismiss="modal" aria-hidden="true">Cancelar</button>
-				<button class="btn btn-danger disabled">Deletar</button>
+				<button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+				<button class="btn btn-danger disabled">Delete</button>
 			</div>
 		  </div>	
 			 {% else %}	
 				 {% csrf_token %}
-				 <p>Tem certeza que deseja o avatar {{object.nome}}?</p>
+				 <p>Are you sure you want to delete the Avatar {{object.nome}}?</p>
 	      </div>
 		  <div class="modal-footer">
-			<button class="btn" data-dismiss="modal" aria-hidden="true">Cancelar</button>
-			<button type="submit" class="btn btn-danger">Deletar</button>
+			<button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+			<button type="submit" class="btn btn-danger">Delete</button>
 	      </div>
 		{% endif %}
 	  </form>

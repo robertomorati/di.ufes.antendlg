@@ -1,7 +1,7 @@
 	  <form id="tipo_objeto_delete_view" class="form-actions" method="post" action="{% url tipo_objeto_delete_view object.pk %}">
 		  <div class="modal-header">
 		    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" action="">×</button>
-		    <h3 id="myModalLabel">Deleção de Tipo de Objeto</h3>
+		    <h3 id="myModalLabel">Delete Object Type</h3>
 		  </div>
 		  <div class="modal-body">  
 			  {% if messages %}
@@ -16,17 +16,17 @@
 						</ul>
 					</div>
 			<div class="modal-footer">
-				<button class="btn" data-dismiss="modal" aria-hidden="true">Cancelar</button>
-				<button class="btn btn-danger disabled">Deletar</button>
+				<button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+				<button class="btn btn-danger disabled">Delete</button>
 			</div>
 		  </div>	
 			 {% else %}	
 				 {% csrf_token %}
-				 <p>Tem certeza que deseja deletar o tipo de objeto {{object.tipo}}?</p>
+				 <p>Are you want to delete object type {{object.tipo}}?</p>
 	      </div>
 		  <div class="modal-footer">
-			<button class="btn" data-dismiss="modal" aria-hidden="true">Cancelar</button>
-			<button type="submit" class="btn btn-danger">Deletar</button>
+			<button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+			<button type="submit" class="btn btn-danger">Delete</button>
 	      </div>
 		{% endif %}
 	  </form>

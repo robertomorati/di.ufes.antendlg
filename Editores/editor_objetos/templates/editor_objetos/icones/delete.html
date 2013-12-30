@@ -1,7 +1,7 @@
  <form id="icone_delete_view" class="form-actions" method="post" action="{% url icone_delete_view object.pk %}">
 		  <div class="modal-header">
 		    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" action="">×</button>
-		    <h3 id="myModalLabel">Deleção de Ícone</h3>
+		    <h3 id="myModalLabel">Delete Icon</h3>
 		  </div>
 		  <div class="modal-body">  
 			  {% if messages %}
@@ -16,18 +16,18 @@
 						</ul>
 					</div>
 			<div class="modal-footer">
-				<button class="btn" data-dismiss="modal" aria-hidden="true">Cancelar</button>
-				<button class="btn btn-danger disabled">Deletar Ícone</button>
+				<button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+				<button class="btn btn-danger disabled">Delete</button>
 			</div>
 		  </div>	
 			 {% else %}	
 				 {% csrf_token %}
-				 <p>Tem certeza que deseja deletar o ícone {{ object.nome }}?</p>
+				 <p>Are you want to delete the icon {{ object.nome }}?</p>
 				 <img  class="avatar" src="{{ object.icone.url }}" alt="avatar"/>
 	      </div>
 		  <div class="modal-footer">
-			<button class="btn" data-dismiss="modal" aria-hidden="true">Cancelar</button>
-			<button type="submit" class="btn btn-danger">Deletar Ícone</button>
+			<button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+			<button type="submit" class="btn btn-danger">Delete</button>
 	      </div>
 		{% endif %}
 	  </form>

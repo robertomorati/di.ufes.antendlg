@@ -3,15 +3,15 @@
 	  <form id="icone_create_view" class="form-actions" method="post" action="{% url icone_create_view %}">
 		  <div class="modal-header">
 		    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" action="">×</button>
-		    <h3 id="myModalLabel">Criar Ícone</h3>
+		    <h3 id="myModalLabel">Create Icon</h3>
 		  </div>
 		  <div class="modal-body">  
 				 {% csrf_token %}
 				 {{ form|as_bootstrap }}
 		  </div>
 		  <div class="modal-footer">
-		    <button class="btn" data-dismiss="modal" aria-hidden="true">Cancelar</button>
-		    <button type="submit" class="btn btn-primary">Salvar Ícone</button>
+		    <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+		    <button type="submit" class="btn btn-primary">Salve</button>
 		  </div>
 	  </form>
 
