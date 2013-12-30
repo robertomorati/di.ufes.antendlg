@@ -46,7 +46,7 @@
 								<p class="lead">
 									{% if user.is_authenticated %}
 									   <p>
-										   <strong>Usuário: {{ user.username }} </strong>
+										   <strong>User: {{ user.username }} </strong>
 										   <strong>
 											   <aventura_ativa style="color: black; text-align: middle;">
 											   	
@@ -73,15 +73,15 @@
 										<div class="accordion-heading">
 											<a class="accordion-toggle" data-toggle="collapse"
 												data-parent="#leftMenu" href="#collapseOne"> <i class="icon-cog"></i>
-												Configurações Aventura
+												Adventure Configurations
 											</a>
 										</div>
 										<div id="collapseOne" class="accordion-body collapse"
 											style="height: 0px;">
 											<div class="accordion-inner">
 												<ul id="ulNoMaker">
-													<li><i class="icon-edit"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url aventura_list_view user.id %}">Editar Aventura</a></li>
-													<li><i class="icon-map-marker"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url gmaps_view %}">Editar Mapa da Aventura</a></li>
+													<li><i class="icon-edit"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url aventura_list_view user.id %}">Adventure Edit</a></li>
+													<li><i class="icon-map-marker"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url gmaps_view %}">Map Adventure Edit</a></li>
 												</ul>
 											</div>
 										</div>
@@ -90,18 +90,18 @@
 										<div class="accordion-heading">
 											<a class="accordion-toggle" data-toggle="collapse"
 												data-parent="#leftMenu" href="#collapseTwo"> <i
-												class="icon-share"></i> Editor de Objetos
+												class="icon-share"></i> Objects Editor
 											</a>
 										</div>
 										<div id="collapseTwo" class="accordion-body collapse"
 											style="height: 0px;">
 											<div class="accordion-inner">
 												<ul id="ulNoMaker">
-													<li><i class="icon-edit"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url tipo_objeto_list_view %}">Editar Tipo de Objetos</a></li>
-													<li><i class="icon-edit"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url objeto_list_view %}">Editar Objetos</a></li>
-													<li><i class="icon-edit"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url icone_list_view %}">Editar Ícones</a></li>
-													<li><i class="icon-road"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url sugestao_list_view %}">Editar Sugestões</a></li>
-													<li><i class="icon-picture"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url tipo_imagem_list_view %}">Editar Imagens</a></li>
+													<li><i class="icon-edit"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url tipo_objeto_list_view %}">Object Type Edit</a></li>
+													<li><i class="icon-edit"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url objeto_list_view %}">Objects Edit </a></li>
+													<li><i class="icon-edit"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url icone_list_view %}">Icon Edit</a></li>
+													<li><i class="icon-road"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url sugestao_list_view %}">Suggestion Edit</a></li>
+													<li><i class="icon-picture"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url tipo_imagem_list_view %}">Images Edit</a></li>
 												</ul>
 											</div>
 										</div>
@@ -110,17 +110,17 @@
 										<div class="accordion-heading">
 											<a class="accordion-toggle" data-toggle="collapse"
 												data-parent="#leftMenu" href="#collapseThree"> <i
-												class="icon-comment"></i> Editor de Missão
+												class="icon-comment"></i>Mission Editor
 											</a>
 										</div>
 										<div id="collapseThree" class="accordion-body collapse"
 											style="height: 0px;">
 											<div class="accordion-inner">
 												<ul id="ulNoMaker">
-													<li><i class="icon-edit"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url missao_list_view %}">Editar Missão</a></li>
-													<li><i class="icon-list-alt"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url condicao_objeto_list_view %}">Editar Condições entre Instâncias</a></li>
-													<li><i class="icon-list-alt"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url condicao_jogador_list_view %}">Editar Condições com Jogadores</a></li>
-													<li><i class="icon-list-alt"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url condicao_dialogo_list_view %}">Editar Condições com Diálogos</a></li>					
+													<li><i class="icon-edit"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url missao_list_view %}">Mission Edit</a></li>
+													<li><i class="icon-list-alt"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url condicao_objeto_list_view %}">Conditions of Instances Edit</a></li>
+													<li><i class="icon-list-alt"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url condicao_jogador_list_view %}">Conditions Between Avatars Edit</a></li>
+													<li><i class="icon-list-alt"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url condicao_dialogo_list_view %}">Conditions with Dialogues Edit</a></li>					
 												</ul>
 											</div>
 										</div>
@@ -129,15 +129,15 @@
 										<div class="accordion-heading">
 											<a class="accordion-toggle" data-toggle="collapse"
 												data-parent="#leftMenu" href="#collapseFour"> <i
-												class="icon-user"></i> Editor de Jogadores
+												class="icon-user"></i> Players Editor
 											</a>
 										</div>
 										<div id="collapseFour" class="accordion-body collapse"
 											style="height: 0px;">
 											<div class="accordion-inner">
 												<ul id="ulNoMaker">
-													<li><i class="icon-edit"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url avatar_list_view %}">Editar Avatares</a></li>
-													<li><i class="icon-edit"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url avatar_list_instances_view %}">Editar Papeis</a></li>					
+													<li><i class="icon-edit"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url avatar_list_view %}">Avatars Edit</a></li>
+													<li><i class="icon-edit"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url avatar_list_instances_view %}">Avatars' Roles Edit </a></li>					
 												</ul>
 											</div>
 										</div>
@@ -146,14 +146,14 @@
 										<div class="accordion-heading">
 											<a class="accordion-toggle" data-toggle="collapse"
 												data-parent="#leftMenu" href="#collapseFive"> <i
-												class="icon-cog"></i> Editor de Movimentos
+												class="icon-cog"></i> Movement’s Editor
 											</a>
 										</div>
 										<div id="collapseFive" class="accordion-body collapse"
 											style="height: 0px;">
 											<div class="accordion-inner">
 												<ul id="ulNoMaker">
-													<li><i class="icon-edit"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="">Em desenvolvimento...</a></li>
+													<li><i class="icon-edit"></i><a class="menu-item  btn btn-link" data-toggle="collapse" >Em desenvolvimento...</a></li>
 												</ul>
 											</div>
 										</div>
@@ -162,14 +162,14 @@
 										<div class="accordion-heading">
 											<a class="accordion-toggle" data-toggle="collapse"
 												data-parent="#leftMenu" href="#collapseSix"> <i
-												class="icon-file"></i> Editor de Enredo
+												class="icon-file"></i>Story Editor
 											</a>
 										</div>
 										<div id="collapseSix" class="accordion-body collapse"
 											style="height: 0px;">
 											<div class="accordion-inner">
 												<ul id="ulNoMaker">
-													<li><i class="icon-edit"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url enredo_list_view %}">Editar Enredos</a></li>
+													<li><i class="icon-edit"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url enredo_list_view %}">Story Edit</a></li>
 												</ul>
 											</div>
 										</div>
@@ -178,7 +178,7 @@
 								    <!-- Apresentação dos Objetos -->
 									<div class="panel panel-info">
 									<div class="alert alert-info">						
-										<h4><strong><p class="text-center"><i class="icon-inbox"></i>Biblioteca de Objetos</h4></p></strong>
+										<h4><strong><p class="text-center"><i class="icon-inbox"></i>Object Library</h4></p></strong>
 										<ul id="objetoTab" class="nav nav-tabs">
 										</ul>
 										<div id="pageTabContent" class="tab-content">
@@ -225,14 +225,13 @@
 					<div class="modal-footer">
 						<div class="well well-small">
 							<p class="text-center">
-								<small>UFES - Universidade Federal do Espírito Santo</small>
+								<small>HEI - Higher Education Institution</small>
 							</p>
 							<p class="text-center">
-								<small>LIED - Laboratório de Informática na Educação</small>
+								<small>LP - Research Laboratory</small>
 							</p>
 							<p class="text-center">
-								<small>Desenvolvido por: Roberto Guimarães Morati Junior </small>
-								
+								<small>Developed by: Blank </small>
 							</p>
 						</div>
 					</div>

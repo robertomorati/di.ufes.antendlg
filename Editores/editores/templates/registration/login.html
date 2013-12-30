@@ -28,7 +28,7 @@
 					<div class="container-fluid login" style="margin: 0 auto; width: 500px">
 						<div class="row ">
 							<div class="center span4 well">
-								<legend>Autenticação Usuário</legend>
+								<legend>User Authentication</legend>
 								
 								 {% if messages %}
 										<div class="alert alert-error" width="30">
@@ -45,12 +45,12 @@
 								<form method="POST" action="." accept-charset="UTF-8">
 									{% csrf_token %}
 									<p>
-										<label><i class="icon-user"></i>Usuário:</label> 
+										<label><i class="icon-user"></i>User:</label> 
 										
 										{{ form.username }}
 									</p>
 									<p>
-										<label><i class="icon-lock"></i>Senha:</label> 
+										<label><i class="icon-lock"></i>Password:</label> 
 										{{ form.password }}
 									</p>
 									{% if next %} 
@@ -59,18 +59,23 @@
 									<input type="hidden" name="next" value="/autendlg/" />
 									{% endif %}
 									<div class="form-actions">
-										<button type="submit" name="submit" class="btn btn-small btn-primary ">Entrar</button>
+										<button type="submit" name="submit" class="btn btn-small btn-primary ">Log-In</button>
 										
 										<a role="button"
 											onClick="openModal('{% url registrar_create_view %}','registrar')"
 											class="btn btn-small"  data-toggle="modal"
-											href="#registrar">Criar Conta</a>
+											href="#registrar">Create Account</a>
 									</div>
 								</form>
-								<!--<div class="alert alert-info text-center">
-									<strong>Acesso para Avaliadores</strong>
-									<p><strong>Usuário:</strong> cinted  <strong>Senha:</strong> cinted</p>
-								</div> -->
+								<div class="alert alert-info text-center">
+									<p><strong>Dear Reviewers,</strong></p>
+									Nowadays, the project is being development by a single programmer. 
+									We are working with the mechanism of internationalization to support Portuguese and English.
+									We thank you for understanding
+									Sincerely,
+									<p><strong>Access to reviewers</strong></p>
+									<p><strong>User:</strong> worldcist14  <strong>Password:</strong> worldcist14</p>
+								</div>
 							</div>
 							
 						</div>
@@ -80,16 +85,15 @@
 					<div class="modal-footer">
 						<div class="well well-small">
 							<p class="text-center">
-								<small>UFES - Universidade Federal do Espírito Santo</small>
+								<small>HEI - Higher Education Institution</small>
 							</p>
 							<p class="text-center">
-								<small>LIED - Laboratório de Informática na Educação</small>
+								<small>LP - Research Laboratory</small>
 							</p>
 							<p class="text-center">
-								<small>Desenvolvido por: Roberto Guimarães Morati Junior </small>
-								
+								<small>Developed by: Blank </small>
 							</p>
-						</div>
+						</div>	
 					</div>
 					<span class="label label-info">Viewport Width:<span class="label label-info"  id="monitor"></span></span>
 					<script>
