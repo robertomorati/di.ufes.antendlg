@@ -43,7 +43,7 @@ function carregaPos (){
 		        	if(obj[0].fields.latitude != '' && obj[0].fields.longitude != ''){
 		        		$latlng = new google.maps.LatLng(obj[0].fields.latitude, obj[0].fields.longitude);
 		        	}else{
-		        		$latlng = new google.maps.LatLng(-20.274636854719642, -40.304203033447266);
+		        		$latlng = new google.maps.LatLng(32.6381461, -16.9332489);
 		        	}
 		        	initialize();//inicializa o google maps
 	        },
@@ -52,7 +52,8 @@ function carregaPos (){
 	        }
 		});	
 	}else{
-		$latlng = new google.maps.LatLng(-30.068637, -51.120404);
+		//32,6381461 -16,9332489   -30.068637, -51.120404
+		$latlng = new google.maps.LatLng(32.6381461, -16.9332489);
 		initialize();//inicializa o google maps em uma posição padrão
 	}
 
