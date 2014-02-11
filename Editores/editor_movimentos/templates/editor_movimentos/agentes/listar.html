@@ -1,0 +1,75 @@
+<div class="form-actions">
+	<h3>
+		<strong>Agents</strong>
+	</h3>
+	<table class="table table-bordered">
+		<tr>
+			<th>Name</th>
+			<th>Behavior</th>
+			<th>Proximity</th>
+			<th>Instance</th>
+		</tr>
+		<tbody>
+				{% for object in object_list %}
+				<tr class="success">
+					<td>
+						<!-- Modal para atualização de objetos   --> <a data-toggle="modal"
+						onClick="openModal('{% url  agente_update_view object.pk %}','agente')"
+						href="#agente">{{ object.nome }}</a> 
+					</td>
+					<td>{{ object.comportamento }}</td>
+					<td>{{ object.proximidade }}</td>	
+					<td>{{ object.instancia }}</td>	
+					<td>
+						<a class="btn btn-block btn-small btn-primary" data-toggle="modal"
+									onClick="openModalComportamentoAgentes('{{ object.comportamento }}','agente',{{ object.pk }})"
+									href="#agente">Configure Behavior</a>	
+					</td>
+					{% if object.comportamento == "Colaborativo" %}
+					<td>
+						<a class="btn btn-block btn-small btn-primary" data-toggle="modal"
+									onClick="addInstancesComportamento('{{ object.comportamento }}','agente','{{ object.pk }}','create')"
+									href="#agente">Add Obstacles</a>	
+					</td>
+					<td>
+						<a class="btn btn-block btn-small btn-primary" data-toggle="modal"
+									onClick="addInstancesComportamento('{{ object.comportamento }}','agente','{{ object.pk }}','list')"
+									href="#agente">Edit Obstacles</a>	
+					</td>
+					{% elif object.comportamento == "Competidor" %}
+					<td>
+						<a class="btn btn-block btn-small btn-primary" data-toggle="modal"
+									onClick="addInstancesComportamento('{{ object.comportamento }}','agente','{{ object.pk }}','create')"
+									href="#agente">Add False Obstacles</a>	
+					</td>
+					<td>
+						<a class="btn btn-block btn-small btn-primary" data-toggle="modal"
+									onClick="addInstancesComportamento('{{ object.comportamento }}','agente','{{ object.pk }}','list')"
+									href="#agente">Edit False Obstacles</a>	
+					</td>
+					{% endif %}
+					<td>
+							{% csrf_token %}
+							<!--<input type="submit" class="btn btn-block btn-small btn-danger " value="Deletar">-->
+							<a class="btn btn-block btn-small btn-danger" data-toggle="modal"
+								onClick="openModal('{% url agente_delete_view object.pk %}','agente')"
+								href="#agente">Delete Agent</a>
+					</td>
+				</tr>
+				{% empty %}
+				<tr>
+					<td colspan="6"><i style="margin-right: 10px;"
+						class="icon-warning-sign"></i><strong>Attention!</strong>There are no exist agents or there is no adventure being edited.</td>
+				</tr>
+				{% endfor %}
+		</tbody>
+	</table>
+	<p class="text-info">
+	<strong>If you change a behavior of the agent, the old behavior will be deleted. Thus, will be necessary to configure the new behavior.</strong>
+	</p>
+	<!-- Modal para criação de agentes -->
+	<a role="button" onClick="openModal('{% url agente_create_view %}','agente')" class="btn btn-small btn-primary" data-toggle="modal" href="#agente">Create Agent</a>
+	<div id="agente" class="modal hide fade"></div>
+	<div id="agente_instance" class="modal hide fade"></div>
+</div>
+

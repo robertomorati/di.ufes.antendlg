@@ -38,13 +38,13 @@
 			// post-submit callback 
 			function showResponse(responseText, statusText, xhr, $form) {
 				var ct = xhr.getResponseHeader("content-type") || "";
-				
-				if (ct.indexOf('json') > -1) {
+				if (responseText.response == "ok") {
 					// fecha o modal
 					$('#missao').modal('hide');
 					refreshDiv('{% url missao_list_view %}','content');
-				}else{
-					//openModal('{% url missao_create_view %}','missao');
+				}else if(responseText.response == "exception created"){
+					//reabre a modal para exibir as informações necessárias ao autor
+					openModal('{% url missao_create_view %}','missao');
 				}
 			}
 		

@@ -1,0 +1,56 @@
+
+<!-- {% load bootstrap_toolkit %} -->
+{% block content %}  
+	  <form id="instance_list_view" class="form-actions" method="post" action="{% url instance_list_view %}">
+		  <div class="modal-header">
+		    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" action="">×</button>
+		    <h3 id="myModalLabel">Instances of Behavior</h3>
+		  </div>
+		  <div class="modal-body">
+				<table class="table table-bordered">
+					<tr>
+						<th>Instance</th>
+						<th>Message</th>
+					</tr>
+					<tbody>
+							{% for object in object_list %}
+							<tr class="success">
+								<td>
+									<!-- Modal para atualização de objetos   --> <a data-toggle="modal"
+									onClick="updateInstanceBehavior('{% url instance_comportamento_update_view object.pk %}','agente_instance')"
+									href="#agente_instance">{{ object.instancia_objeto }}</a> 
+								</td>
+								<td>{{ object.mensagem }}</td>
+								
+							{% endfor %}
+					</tbody>
+				</table>
+		  </div>
+
+	  </form>
+
+
+		<script type="text/javascript">
+			var options = {
+				target : '#agente',
+				success : showResponse
+			};
+		
+			// post-submit callback 
+			function showResponse(responseText, statusText, xhr, $form) {
+				var ct = xhr.getResponseHeader("content-type") || "";
+				// se a resposta for um json, significa que o objeto foi criado com sucesso,
+				if (ct.indexOf('json') > -1) {
+					// fecha o modal
+					$('#agente').modal('hide');
+					openModal('{% url instance_list_view %}','agente');
+				}else if (ct == 'text'){
+					//openModal('{% url instance_list_view %}','agente');
+				}
+			}
+		
+			$('#instance_list_view').ajaxForm(options);
+		</script>
+{% endblock %}
+
+

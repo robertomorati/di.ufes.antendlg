@@ -18,6 +18,117 @@ function openModal(url,idDiv) {
 
 
 /**
+ * Função que trata a criação de comportamento para o agente em questão.
+ * 
+ * @param comportamento - tipo de comportamento
+ * @param idDiv - id da div
+ * @param idAgente - id do agente que terá o comportamento
+ */
+function openModalComportamentoAgentes(comportamento, idDiv, idAgente){
+	
+	  //salva os dados do agente na session, de modo a, permitir a criação do comportamento para o agente
+	  msg_datas_agente = '[{"comportamento":"' + comportamento + '"' + ',"idAgente":"' + idAgente + '"}]'
+	 // alert(msg_datas_agente);
+	  $.ajax({
+			 headers: { "X-CSRFToken": getCookie("csrftoken") },//token django
+		     type:"POST",
+		     url:'/editor_movimentos/agente/agente_session/'+idAgente+'/',
+		     data: msg_datas_agente,
+		     success: function(data,status){
+
+		    	 	//data retorna msg em formato json se é criação ou atualização
+		    	 	if(data.response == "create"){
+			    	 	//cria comportamento agressivo para  agente
+			    	 	if(comportamento == "Agressivo"){
+			    	 		url = '/editor_movimentos/agente/criar_comportamento_agressivo/';
+			    			openModal(url,idDiv);
+			    	 	}else if(comportamento == "Passivo"){
+			    	 		url = '/editor_movimentos/agente/criar_comportamento_passivo/';
+			    			openModal(url,idDiv);
+			    	 	}else if(comportamento == "Colaborativo"){
+			    	 		url = '/editor_movimentos/agente/create_comportamento_colaborativo/';
+			    			openModal(url,idDiv);
+			    	 	}else if(comportamento == "Competidor"){
+			    	 		url = '/editor_movimentos/agente/create_comportamento_competitivo/';
+			    			openModal(url,idDiv);
+			    	 	}
+			    	 	
+		    	 	}if(data.response == "update"){
+			    	 	//atualização do comportamento
+			    	 	if(comportamento == "Agressivo"){
+			    	 		url = '/editor_movimentos/agente/update_comportamento_agressivo/'+idAgente+'/';
+			    	 		openModal(url,idDiv);
+			    	 	}else if(comportamento == "Passivo"){
+			    	 		url = '/editor_movimentos/agente/update_comportamento_passivo/'+idAgente+'/';
+			    			openModal(url,idDiv);
+			    	 	}else if(comportamento == "Colaborativo"){
+			    	 		url = '/editor_movimentos/agente/update_comportamento_colaborativo/'+idAgente+'/';
+			    			openModal(url,idDiv);
+			    	 	}else if(comportamento == "Competidor"){
+			    	 		url = '/editor_movimentos/agente/update_comportamento_competitivo/'+idAgente+'/';
+			    			openModal(url,idDiv);
+			    	 	}
+		    	 	}
+		    	 	
+		     },
+		     error: function(xhr) {
+		        	alert("Erro ao criar comportamento.");
+		     }
+		 });
+}
+
+/**
+ * Função que trata a add de instancias para comportamentos colaborativos e competitivos
+ * 
+ * @param comportamento - tipo de comportamento
+ * @param idDiv - id da div
+ * @param idAgente - id do agente que terá o comportamento atualizado
+ * @param op - tipo de operacao
+ */
+function addInstancesComportamento(comportamento, idDiv, idAgente,op){
+	
+	  //salva os dados do agente na session, de modo a, permitir a atualização do comportamento para o agente
+	  msg_datas_agente = '[{"comportamento":"' + comportamento + '"' + ',"idAgente":"' + idAgente + '"}]'
+	  
+	  $.ajax({
+			 headers: { "X-CSRFToken": getCookie("csrftoken") },//token django
+		     type:"POST",
+		     url:'/editor_movimentos/agente/agente_session/'+idAgente+'/',
+		     data: msg_datas_agente,
+		     success: function(data,status){
+
+		     	  if(op == "create"){
+		     		  url = '/editor_movimentos/agente/add_instance_agente/';
+		     		  openModal(url,idDiv);
+		     	  }else if(op == "list"){
+			          url = '/editor_movimentos/agente/list_instance_agente/';
+			          openModal(url,idDiv);
+		     	  }
+		    	 	
+		     },
+		     error: function(xhr) {
+		        	alert("Erro ao criar comportamento.");
+		     }
+		 });
+}
+
+
+/**
+ * Função que atualiza uma instancia e a mensagem que está sendo referenciada pelo comportamento de um dado agente
+ * É válido lembrar que os dados do agente/comportamento neste momento estão armazenados na session.
+ * 
+ * @param urlUpdate
+ * @param idDiv
+ */
+function updateInstanceBehavior(urlUpdate, idDiv){
+	
+		 $('#agente').modal('hide');
+	     openModal(urlUpdate,idDiv);
+	     
+}
+
+
+/**
  * Update the content of a div.
  * 
  * @param urlView - url with content

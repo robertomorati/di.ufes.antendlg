@@ -40,11 +40,11 @@
 				var ct = xhr.getResponseHeader("content-type") || "";
 				// se a resposta for um json, significa que o objeto foi criado com sucesso,
 			
-				if (ct.indexOf('json') > -1) {
+				if (responseText.response == "ok") {
 					// fecha o modal
 					$('#avatares').modal('hide');
 					refreshDiv('{% url avatar_list_view %}','content');
-				}else{
+				}else if(responseText.response == "exception created"){
 					openModal('{% url avatar_create_view %}','avatares');
 				}
 			}

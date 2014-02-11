@@ -27,7 +27,7 @@
         {% bootstrap_stylesheet_tag "responsive" %}
 
 		<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=places"></script>
-		<title>{% if title %}{{ title }}{% else %}AntEnDLG - Ambiente de Autoria de Jogos Locativos de Decisão{% endif %}</title>
+		<title>{% if title %}{{ title }}{% else %}AntEnDLG - Authoring Environment for Location Decision Games{% endif %}</title>
 	</head>
 	{% csrf_token %}
 	<body id="body" onload="refreshDiv('{% url gmaps_view %}','content'); addTabs('{% url tipo_objeto_get_view %}'); getAvatar({{ user.id }});">	
@@ -152,8 +152,8 @@
 										<div id="collapseFive" class="accordion-body collapse"
 											style="height: 0px;">
 											<div class="accordion-inner">
-												<ul id="ulNoMaker">
-													<li><i class="icon-edit"></i><a class="menu-item  btn btn-link" data-toggle="collapse" >Developing...</a></li>
+												<ul id="ulNoMaker">	
+													<li><i class="icon-edit"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url agente_list_view %}">Agents Edit</a></li>
 												</ul>
 											</div>
 										</div>
@@ -225,13 +225,13 @@
 					<div class="modal-footer">
 						<div class="well well-small">
 							<p class="text-center">
-								<small>HEI - Higher Education Institution</small>
+								<small>UFES - Universidade Federal do Espirito Santo</small>
 							</p>
 							<p class="text-center">
-								<small>LP - Research Laboratory</small>
+								<small>LIED - Laboratório de Informática na Educação</small>
 							</p>
 							<p class="text-center">
-								<small>Developed by: Blank </small>
+								<small>Desenvolvido por: Roberto Guimarães Morati Junior </small>
 							</p>
 						</div>
 					</div>

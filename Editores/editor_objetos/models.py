@@ -58,7 +58,7 @@ Pendências: Redimensionar o icone para tamanho padrão.
 '''
 class Icone (models.Model):
     nome =  models.CharField(max_length=30,)
-    icone = models.ImageField(upload_to ='imagens/icones/', help_text="Ícone do objeto.", blank=True,)
+    icone = models.ImageField(upload_to ='imagens/icones/', help_text="Ícone do Objeto", blank=True,)
     
     #retorna o icone (dir)
     def __unicode__(self):
@@ -309,6 +309,9 @@ class PosicaoGeografica(models.Model):
     instancia_objeto = models.ForeignKey(InstanciaObjeto, related_name="pos_inst_objeto",blank=True,default="",)
     #instancia_objeto = models.ManyToManyField(InstanciaObjeto, related_name="pos_inst_objeto",blank=True,) 
 
+    def get_nome_instancia(self,posn):
+        nomepos = "POS " + str(posn)
+        return u'%s' % (nomepos)
 
 '''
 Jogador - representar um jogador cadastrado com seu dispositivo movel
@@ -389,6 +392,7 @@ class Enredo(models.Model):
     tipo = models.CharField(max_length=10, choices=TIPO_SUGESTAO ,default=TEXTO)
     enredo = models.FileField(upload_to ='enredo/', help_text="Elemente que auxilia na contextualição da tomada de decisão..",default="", )
     descricao = models.CharField(max_length=200, default="")
+    aventura = models.ForeignKey(Aventura,verbose_name="Aventura",related_name="aventura_enredo", blank=True, default="", null=True, )
     
     def __unicode__(self):
         return u'%s' % (self.nome)
@@ -445,6 +449,10 @@ class Missao(models.Model):
  
     def __unicode__(self):
         return u'%s' % (self.nome)
+    
+    def get_nome_missao(self):
+        return u'%s' % (self.nome)
+    
     
 '''
 Condicao - classe que representa atributos comuns para os três tipos de conções definidas no trabalho.
@@ -540,10 +548,79 @@ class NivelAutor(models.Model):
     autor = models.ForeignKey(Autor, related_name="autor", blank=True, default="", null=True, )
     aventura =  models.ForeignKey(Aventura, related_name="aventura", blank=True, default="", null=True, )
     nivel = models.CharField(max_length=1, choices=NIVEL_AUTOR ,default=PRINCIPAL)
- 
 
 
-     
+'''
+Agente - classe responsavem por conter o nome do agente e o tipo de comportamento.
+'''
+class Agente(models.Model):
+    AGRESSIVO = 'Agressivo'
+    PASSIVO = 'Passivo'
+    COLABORATIVO = 'Colaborativo'
+    COMPETIDOR = 'Competidor'
+    COMPORTAMENTO = (
+        (AGRESSIVO, 'Agressivo'),
+        (PASSIVO, 'Passivo'),
+        (COLABORATIVO, 'Colaborativo'),
+        (COMPETIDOR, 'Competidor'),)
+    nome = models.CharField(max_length=30,default="", )
+    instancia =  models.ForeignKey(InstanciaObjeto, related_name="instancia", blank=True, default="", null=True, )
+    proximidade = models.IntegerField(max_length=3,default=1)
+    comportamento = models.CharField(max_length=15, choices=COMPORTAMENTO ,default=AGRESSIVO)
+    aventura_agente = models.ForeignKey(Aventura, related_name="aventura_agente",blank=True,default="",null=True,)
+    
+'''
+Comportamento - após acriação do agente, o autor deve criar e editar informações inerentes ao comportmento de agente definido
+'''
+class Comportamento(models.Model):
+    pos_inicial =  models.ForeignKey(PosicaoGeografica, related_name="pos_inicial", blank=True, default="", null=True, )
+    agente = models.ForeignKey(Agente, related_name="agente", blank=True, default="", null=True, )
+    
+
+'''
+Agressivo
+'''
+class Agressivo(Comportamento, models.Model):
+    item =  models.ForeignKey(InstanciaObjeto, related_name="instancia_agressivo", blank=True, default="", null=True, )
+    avatar_vit = models.ForeignKey(Avatar,related_name="avatar_vit", blank=True, default="", null=True,)
+
+'''
+Passivo
+'''
+class Passivo(Comportamento, models.Model):
+    #avatar_vit = models.ForeignKey(Avatar,related_name="avatar_vit", blank=True, default="", null=True,)
+    pass
+
+
+'''
+Colaborativo
+'''
+class Colaborativo(Comportamento, models.Model):
+    avatar_col = models.ForeignKey(Avatar,related_name="avatar_col", blank=True, default="", null=True,)
+    obstaculoscl =  models.ManyToManyField(InstanciaObjeto, through='Mensagem', related_name="obstaculoscl", blank=True, default="", null=True, )
+   
+'''
+Competitivo
+'''
+class Competitivo(Comportamento, models.Model):
+    avatar_comp = models.ForeignKey(Avatar,related_name="avatar_comp", blank=True, default="", null=True,)
+    obstaculoscp =  models.ManyToManyField(InstanciaObjeto, through='Mensagem', related_name="obstaculoscp", blank=True, default="", null=True, )
+    
+'''
+Mensagem - mensagem usada nos agente Colaborativos e Competitivos
+'''
+class Mensagem(models.Model):
+    mensagem = models.CharField(max_length=200,default="", )
+    instancia_objeto =  models.ForeignKey(InstanciaObjeto, related_name="instancia_objeto", blank=True, default="", null=True, )
+    colaborativo =  models.ForeignKey(Colaborativo, related_name="colaborativo", blank=True, default="", null=True, )
+    competitivo =  models.ForeignKey(Competitivo, related_name="competitivo", blank=True, default="", null=True, )
+    
+'''
+Mensagemcp - mensagem usada nos agente Colaborativos e Competitivos
+'''
+#class Mensagemcp(models.Model):
+#    mensagem = models.CharField(max_length=200,default="", )
+#    competitivo =  models.ForeignKey(Competitivo, related_name="competitivo", blank=True, default="", null=True, )
 
 '''
 Dialogo permite a criacao de um dialogo para o objeto do tipo personagem

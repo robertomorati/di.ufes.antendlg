@@ -54,16 +54,15 @@
 			// post-submit callback 
 			function showResponse(responseText, statusText, xhr, $form) {
 				var ct = xhr.getResponseHeader("content-type") || "";
-				
-				if (ct.indexOf('json') > -1) {
+				if (responseText.response == "ok") {
 					// fecha o modal
-					$('#condicoes').modal('hide');
+					$('#missao').modal('hide');
 					refreshDiv('{% url condicao_objeto_list_view %}','content');
-				}else{
-					//openModal('{% url missao_create_view %}','missao');
+				}else if(responseText.response == "exception created"){
+					//reabre a modal para exibir as informações necessárias ao autor
+					openModal('{% url condicao_objeto_create_view %}','missao');
 				}
 			}
-		
 			$('#condicao_objeto_create_view').ajaxForm(options);
 		</script>
 {% endblock %}

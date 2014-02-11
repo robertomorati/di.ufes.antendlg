@@ -13,20 +13,33 @@ from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.views.generic import TemplateView, ListView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from editor_objetos.models import Objeto, TipoObjeto, Icone, Aventura, InstanciaObjeto, PosicaoGeografica, Sugestao, TipoImagem, Enredo, Missao, Condicao,CondicaoDialogo,CondicaoJogador,CondicaoObjeto
-from editor_objetos.models import Avatar
 from django.core import serializers
-from forms import AventuraForm, AventuraWithoutFieldsForm,AvatarRoleListForm, InstanciaObjetoCreateForm, PosicaoGeograficaCreateForm, InstanciaObjetoUpdateForm, UpdateObjetoForm, CreateMissaoForm,CreateAvatarForm,CondicaoObjetoForm, CondicaoDialogoForm,CondicaoJogadorForm
 from django.core.context_processors import request
 from django.http import HttpResponse
-import json
 from core.ajax import AjaxableResponseMixin
+
+#imports para objeto, tipos de objetos, icones utilizados no momento de autoria, instancias dos objetos.
+#Also, imports para posições geográficas que as instâncias possuem, bem como a sugestão e o tipo de imagem
+from editor_objetos.models import Objeto, TipoObjeto, Icone, Aventura, InstanciaObjeto, PosicaoGeografica, Sugestao, TipoImagem
+
+#impost para Enredo, criação de missões e tipos de condições que compoõem missões
+from editor_objetos.models import Enredo, Missao, Condicao,CondicaoDialogo,CondicaoJogador,CondicaoObjeto
+
+#imports para avatar e criação de agentes com seus tipos de comportamentps
+from editor_objetos.models import Avatar, Agente, Agressivo, Comportamento, Passivo, Colaborativo, Mensagem, Competitivo
+
+from forms import AventuraForm, AventuraWithoutFieldsForm,AvatarRoleListForm, InstanciaObjetoCreateForm, PosicaoGeograficaCreateForm, InstanciaObjetoUpdateForm, UpdateObjetoForm, CreateMissaoForm,CreateAvatarForm,CondicaoObjetoForm, CondicaoDialogoForm,CondicaoJogadorForm,AgenteCreateForm
+from forms import AgenteWithoutFieldsForm,AgressivoCreateForm,PassivoCreateForm, ColaborativoCreateForm, InstancesComportamentoAddForm, CompetitivoCreateForm
+
 import os
+import json
 
 SESSION_AVENTURA = '_user_aventura_id'
 
 #assumindo que a criação de aventuras não seja colaborativa
 SESSION_INSTANCIA = '_instancia_aventura'
+SESSION_AGENTE = '_instancia_agente'
+SESSION_TYPE_BEHAVIOR = '_type_behavior'
 
 '''
 ===================================================================
@@ -959,6 +972,14 @@ class EnredoListView(ListView):
     template_name = 'editor_enredos/enredos/listar.html'
     model = Enredo
     
+    def get_queryset(self):
+        
+        object_list = ''
+        if self.request.session[SESSION_AVENTURA] != '-1':
+            object_list = Enredo.objects.all().filter(aventura_id=self.request.session[SESSION_AVENTURA].id)
+            #for obj in object_list:
+                #print obj
+        return object_list
 
 #create Enredo
 class EnredoCreateView(CreateView):
@@ -967,61 +988,73 @@ class EnredoCreateView(CreateView):
     
     #Override no form
     def form_valid(self, form):
-        #arquivos devem ser txt, jpeg, png ou fbx (extensões de objetos 3D para Wikitude SDK Android para AR)
-        tipo = form.cleaned_data['tipo']#recupera tipo de imagem
-        arquivo = form.cleaned_data['enredo']#recupera file
-        if arquivo:
-            if tipo == 'STX':
-            #valida arquivo de texto para salvar sugestao
-                if not os.path.splitext(arquivo.name)[1] in [".txt"]:
-                    ValidationError
-                    msg = "O arquivo deve ser *.txt...."
-                    messages.error(self.request, "".join(msg))
-                    return HttpResponse(json.dumps({'response': 'exception create'}), content_type="text")
-                elif not arquivo.content_type == 'text/plain':
-                    ValidationError
-                    msg = "Não é um arquivo de texto válido!"
-                    messages.error(self.request, "".join(msg))
-                    return HttpResponse(json.dumps({'response': 'exception create'}), content_type="text")
-            elif tipo == 'SAU':
-            #valida arquivo de audio para salvar sugestao
-            #if not file.content-type in ["audio/mpeg","audio/..."]:
-                if not os.path.splitext(arquivo.name)[1] in [".mp3"]:
-                    ValidationError
-                    msg = "O arquivo deve ser *.mp3...."
-                    messages.error(self.request, "".join(msg))
-                    return HttpResponse(json.dumps({'response': 'exception create'}), content_type="text")
-                elif not arquivo.content_type == 'audio/mp3':
-                    ValidationError
-                    msg = "Não é um arquivo de áudio válido!"
-                    messages.error(self.request, "".join(msg))
-                    return HttpResponse(json.dumps({'response': 'exception create'}), content_type="text")
-            if tipo == 'IMGC':
-                if not os.path.splitext(arquivo.name)[1] in [".fbx"]:
-                    ValidationError
-                    msg = "O arquivo deve ser *.fbx...."
-                    messages.error(self.request, "".join(msg))
-                    return HttpResponse(json.dumps({'response': 'exception create'}), content_type="text")
-                elif not arquivo.content_type == 'application/octet-stream':
-                    ValidationError
-                    msg = "Imagens para serem visualizadas câmera, a mesma deve ser de extensão fbx!"
-                    messages.error(self.request, "".join(msg))
-                    return HttpResponse(json.dumps({'response': 'exception create'}), content_type="text")
-            elif tipo == 'IMGM':
-                if not os.path.splitext(arquivo.name)[1] in [".png",".jpeg",".jpg"]:
-                    ValidationError
-                    msg = "O arquivo deve ser *.png ou *.jpeg...."
-                    messages.error(self.request, "".join(msg))
-                    return HttpResponse(json.dumps({'response': 'exception create'}), content_type="text")
-                elif not arquivo.content_type == 'image/png':
-                    if not arquivo.content_type == 'image/jpeg':
+        
+        if self.request.session[SESSION_AVENTURA] != '-1':
+            
+            #arquivos devem ser txt, jpeg, png ou fbx (extensões de objetos 3D para Wikitude SDK Android para AR)
+            tipo = form.cleaned_data['tipo']#recupera tipo de imagem
+            arquivo = form.cleaned_data['enredo']#recupera file
+            if arquivo:
+                if tipo == 'STX':
+                #valida arquivo de texto para salvar sugestao
+                    if not os.path.splitext(arquivo.name)[1] in [".txt"]:
                         ValidationError
-                        msg = "Não é um arquivo de imagem válido!"
+                        msg = "O arquivo deve ser *.txt...."
                         messages.error(self.request, "".join(msg))
                         return HttpResponse(json.dumps({'response': 'exception create'}), content_type="text")
-
-        self.object = form.save()   
-        return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")
+                    elif not arquivo.content_type == 'text/plain':
+                        ValidationError
+                        msg = "Não é um arquivo de texto válido!"
+                        messages.error(self.request, "".join(msg))
+                        return HttpResponse(json.dumps({'response': 'exception create'}), content_type="text")
+                elif tipo == 'SAU':
+                #valida arquivo de audio para salvar sugestao
+                #if not file.content-type in ["audio/mpeg","audio/..."]:
+                    if not os.path.splitext(arquivo.name)[1] in [".mp3"]:
+                        ValidationError
+                        msg = "O arquivo deve ser *.mp3...."
+                        messages.error(self.request, "".join(msg))
+                        return HttpResponse(json.dumps({'response': 'exception create'}), content_type="text")
+                    elif not arquivo.content_type == 'audio/mp3':
+                        ValidationError
+                        msg = "Não é um arquivo de áudio válido!"
+                        messages.error(self.request, "".join(msg))
+                        return HttpResponse(json.dumps({'response': 'exception create'}), content_type="text")
+                if tipo == 'IMGC':
+                    if not os.path.splitext(arquivo.name)[1] in [".fbx"]:
+                        ValidationError
+                        msg = "O arquivo deve ser *.fbx...."
+                        messages.error(self.request, "".join(msg))
+                        return HttpResponse(json.dumps({'response': 'exception create'}), content_type="text")
+                    elif not arquivo.content_type == 'application/octet-stream':
+                        ValidationError
+                        msg = "Imagens para serem visualizadas câmera, a mesma deve ser de extensão fbx!"
+                        messages.error(self.request, "".join(msg))
+                        return HttpResponse(json.dumps({'response': 'exception create'}), content_type="text")
+                elif tipo == 'IMGM':
+                    if not os.path.splitext(arquivo.name)[1] in [".png",".jpeg",".jpg"]:
+                        ValidationError
+                        msg = "O arquivo deve ser *.png ou *.jpeg...."
+                        messages.error(self.request, "".join(msg))
+                        return HttpResponse(json.dumps({'response': 'exception create'}), content_type="text")
+                    elif not arquivo.content_type == 'image/png':
+                        if not arquivo.content_type == 'image/jpeg':
+                            ValidationError
+                            msg = "Não é um arquivo de imagem válido!"
+                            messages.error(self.request, "".join(msg))
+                            return HttpResponse(json.dumps({'response': 'exception create'}), content_type="text")
+                    
+            #add id da aventura no enredo
+            form.instance.aventura_id = self.request.session[SESSION_AVENTURA].id
+            self.object = form.save()   
+            return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")
+        
+        else:
+            ValidationError
+            msg = "Please. Activate an adventure for authoring!"
+            messages.error(self.request, "".join(msg))
+            return HttpResponse(json.dumps({'response': 'exception created'}), content_type="application/json")
+            
     
 class  EnredoUpdateView(UpdateView):
     template_name = 'editor_enredos/enredos/update.html'
@@ -1086,6 +1119,9 @@ class  EnredoUpdateView(UpdateView):
                             messages.error(self.request, "".join(msg))
                             return HttpResponse(json.dumps({'response': 'exception create'}), content_type="text")
 
+        #add id da aventura no enredo
+        form.instance.aventura_id = self.request.session[SESSION_AVENTURA].id
+        
         self.object = form.save()   
         return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")
    
@@ -1137,9 +1173,16 @@ class MissaoCreateView(CreateView):
     
     def form_valid(self, form):
           
-        form.instance.aventuras_id =  self.request.session[SESSION_AVENTURA].id
-        self.object = form.save() 
-        return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")
+        #verifica se aventura está ativa
+        if self.request.session[SESSION_AVENTURA] != '-1':
+            form.instance.aventuras_id =  self.request.session[SESSION_AVENTURA].id
+            self.object = form.save() 
+            return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")
+        else:
+            ValidationError
+            msg = "For the creating a mission it's necessary activate an adventure!"
+            messages.error(self.request, "".join(msg))
+            return HttpResponse(json.dumps({'response': 'exception created'}), content_type="pplication/json")
 
 #update missao
 class MissaoUpdateView(UpdateView):
@@ -1225,7 +1268,10 @@ class CondicaoObjetoCreateView(CreateView):
     
     def get_initial(self):
         initial = super(CondicaoObjetoCreateView, self).get_initial()
-        initial['aventura_id'] = self.request.session[SESSION_AVENTURA].id
+        if self.request.session[SESSION_AVENTURA] != '-1':
+            initial['aventura_id'] = self.request.session[SESSION_AVENTURA].id
+        else:
+            initial['aventura_id'] = '0'
         return initial
      
     def get_success_url(self):
@@ -1233,8 +1279,16 @@ class CondicaoObjetoCreateView(CreateView):
     
     def form_valid(self, form):
         
-        self.object = form.save() 
-        return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")  
+        #verifica se aventura está ativa
+        if self.request.session[SESSION_AVENTURA] != '-1':
+            form.instance.aventuras_id =  self.request.session[SESSION_AVENTURA].id
+            self.object = form.save() 
+            return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")
+        else:
+            ValidationError
+            msg = "For the creating a condition it's necessary activate an adventure!"
+            messages.error(self.request, "".join(msg))
+            return HttpResponse(json.dumps({'response': 'exception created'}), content_type="pplication/json") 
 
 
 #update condicao entre instancias
@@ -1278,16 +1332,28 @@ class CondicaoJogadorCreateView(CreateView):
     
     def get_initial(self):
         initial = super(CondicaoJogadorCreateView, self).get_initial()
-        initial['aventura_id'] = self.request.session[SESSION_AVENTURA].id
+        if self.request.session[SESSION_AVENTURA] != '-1':
+            initial['aventura_id'] = self.request.session[SESSION_AVENTURA].id
+        else:
+            initial['aventura_id'] = '0'
         return initial
     
     def get_success_url(self):
         return reverse('condicao_jogador_list_view')
     
     def form_valid(self, form):
-          
-        self.object = form.save() 
-        return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json") 
+
+        #verifica se aventura está ativa
+        if self.request.session[SESSION_AVENTURA] != '-1':
+            form.instance.aventuras_id =  self.request.session[SESSION_AVENTURA].id
+            self.object = form.save() 
+            return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")
+        else:
+            ValidationError
+            msg = "For the creating a condition it's necessary activate an adventure!"
+            messages.error(self.request, "".join(msg))
+            return HttpResponse(json.dumps({'response': 'exception created'}), content_type="pplication/json") 
+    
 
 
 #update condicao entre instancias
@@ -1347,7 +1413,10 @@ class CondicaoDialogoCreateView(CreateView):
     
     def get_initial(self):
         initial = super(CondicaoDialogoCreateView, self).get_initial()
-        initial['aventura_id'] = self.request.session[SESSION_AVENTURA].id
+        if self.request.session[SESSION_AVENTURA] != '-1':
+            initial['aventura_id'] = self.request.session[SESSION_AVENTURA].id
+        else:
+            initial['aventura_id'] = '0'
         return initial
     
     def get_success_url(self):
@@ -1405,13 +1474,14 @@ class CondicaoDeleteView(DeleteView):
 ====================================================================
 '''
    
+#Recupera lista de avatars para a avetura que está sendo editada. 
 class AvataresListView(ListView):
     template_name = 'editor_jogadores/avatares/listar.html'
     model = Avatar
     
     def get_queryset(self):
         
-        id_av = self.request.session[SESSION_AVENTURA]
+        #id_av = self.request.session[SESSION_AVENTURA]
         
         object_list = ''
         if self.request.session[SESSION_AVENTURA] != '-1':
@@ -1419,8 +1489,7 @@ class AvataresListView(ListView):
 
         return object_list
     
-    
-    
+#Cria avatares para a aventura que está sendo editada
 class AvataresCreateView(CreateView):
     template_name = 'editor_jogadores/avatares/create.html'
     model = Avatar
@@ -1430,11 +1499,18 @@ class AvataresCreateView(CreateView):
         return reverse('missao_list_view')
     
     def form_valid(self, form):
-          
-        form.instance.aventura_avatar_id =  self.request.session[SESSION_AVENTURA].id
-        self.object = form.save() 
-        return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")
+        if self.request.session[SESSION_AVENTURA] != '-1':
+            form.instance.aventura_avatar_id =  self.request.session[SESSION_AVENTURA].id
+            self.object = form.save()
+            return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")
+        else:
+            ValidationError
+            msg = "Please. Activate an adventure for authoring!"
+            messages.error(self.request, "".join(msg))
+            return HttpResponse(json.dumps({'response': 'exception created'}), content_type="application/json")
+              
 
+#Atualiza avatar
 class AvataresUpdateView(UpdateView):
     template_name = 'editor_jogadores/avatares/update.html'
     model = Avatar
@@ -1443,6 +1519,7 @@ class AvataresUpdateView(UpdateView):
         self.object = form.save()   
         return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")
 
+#Deleção do avatar
 class AvataresDeleteView(DeleteView):
     template_name = 'editor_jogadores/avatares/delete.html'
     model = Avatar
@@ -1456,8 +1533,7 @@ class AvataresDeleteView(DeleteView):
             return HttpResponse(json.dumps({'response': 'exception delete'}), content_type="text")
         return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")
     
-    
-    
+#Recupe a lista de instâncias que são controaldas por avatares
 class AvataresListInstancesView(ListView):
     template_name = 'editor_jogadores/papeis/listar.html'
     model = Avatar
@@ -1478,7 +1554,7 @@ class AvataresListInstancesView(ListView):
         #    object_list = Missao.objects.all().filter(aventuras_id=id_av)
 
         #return object_list
-
+#Atualiza roles
 class AvataresUpdateRolesView(UpdateView):
     template_name = 'editor_jogadores/papeis/update.html'
     model = Avatar
@@ -1501,3 +1577,448 @@ class AvataresUpdateRolesView(UpdateView):
         
         self.object = form.save()   
         return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")
+
+ 
+'''
+====================================================================
+                        Views para Agentes
+====================================================================
+''' 
+   
+#atualiza session do agente que está tendo o comportamento criado
+class AgenteSessionView(UpdateView):
+    #template_name = 'editor_objetos/aventura/message.html'
+    model = Agente
+    form_class = AgenteWithoutFieldsForm
+    
+    def get_success_url(self):
+        return reverse('agente_list_view') 
+    
+    #Verifica se o agente possui o comportamento informado
+    #Assim, retornar uma resposta se é atualização ou criação de comportamento
+    def form_valid(self, form,*args, **kwargs):
+        #form.instance.aventura_agente_id =  self.request.session[SESSION_AVENTURA].id
+
+        dados = json.loads(self.request.body)#get json post
+        
+        self.request.session[SESSION_AGENTE] = self.object
+        self.request.session[SESSION_TYPE_BEHAVIOR] = dados[0]['comportamento']
+        comportamento = Comportamento.objects.all().filter(agente_id = dados[0]['idAgente'])
+         
+        #nunca atualiza - POG ;)
+        flag = 0
+        if flag == 1:
+            self.object = form.save()
+        
+        if comportamento:
+            return HttpResponse(json.dumps({'response': 'update'}), content_type="application/json")
+        else:
+            return HttpResponse(json.dumps({'response': 'create'}), content_type="application/json")
+   
+#recupera a lista de agentes da aventura corrente
+class AgentesListView(ListView):
+    template_name = 'editor_movimentos/agentes/listar.html'
+    model = Agente
+    
+    def get_queryset(self):
+        object_list = ''
+        if self.request.session[SESSION_AVENTURA] != '-1':
+            object_list = Agente.objects.all().filter(aventura_agente_id=self.request.session[SESSION_AVENTURA].id)
+
+        return object_list   
+
+#Criaçãao do agente
+class AgenteCreateView(CreateView):
+    template_name = 'editor_movimentos/agentes/create.html'   
+    model = Agente
+    form_class = AgenteCreateForm
+    
+    def get_success_url(self):
+        return reverse('agente_list_view')
+    
+    def form_valid(self, form):
+        
+        if self.request.session[SESSION_AVENTURA] != '-1':
+            form.instance.aventura_agente_id =  self.request.session[SESSION_AVENTURA].id
+            self.object = form.save()
+        else:
+            ValidationError
+            messages.error(self.request, "".join("Please. Activate an adventure for authoring!"))
+            return HttpResponse(json.dumps({'response': 'no adventure activate'}), content_type="text")
+        
+        
+        return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")
+ 
+#Atualização do agente
+class AgenteUpdateView(UpdateView):
+    template_name = 'editor_movimentos/agentes/update.html'   
+    model = Agente
+    form_class = AgenteCreateForm
+    
+    def get_success_url(self):
+        return reverse('agente_list_view')
+    
+    def form_valid(self, form):
+        
+        form.instance.aventura_agente_id =  self.request.session[SESSION_AVENTURA].id
+        
+        if self.request.session[SESSION_AVENTURA] != '-1':
+            
+            #id agente
+            id_agente = self.kwargs['pk']
+            #recupera comportamento
+            comportamento = Comportamento.objects.all().filter(agente_id = id_agente)
+            #verifica tipo de comportamento
+            tipo_comportamento_nome = ''
+            tipo_comportamento_objeto = ''
+            tipo_comportamento_id = ' '
+            for obj in comportamento:
+                #verificando o tipo de comportamento
+                agressivo = Agressivo.objects.all().filter(comportamento_ptr_id = obj.pk)
+                if agressivo:
+                    tipo_comportamento_objeto = agressivo
+                    tipo_comportamento_nome = "Agressivo"
+                    tipo_comportamento_id = obj.pk
+                passivo = Passivo.objects.all().filter(comportamento_ptr_id = obj.pk)
+                if passivo:
+                    tipo_comportamento_objeto = passivo
+                    tipo_comportamento_nome = "Passivo"
+                    tipo_comportamento_id = obj.pk
+                colaborativo = Colaborativo.objects.all().filter(comportamento_ptr_id = obj.pk)
+                if colaborativo:
+                    tipo_comportamento_objeto = colaborativo
+                    tipo_comportamento_nome = "Colaborativo"
+                    tipo_comportamento_id = obj.pk 
+                competidor = Competitivo.objects.all().filter(comportamento_ptr_id = obj.pk)
+                if competidor:
+                    tipo_comportamento_objeto = competidor
+                    tipo_comportamento_nome = "Competidor"
+                    tipo_comportamento_id = obj.pk     
+                          
+            #verifica se o novo comportamento é diferente ao antigo
+            if str(tipo_comportamento_nome) != str(form.instance.comportamento):#verificação ineficiente, feita com base em string
+                    #deleta comportamento antigo
+                    if tipo_comportamento_objeto: 
+                        #mensagem apresentada ao autor, informando que o comprotamento antigo foi apagado.
+                        msg = "The old beahavior, called " + tipo_comportamento_nome + ", was deleted!"
+                        
+                        self.object = form.save()
+                        
+                        return HttpResponse(json.dumps({'comportamento': str(tipo_comportamento_id), 'mensagem' : msg }), content_type="application/json")
+                    
+        self.object = form.save()
+        return HttpResponse(json.dumps({'comportamento': 'nothing'}), content_type="application/json")
+
+#Delecao do comportamento
+class ComportamentoOldDeleteView(DeleteView):
+    model = Comportamento
+    
+    def get_success_url(self):
+        return reverse('agente_list_view')
+    
+    
+    def delete(self, request, *args, **kwargs):
+        
+        comportamento = Comportamento.objects.all().filter(pk = self.kwargs['pk'])
+        self.object = comportamento
+        self.object.delete()
+    
+        return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")
+    
+
+#Criação do comportamento agressivo para o agente   
+class AgressivoCreateView(CreateView):
+    template_name = 'editor_movimentos/agentes/create_agressivo.html'   
+    model = Agressivo
+    form_class = AgressivoCreateForm
+    
+    
+    def get_initial(self):
+        initial = super(AgressivoCreateView, self).get_initial()
+        print self.request.session[SESSION_AGENTE]
+        print self.request.session[SESSION_AGENTE].instancia_id
+        initial['instancia_id'] = self.request.session[SESSION_AGENTE].instancia_id
+        initial['aventura_id'] = self.request.session[SESSION_AVENTURA].id
+        return initial
+    
+    def get_success_url(self):
+        return reverse('agente_list_view')
+    
+    def form_valid(self, form):
+        #form.instance.aventura_agente_id =  self.request.session[SESSION_AVENTURA].id
+        form.instance.agente_id = self.request.session[SESSION_AGENTE].id
+        self.object = form.save()
+    
+        return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")
+    
+#atualiza comportamento agressivo
+class AgressivoUpdateView(UpdateView):
+    template_name = 'editor_movimentos/agentes/update_agressivo.html'
+    model = Agressivo
+    form_class = AgressivoCreateForm
+    
+    def get_initial(self):
+        initial = super(AgressivoUpdateView, self).get_initial()
+        initial['instancia_id'] = self.request.session[SESSION_AGENTE].instancia_id
+        initial['aventura_id'] = self.request.session[SESSION_AVENTURA].id
+        return initial
+    
+    def get_success_url(self):
+        return reverse('agente_list_view')
+    
+    def form_valid(self, form):
+        #form.instance.aventura_agente_id =  self.request.session[SESSION_AVENTURA].id
+        form.instance.agente_id = self.request.session[SESSION_AGENTE].id
+        
+        self.object = form.save()
+    
+        return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")
+    
+#Criação do comportamento passivo para o agente   
+class PassivoCreateView(CreateView):
+    template_name = 'editor_movimentos/agentes/create_passivo.html'   
+    model = Passivo
+    form_class = PassivoCreateForm
+    
+    
+    def get_initial(self):
+        initial = super(PassivoCreateView, self).get_initial()
+        initial['instancia_id'] = self.request.session[SESSION_AGENTE].instancia_id
+        initial['aventura_id'] = self.request.session[SESSION_AVENTURA].id
+        return initial
+    
+    def get_success_url(self):
+        return reverse('agente_list_view')
+    
+    def form_valid(self, form):
+        #form.instance.aventura_agente_id =  self.request.session[SESSION_AVENTURA].id
+        form.instance.agente_id = self.request.session[SESSION_AGENTE].id
+        self.object = form.save()
+    
+        return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")
+    
+#Atualização do comportamento passivo para o agente   
+class PassivoUpdateView(UpdateView):
+    template_name = 'editor_movimentos/agentes/update_passivo.html'   
+    model = Passivo
+    form_class = PassivoCreateForm
+    
+    
+    def get_initial(self):
+        initial = super(PassivoUpdateView, self).get_initial()
+        initial['instancia_id'] = self.request.session[SESSION_AGENTE].instancia_id
+        initial['aventura_id'] = self.request.session[SESSION_AVENTURA].id
+        return initial
+    
+    def get_success_url(self):
+        return reverse('agente_list_view')
+    
+    def form_valid(self, form):
+        #form.instance.aventura_agente_id =  self.request.session[SESSION_AVENTURA].id
+        form.instance.agente_id = self.request.session[SESSION_AGENTE].id
+        self.object = form.save()
+    
+        return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")
+    
+#Criação do comportamento Colaborativo para p agente
+class ColaborativoCreateView(CreateView):
+    template_name = 'editor_movimentos/agentes/create_colaborativo.html'
+    model = Colaborativo
+    form_class = ColaborativoCreateForm
+    
+    def get_initial(self):
+        initial = super(ColaborativoCreateView, self).get_initial()
+        initial['instancia_id'] = self.request.session[SESSION_AGENTE].instancia_id
+        initial['aventura_id'] = self.request.session[SESSION_AVENTURA].id
+        return initial
+    
+    def get_success_url(self):
+        return reverse('agente_list_view')
+    
+    def form_valid(self, form):
+        #form.instance.aventura_agente_id =  self.request.session[SESSION_AVENTURA].id
+        print form 
+        form.instance.agente_id = self.request.session[SESSION_AGENTE].id
+        self.object = form.save()
+    
+        return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")
+
+#Atualização do comportamento Colaborativo para p agente
+class ColaborativoUpdateView(UpdateView):
+    template_name = 'editor_movimentos/agentes/update_colaborativo.html'
+    model = Colaborativo
+    form_class = ColaborativoCreateForm
+    
+    def get_initial(self):
+        initial = super(ColaborativoUpdateView, self).get_initial()
+        initial['instancia_id'] = self.request.session[SESSION_AGENTE].instancia_id
+        initial['aventura_id'] = self.request.session[SESSION_AVENTURA].id
+        return initial
+    
+    def get_success_url(self):
+        return reverse('agente_list_view')
+    
+    def form_valid(self, form):
+        #form.instance.aventura_agente_id =  self.request.session[SESSION_AVENTURA].id
+        print form 
+        form.instance.agente_id = self.request.session[SESSION_AGENTE].id
+        self.object = form.save()
+    
+        return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")
+    
+
+#Criação do comportamento Competitivo para o agente
+class CompetitivoCreateView(CreateView):
+    template_name = 'editor_movimentos/agentes/create_competitivo.html'
+    model = Competitivo
+    form_class = CompetitivoCreateForm
+    
+    def get_initial(self):
+        initial = super(CompetitivoCreateView, self).get_initial()
+        initial['instancia_id'] = self.request.session[SESSION_AGENTE].instancia_id
+        initial['aventura_id'] = self.request.session[SESSION_AVENTURA].id
+        return initial
+    
+    def get_success_url(self):
+        return reverse('agente_list_view')
+    
+    def form_valid(self, form):
+        #form.instance.aventura_agente_id =  self.request.session[SESSION_AVENTURA].id
+        print form 
+        form.instance.agente_id = self.request.session[SESSION_AGENTE].id
+        self.object = form.save()
+    
+        return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")
+    
+#Atualização do comportamento Colaborativo para p agente
+class CompetitivoUpdateView(UpdateView):
+    template_name = 'editor_movimentos/agentes/update_competitivo.html'
+    model = Competitivo
+    form_class = CompetitivoCreateForm
+    
+    def get_initial(self):
+        initial = super(CompetitivoUpdateView, self).get_initial()
+        initial['instancia_id'] = self.request.session[SESSION_AGENTE].instancia_id
+        initial['aventura_id'] = self.request.session[SESSION_AVENTURA].id
+        return initial
+    
+    def get_success_url(self):
+        return reverse('agente_list_view')
+    
+    def form_valid(self, form):
+        #form.instance.aventura_agente_id =  self.request.session[SESSION_AVENTURA].id
+        print form 
+        form.instance.agente_id = self.request.session[SESSION_AGENTE].id
+        self.object = form.save()
+    
+        return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")
+
+#retorna a lista de mensagegens do comportamento atual que está sendo editado
+class ListInstances(ListView):
+    template_name = 'editor_movimentos/agentes/list_instance.html'
+    model = Mensagem
+    
+    def get_queryset(self):
+        
+        object_list = ''
+        if self.request.session[SESSION_AVENTURA] != '-1':
+            
+            comportamento = Comportamento.objects.all().filter(agente_id=self.request.session[SESSION_AGENTE].id)
+            
+            id_comportamento = ''
+            for obj in comportamento:
+                id_comportamento = obj.pk
+            
+            object_list = Mensagem.objects.all().filter(colaborativo_id = id_comportamento)
+
+        return object_list   
+
+
+#Add Instâncias para comportamento Calaborativo ou Competidor
+class InstanciasCreateView(CreateView):
+    template_name = 'editor_movimentos/agentes/add_instance.html'
+    model = Mensagem
+    form_class = InstancesComportamentoAddForm
+    
+    def get_initial(self):
+        initial = super(InstanciasCreateView, self).get_initial()
+        initial['instancia_id'] = self.request.session[SESSION_AGENTE].instancia_id
+        initial['aventura_id'] = self.request.session[SESSION_AVENTURA].id
+        return initial
+    
+    def get_success_url(self):
+        return reverse('agente_list_view')
+    
+    def form_valid(self, form):
+        #form.instance.aventura_agente_id =  self.request.session[SESSION_AVENTURA].id
+        
+        comportamentos = Comportamento.objects.all().filter(agente_id = self.request.session[SESSION_AGENTE].id)
+        
+        id_comportamento = ''
+        for obj in comportamentos:
+            id_comportamento = obj.pk
+        
+        print id_comportamento
+        print self.request.session[SESSION_TYPE_BEHAVIOR]
+        
+        if self.request.session[SESSION_TYPE_BEHAVIOR] == "Colaborativo":
+            form.instance.colaborativo_id = id_comportamento
+        else:
+            form.instance.colaborativo_id = id_comportamento
+            
+        self.object = form.save()
+    
+        return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")  
+
+  
+#Atualiza Instâncias para comportamento Calaborativo ou Competidor
+class InstanciasUpdateView(UpdateView):
+    template_name = 'editor_movimentos/agentes/update_instance.html'
+    model = Mensagem
+    form_class = InstancesComportamentoAddForm
+    
+    def get_initial(self):
+        initial = super(InstanciasUpdateView, self).get_initial()
+        initial['instancia_id'] = self.request.session[SESSION_AGENTE].instancia_id
+        initial['aventura_id'] = self.request.session[SESSION_AVENTURA].id
+        return initial 
+    
+    def form_valid(self, form):
+        #form.instance.aventura_agente_id =  self.request.session[SESSION_AVENTURA].id
+        
+        comportamentos = Comportamento.objects.all().filter(agente_id = self.request.session[SESSION_AGENTE].id)
+        
+        id_comportamento = ''
+        for obj in comportamentos:
+            id_comportamento = obj.pk
+        
+        print id_comportamento
+        print self.request.session[SESSION_TYPE_BEHAVIOR]
+        
+        if self.request.session[SESSION_TYPE_BEHAVIOR] == "Colaborativo":
+            form.instance.colaborativo_id = id_comportamento
+        else:
+            form.instance.colaborativo_id = id_comportamento
+            
+        self.object = form.save()
+    
+        return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json") 
+    
+    def get_success_url(self):
+        return reverse('agente_list_view')
+    
+#Deleção do Agente
+class AgenteDeleteView(DeleteView):
+    template_name = 'editor_movimentos/agentes/delete.html'
+    model = Agente
+
+    #Override no delete para retornar uma resposta json caso o objeto seja deletado com sucesso
+    def delete(self, request, *args, **kwargs):
+        
+        self.object = self.get_object()
+        self.object.delete()
+        
+        return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")
+    
+    def get_success_url(self):
+        return reverse('agente_list_view') 

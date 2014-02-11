@@ -5,8 +5,10 @@ Created on 23/10/2013
 @author: Roberto Gumarães  Morati Junior
 '''
 from django import forms 
-from editor_objetos.models import Aventura, Autor, PosicaoGeografica, InstanciaObjeto, Objeto, TipoImagem, Icone, Missao, Avatar,CondicaoObjeto,CondicaoDialogo,CondicaoJogador
-    
+from editor_objetos.models import Aventura, Autor, PosicaoGeografica, InstanciaObjeto, Objeto, TipoImagem, Icone, Missao, Avatar,\
+    Enredo
+from editor_objetos.models import CondicaoObjeto,CondicaoDialogo,CondicaoJogador, Agente
+from editor_objetos.models import Agressivo, Passivo,Colaborativo, Mensagem, Competitivo
 from django.forms.extras.widgets import SelectDateWidget 
 from django.forms.models import ModelChoiceField
 from datetime import date
@@ -15,37 +17,50 @@ from django.utils.translation import ugettext_lazy as _
 
 
 '''
-Forms para Listagem de Condições 
+Forms para tratar listagem de condições
 '''
+#retorna o nome da instância do objeto
 class CondicoesObjetosFielForm(ModelChoiceField):
     def label_from_instance(self,obj):
         return obj.get_nome_instancia()
-    
+
+#<NOTHING>
 class CondicoesObjetosListagemForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(CondicoesObjetosListagemForm, self).__init__(*args, **kwargs)
         
         self.fields['ligacao']  = CondicoesObjetosFielForm()
         
-        
+
 '''
-Forms para Ajustar Templates/Forms para Criação de Condinções
+Forms para templates para criação de Condições
 '''
+#retorna o nome da instancia do objeto       
 class CondicaoObjetoModelChoiceField(ModelChoiceField):
     def label_from_instance(self,obj):
         return obj.get_nome_instancia()
 
-#Condições Objetos 
+#retorna nome da missao
+class MissaoModelChoiceField(ModelChoiceField):
+    def label_from_instance(self, obj):
+        return obj.get_nome_missao()
+    
+#retorna nome do enredo
+class EnredoModelChoiceField(ModelChoiceField):
+    def label_from_instance(self, obj):
+        return obj.get_nome_enredo()    
+
+#Template para condições do objeto
 class CondicaoObjetoForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(CondicaoObjetoForm, self).__init__(*args, **kwargs)
            
         #recupera id da aventura
         self.aventura_id = kwargs['initial']['aventura_id']
+        
         object_list = Objeto.objects.filter(coletavel= True)
 
         #Recuperando Instâncias
-        self.fields['prefixo'].label = 'Instâncias'
         flag = 0;
         buffer_inst = '';
         for obj in object_list:
@@ -55,34 +70,49 @@ class CondicaoObjetoForm(forms.ModelForm):
             elif flag == 1:
                 buffer_inst = buffer_inst | InstanciaObjeto.objects.filter(objeto_id=obj.id);# | concatena apenas QuerySet
         
+        self.fields['nome'].label = 'Name'
+        self.fields['operador'].label = 'Logical Operator'
+        self.fields['ligacao'].label = 'Link'
+        
         #Carregando Instâncias
         self.fields['prefixo']  = InstanciaObjetoRoleModelChoiceField(queryset=buffer_inst,)
         self.fields['prefixo'].required = True
+        self.fields['prefixo'].label = 'Instances'
+        
+        #Carregando missoes da aventura
+        self.fields['missao'] = MissaoModelChoiceField(Missao.objects.filter(aventuras_id = self.aventura_id),)
+        self.fields['missao'].required = True
+        self.fields['missao'].label = 'Mission'
+
+        #Carregando enredos da aventura
+        self.fields['enredo'] = EnredoModelChoiceField(Enredo.objects.filter(aventura_id=self.aventura_id),)
+        self.fields['enredo'].required = True
+        self.fields['enredo'].label = 'Story'
+        
         
         #Carregando Instâncias
-        self.fields['sufixo'].label = 'Instâncias'
         self.fields['sufixo']  = InstanciaObjetoRoleModelChoiceField(queryset=buffer_inst,)
         self.fields['sufixo'].required = True
+        self.fields['sufixo'].label = 'Instances'
     
     class Meta: 
         model = CondicaoObjeto
 
 
+#retorna o nome do avatar
 class CondicaoJogadorModelChoiceField(ModelChoiceField):
     def label_from_instance(self,obj):
         return obj.get_nome_avatar()
     
-#Ajusta forms para condições entre jogadores e instâncias de objetos coletáveis.        
+#Ajusta templates para condições entre jogadores e instâncias de objetos coletáveis.        
 class CondicaoJogadorForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(CondicaoJogadorForm, self).__init__(*args, **kwargs)
 
-        #recupera id da aventura para recuperar instãncias daquela aventura
+        #recupera id da aventura para recuperar instãncias da aventura
         self.aventura_id = kwargs['initial']['aventura_id']
         object_list = Objeto.objects.filter(coletavel= True)
-        
-        self.fields['sufixo'].label = 'Instâncias'
-        
+             
         #recueprando instâncias
         flag = 0;
         buffer_inst = '';
@@ -93,18 +123,32 @@ class CondicaoJogadorForm(forms.ModelForm):
             elif flag == 1:
                 buffer_inst = buffer_inst | InstanciaObjeto.objects.filter(objeto_id=obj.id);# | concatena apenas QuerySet
         
+        self.fields['nome'].label = 'Name'
+        self.fields['operador'].label = 'Logical Operator'
+        self.fields['ligacao'].label = 'Link'
+        
         #carregando instâncias
         self.fields['sufixo']  = InstanciaObjetoRoleModelChoiceField(queryset=buffer_inst,)
         self.fields['sufixo'].required = True
+        self.fields['sufixo'].label = 'Instances'
         
         #recupernado e carregando avatares da aventura
-        self.fields['prefixo'].label = 'Avatar'
         self.fields['prefixo']  = CondicaoJogadorModelChoiceField(queryset=Avatar.objects.filter(aventura_avatar_id=self.aventura_id))
         self.fields['prefixo'].required = True
+        self.fields['prefixo'].label = 'Avatar'
+        
+                #Carregando missoes da aventura
+        self.fields['missao'] = MissaoModelChoiceField(Missao.objects.filter(aventuras_id = self.aventura_id),)
+        self.fields['missao'].required = True
+        self.fields['missao'].label = 'Mission'
+
+        #Carregando enredos da aventura
+        self.fields['enredo'] = EnredoModelChoiceField(Enredo.objects.filter(aventura_id=self.aventura_id),)
+        self.fields['enredo'].required = True
+        self.fields['enredo'].label = 'Story'
         
     class Meta: 
         model = CondicaoJogador
-
 
 class CondicaoDialogoModelChoiceField(ModelChoiceField):
     def label_from_instance(self,obj):
@@ -120,8 +164,14 @@ class CondicaoDialogoForm(forms.ModelForm):
         self.aventura_id = kwargs['initial']['aventura_id']
         object_list = Objeto.objects.filter(coletavel= False, dialogo = True, )
         
+        
+        self.fields['nome'].label = 'Name'
+        self.fields['operador'].label = 'Logical Operator'
+        self.fields['ligacao'].label = 'Link'
+        
+        
+        
         #recuperar instâncias que possuem diálogo como ativado.
-        self.fields['referencia_sufixo'].label = 'Instância Referência'
         flag = 0;
         buffer_inst = '';
         for obj in object_list:
@@ -133,10 +183,22 @@ class CondicaoDialogoForm(forms.ModelForm):
         
         self.fields['referencia_sufixo']  = InstanciaObjetoRoleModelChoiceField(queryset=buffer_inst,)
         self.fields['referencia_sufixo'].required = True
+        self.fields['referencia_sufixo'].label = 'Instance Reference'
         
-        self.fields['prefixo'].label = 'Avatar'
+        
         self.fields['prefixo']  = CondicaoDialogoModelChoiceField(queryset=Avatar.objects.filter(aventura_avatar_id=self.aventura_id))
         self.fields['prefixo'].required = True
+        self.fields['prefixo'].label = 'Avatar'
+        
+                        #Carregando missoes da aventura
+        self.fields['missao'] = MissaoModelChoiceField(Missao.objects.filter(aventuras_id = self.aventura_id),)
+        self.fields['missao'].required = True
+        self.fields['missao'].label = 'Mission'
+
+        #Carregando enredos da aventura
+        self.fields['enredo'] = EnredoModelChoiceField(Enredo.objects.filter(aventura_id=self.aventura_id),)
+        self.fields['enredo'].required = True
+        self.fields['enredo'].label = 'Story'
         
     class Meta: 
         model = CondicaoDialogo
@@ -155,7 +217,7 @@ class AvatarRoleListForm(forms.ModelForm):
     def __init__(self,  *args, **kwargs):
         super(AvatarRoleListForm, self).__init__(*args, **kwargs)
         #get_nome_tipo_imagem
-        self.fields['inst_objeto'].label = 'Instância Objeto'
+        self.fields['inst_objeto'].label = 'Object Instance'
         self.fields['inst_objeto']  = InstanciaObjetoRoleModelChoiceField(queryset=InstanciaObjeto.objects.filter(encenacao='AV'),)
         self.fields['inst_objeto'].required = False
         
@@ -196,7 +258,25 @@ class UpdateObjetoForm(forms.ModelForm):
         self.fields['icone_objeto'] = IconeModelChoiceField(queryset=Icone.objects.filter(),)
         #forms.ModelChoiceField(queryset=TipoImagem.objects.filter(tipo='IM'))
        
-            
+
+'''
+Form para Agente
+'''            
+class AgenteCreateForm(forms.ModelForm):
+    
+    def __init__(self,  *args, **kwargs):
+        super(AgenteCreateForm, self).__init__(*args, **kwargs)
+        #get_nome_tipo_imagem
+        self.fields['instancia'].label = 'Instance'
+        print InstanciaObjeto.objects.filter(encenacao='AG')
+        self.fields['instancia']  = InstanciaObjetoRoleModelChoiceField(queryset=InstanciaObjeto.objects.filter(encenacao='AG'),)
+        self.fields['instancia'].required = True
+        
+    class Meta:
+        model = Agente
+        exclude = ['aventura_agente',]        
+
+        
 
 '''
 Form para Objeto
@@ -226,6 +306,14 @@ class AventuraWithoutFieldsForm(forms.ModelForm):
     class Meta:
         model = Aventura
         exclude = ['nome','descricao','inicio','fim','longitude','autor','latitude',]
+        
+'''
+Form utilizado para salvar aventura na session
+'''
+class AgenteWithoutFieldsForm(forms.ModelForm):
+    class Meta:
+        model = Agente
+        exclude = ['nome','proximidade','aventura_agente','comportamento','instancia_id','instancia']
 
 '''
 Form para Login
@@ -316,3 +404,167 @@ class InstanciaObjetoUpdateForm(forms.ModelForm):
                     dialogo +="\n</dialogo>" 
                     self.initial ={'nome':instance.nome, 'dialogo': dialogo,'proximidade': instance.proximidade,
                                    'encenacao':instance.encenacao,'sugestao':instance.sugestao_objeto,'visivel':instance.visivel}
+                    
+'''
+Forms para criação para Comportamentos
+'''
+
+class PosGeoRoleModelChoiceField(ModelChoiceField):
+    def label_from_instance(self, obj):
+        nome = obj.get_nome_instancia(0)
+        print nome
+        return nome
+    
+class AgressivoCreateForm(forms.ModelForm):
+        
+        def __init__(self,  *args, **kwargs):
+            super(AgressivoCreateForm, self).__init__(*args, **kwargs)
+            
+            #recupera id da instância do agente
+            instancia_id = kwargs['initial']['instancia_id']
+            #recupera id da aventura
+            id_aventura = kwargs['initial']['aventura_id']
+            
+            #configura select com as posições da instância.
+            queryset=PosicaoGeografica.objects.filter(instancia_objeto_id=instancia_id)
+            aux = 0
+            for obj in queryset:
+                print obj.get_nome_instancia(aux)
+                aux = aux +1
+            
+            self.fields['pos_inicial']  = PosGeoRoleModelChoiceField(queryset=PosicaoGeografica.objects.filter(instancia_objeto_id=instancia_id),)
+            self.fields['pos_inicial'].required = True
+            self.fields['pos_inicial'].label = 'Initial Position'
+            #recuperando instancias que sejam coletaveis
+            
+            
+            objetos = Objeto.objects.filter(coletavel=1)
+            print objetos
+            
+            flag = 0
+            for obj in objetos:
+                if flag == 0:
+                    instancias = InstanciaObjeto.objects.filter(objeto_id=obj.id,aventura_id=id_aventura,)
+                    flag = 1;
+                elif flag == 1:
+                    instancias = instancias | InstanciaObjeto.objects.filter(objeto_id=obj.id,aventura_id=id_aventura, )# | concatena apenas QuerySet
+
+            
+            self.fields['item'] = InstanciaObjetoRoleModelChoiceField(queryset=instancias,)
+            self.fields['item'].required = True
+            self.fields['item'].label = 'Item'
+            
+            #carregando avatares 
+            
+            self.fields['avatar_vit']  = CondicaoJogadorModelChoiceField(queryset=Avatar.objects.filter(aventura_avatar_id=id_aventura))
+            self.fields['avatar_vit'].required = True
+            self.fields['avatar_vit'].label = 'Avatar'
+            
+        class Meta:
+            model = Agressivo
+            exclude = ['agente',] 
+            
+class PassivoCreateForm(forms.ModelForm):
+        
+        def __init__(self,  *args, **kwargs):
+            super(PassivoCreateForm, self).__init__(*args, **kwargs)
+            
+            #recupera id da instância do agente
+            instancia_id = kwargs['initial']['instancia_id']
+            #recupera id da aventura
+            #id_aventura = kwargs['initial']['aventura_id']
+            
+            #configura select com as posições da instância.
+           
+            
+            queryset=PosicaoGeografica.objects.filter(instancia_objeto_id=instancia_id)
+            aux = 0
+            for obj in queryset:
+                print obj.get_nome_instancia(aux)
+                aux = aux +1
+            
+            self.fields['pos_inicial']  = PosGeoRoleModelChoiceField(queryset=PosicaoGeografica.objects.filter(instancia_objeto_id=instancia_id),)
+            self.fields['pos_inicial'].required = True
+            self.fields['pos_inicial'].label = "Initial Position"
+
+        class Meta:
+            model = Passivo
+            exclude = ['agente',] 
+            
+class ColaborativoCreateForm(forms.ModelForm):
+    
+    def __init__(self,  *args, **kwargs):
+        super(ColaborativoCreateForm, self).__init__(*args, **kwargs)
+        
+        #recupera id da instância do agente
+        instancia_id = kwargs['initial']['instancia_id']
+        #recupera id da aventura
+        id_aventura = kwargs['initial']['aventura_id']
+        
+        queryset=PosicaoGeografica.objects.filter(instancia_objeto_id=instancia_id)
+        aux = 0
+        for obj in queryset:
+            print obj.get_nome_instancia(aux)
+            aux = aux +1
+            
+        self.fields['pos_inicial']  = PosGeoRoleModelChoiceField(queryset=PosicaoGeografica.objects.filter(instancia_objeto_id=instancia_id),)
+        self.fields['pos_inicial'].required = True
+        self.fields['pos_inicial'].label = "Initial Position"
+        
+        self.fields['avatar_col']  = CondicaoJogadorModelChoiceField(queryset=Avatar.objects.filter(aventura_avatar_id=id_aventura))
+        self.fields['avatar_col'].required = True
+        self.fields['avatar_col'].label = 'Avatar'
+        
+    class Meta:
+        model = Colaborativo
+        exclude = ['obstaculoscl','agente',] 
+        
+        
+class CompetitivoCreateForm(forms.ModelForm):
+    
+    def __init__(self,  *args, **kwargs):
+        super(CompetitivoCreateForm, self).__init__(*args, **kwargs)
+        
+        #recupera id da instância do agente
+        instancia_id = kwargs['initial']['instancia_id']
+        #recupera id da aventura
+        id_aventura = kwargs['initial']['aventura_id']
+        
+        queryset=PosicaoGeografica.objects.filter(instancia_objeto_id=instancia_id)
+        aux = 0
+        for obj in queryset:
+            print obj.get_nome_instancia(aux)
+            aux = aux +1
+            
+        self.fields['pos_inicial']  = PosGeoRoleModelChoiceField(queryset=PosicaoGeografica.objects.filter(instancia_objeto_id=instancia_id),)
+        self.fields['pos_inicial'].required = True
+        self.fields['pos_inicial'].label = "Initial Position"
+        
+        self.fields['avatar_comp']  = CondicaoJogadorModelChoiceField(queryset=Avatar.objects.filter(aventura_avatar_id=id_aventura))
+        self.fields['avatar_comp'].required = True
+        self.fields['avatar_comp'].label = 'Avatar'
+        
+    class Meta:
+        model = Competitivo
+        exclude = ['obstaculoscp','agente',]         
+        
+        
+        
+class InstancesComportamentoAddForm(forms.ModelForm):
+    
+    def __init__(self,  *args, **kwargs):
+        super(InstancesComportamentoAddForm, self).__init__(*args, **kwargs)
+        
+        #recupera id da instância do agente
+        #instancia_id = kwargs['initial']['instancia_id']
+        #recupera id da aventura
+        id_aventura = kwargs['initial']['aventura_id']
+        
+        
+        self.fields['instancia_objeto'] = InstanciaObjetoRoleModelChoiceField(queryset=InstanciaObjeto.objects.filter(aventura_id=id_aventura,encenacao="DS"),)
+        self.fields['instancia_objeto'].required = True
+        self.fields['instancia_objeto'].label = 'Instances'
+        
+    class Meta:
+        model = Mensagem
+        exclude = ['colaborativo','competitivo',] 

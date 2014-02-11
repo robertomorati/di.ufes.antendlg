@@ -1,0 +1,56 @@
+
+<!-- {% load bootstrap_toolkit %} -->
+{% block content %}  
+	  <form id="instance_comportamento_update_view" class="form-actions" method="post" action="{% url instance_comportamento_update_view object.pk %}">
+		  <div class="modal-header">
+		    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" action="">×</button>
+		    <h3 id="myModalLabel">Update Instance for the Behavior</h3>
+		  </div>
+		  <div class="modal-body">
+			  {% if messages %}
+						<div class="alert alert-error" width="30">
+							<button type="button" class="close" data-dismiss="alert">
+								<span class="badge badge-important">x</span>
+							</button>
+							<ul class="messages">
+								{% for message in messages %}
+									<li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li> 
+								{% endfor %}
+							</ul>
+						</div>
+				 {% endif %}
+				 {% csrf_token %}
+				 {{ form|as_bootstrap }}
+		  </div>
+		  <div class="modal-footer">
+		    <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+		    <button type="submit" class="btn btn-primary">Update Instance</button>
+		  </div>
+	  </form>
+
+
+		<script type="text/javascript">
+			var options = {
+				target : '#agente_instance',
+				success : showResponse
+			};
+		
+			// post-submit callback 
+			function showResponse(responseText, statusText, xhr, $form) {
+				var ct = xhr.getResponseHeader("content-type") || "";
+				if (ct.indexOf('json') > -1) {
+					// fecha o modal
+					$('#agente_instance').modal('hide');
+					//refreshDiv('{% url agente_list_view %}','content');
+					refreshDiv('{% url instance_list_view %}','agente');
+					$('#agente').modal('show');
+				}else if (ct == 'text'){
+					openModal('{% url instance_comportamento_update_view object.pk %}','agente_instance');
+				}
+			}
+		
+			$('#instance_comportamento_update_view').ajaxForm(options);
+		</script>
+{% endblock %}
+
+

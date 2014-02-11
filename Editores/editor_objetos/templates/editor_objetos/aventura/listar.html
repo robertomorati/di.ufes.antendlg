@@ -20,32 +20,32 @@
 				<td>{{ object.inicio }}</td>
 				<td>{{ object.fim }}</td>
 				<td>{{ object.latitude }} 
-				    {{ object.longitude }}</td>
-				<td>
-				{% csrf_token %} 
-					<a class="btn btn-block btn-small btn-danger" data-toggle="modal" 
-					onClick="openModal('{% url  aventura_delete_view object.pk %}','aventura')" 
-					href="#aventura">Delete</a>
+				    {{ object.longitude }}
 				</td>
+				    {% csrf_token %} 
+				
 				<td>
 				 <!-- botao editar - id da aventura é inserido na seçção -->
-				 	<a class="btn btn-block btn-small" data-toggle="modal"
+				 	<a class="btn btn-block btn-small btn-primary" data-toggle="modal"
 				 	onClick="openModal('{% url aventura_ativar_edicao_view object.pk %}','aventura')" 
 				 	href="#aventura">Activate Authoring</a>		 
 				</td>
 				<td>
 				 <!-- botao editar - id da aventura é inserido na seçção -->
-				 	<a class="btn btn-warning btn-small" data-toggle="modal"
+				 	<a class="btn btn-block btn-small" data-toggle="modal"
 				 	onClick="openModal('{% url aventura_desativar_edicao_view object.pk %}','aventura')" 
 				 	href="#aventura">Deactivate Authoring</a>		 
 				</td>
-				
+				<td>
+					<a class="btn btn-block btn-small btn-danger" data-toggle="modal" 
+					onClick="openModal('{% url  aventura_delete_view object.pk %}','aventura')" 
+					href="#aventura">Delete</a>
+				</td>
 			</tr>
 			{% empty %}
 			<tr>
 				<td colspan="4"><i style="margin-right: 10px;"
-					class="icon-warning-sign"></i><strong>Atenção!</strong>Não existem
-					aventuras.
+					class="icon-warning-sign"></i><strong>Attention!</strong>There are no adventures.
 				</td>
 			</tr>
 			{% endfor %}

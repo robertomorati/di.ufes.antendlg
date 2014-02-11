@@ -4,6 +4,7 @@ encoding//core/views.py=utf-8
 encoding//editor_enredos/urls.py=utf-8
 encoding//editor_jogadores/urls.py=utf-8
 encoding//editor_missoes/urls.py=utf-8
+encoding//editor_movimentos/urls.py=utf-8
 encoding//editor_objetos/admin.py=utf-8
 encoding//editor_objetos/migrations/0002_auto__add_field_sugestao_tipo__add_field_sugestao_sugestao__add_field_.py=utf-8
 encoding//editor_objetos/models.py=utf-8

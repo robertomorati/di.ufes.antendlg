@@ -50,7 +50,7 @@
 					$('#sugestao').modal('hide');
 					refreshDiv('{% url sugestao_list_view %}','content');
 				}else if (ct == 'text'){
-						openModal('{% url sugestao_delete_view object.pk %}','objeto');
+				    openModal('{% url sugestao_delete_view object.pk %}','objeto');
 				}
 			}
 		
