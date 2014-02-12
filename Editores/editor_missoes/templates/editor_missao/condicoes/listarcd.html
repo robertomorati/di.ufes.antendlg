@@ -22,7 +22,7 @@
 							onClick="openModal('{% url  condicao_dialogo_update_view object.pk %}','condicoes')"
 							href="#condicoes">{{ object.nome }}</a> 
 						</td>
-						<td>{{ object.prefixo }}</td>
+						<td>{{ object.prefixo.nome }}</td>
 						<td>{{ object.ligacao }}</td>		
 						<td>{{ object.sufixo }}</td>
 						<td>{{ object.referencia_sufixo }}</td>

@@ -1257,6 +1257,15 @@ class CondicaoObjetoListView(ListView):
             for obj in missao_list:
                 object_list = CondicaoObjeto.objects.all().filter(missao_id=obj.id).order_by('missao')
                 
+            #atualizando field link
+            for obj in object_list:
+                if obj.ligacao == "JOIN_OBJ":
+                    obj.ligacao = "combinou"
+                elif obj.ligacao == "GET_OBJ":
+                    obj.ligacao = 'possui'
+                else:
+                    obj.ligacao = "conversou"
+
         return object_list
     
     
@@ -1321,7 +1330,17 @@ class CondicaoJogadorListView(ListView):
             #flag = 0;
             for obj in missao_list:
                 object_list = CondicaoJogador.objects.all().filter(missao_id=obj.id).order_by('missao')
-
+                
+            #atualizando field link
+            for obj in object_list:
+                
+                if obj.ligacao == "JOIN_OBJ":
+                    obj.ligacao = "combinou"
+                elif obj.ligacao == "GET_OBJ":
+                    obj.ligacao = 'possui'
+                else:
+                    obj.ligacao = "conversou"
+                
         return object_list
     
 #Cria condição entre um determinado avatar da aventura e a instância de objeto
@@ -1403,6 +1422,25 @@ class CondicaoDialogoListView(ListView):
             for obj in missao_list:
                 object_list = CondicaoDialogo.objects.all().filter(missao_id=obj.id).order_by('missao')
                 
+            #atualizando field link
+            for obj in object_list:
+
+                if obj.ligacao == "JOIN_OBJ":
+                    obj.ligacao = "combinou"
+                elif obj.ligacao == "GET_OBJ":
+                    obj.ligacao = 'possui'
+                else:
+                    obj.ligacao = "conversou"
+                
+                if obj.sufixo ==  "DIALOGO_INICIAL":
+                    obj.sufixo = "Dialogo Inicial"
+                elif obj.sufixo ==  "DIALOGO_FINAL":
+                    obj.sufixo = "Dialogo Final"
+                elif obj.sufixo == "ACEITO":
+                    obj.sufixo = "aceito"
+                else:
+                    obj.sufixo = "Negação"
+                    
         return object_list
     
 #Cria a dondição entre um Avatar e uma parte de diálogo de uma dada instância.

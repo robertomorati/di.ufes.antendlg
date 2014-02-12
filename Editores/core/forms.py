@@ -169,8 +169,6 @@ class CondicaoDialogoForm(forms.ModelForm):
         self.fields['operador'].label = 'Logical Operator'
         self.fields['ligacao'].label = 'Link'
         
-        
-        
         #recuperar instâncias que possuem diálogo como ativado.
         flag = 0;
         buffer_inst = '';
@@ -205,14 +203,14 @@ class CondicaoDialogoForm(forms.ModelForm):
 
         
 '''
-Form para Criar Papeis
+Form para criação de roles/papeis para avatares
 '''
-
+#retorna o nome da instancia       
 class InstanciaObjetoRoleModelChoiceField(ModelChoiceField):
     def label_from_instance(self, obj):
         return obj.get_nome_instancia()
 
-
+#Formada o template para criação de papéis
 class AvatarRoleListForm(forms.ModelForm):  
     def __init__(self,  *args, **kwargs):
         super(AvatarRoleListForm, self).__init__(*args, **kwargs)
@@ -226,7 +224,7 @@ class AvatarRoleListForm(forms.ModelForm):
         exclude = ['publico','longitude','latitude','aventureiro','aventura_avatar','avatar']  
     
 '''
-Form para CreateAvatar
+Form para tratar  a criação de avatar
 '''
 class CreateAvatarForm(forms.ModelForm):
     class Meta:
@@ -547,7 +545,6 @@ class CompetitivoCreateForm(forms.ModelForm):
     class Meta:
         model = Competitivo
         exclude = ['obstaculoscp','agente',]         
-        
         
         
 class InstancesComportamentoAddForm(forms.ModelForm):

@@ -480,6 +480,13 @@ class Condicao(models.Model):
     enredo = models.ForeignKey(Enredo,verbose_name="Enredo", related_name="enredos", blank=True, default="", null=True, )
     missao = models.ForeignKey(Missao,verbose_name="Missão",related_name="condicoes_missao", blank=True, default="", null=True, )
     
+    def get_ligacao(self):   
+        if self.ligacao == "GET_OBJ":
+            return u'possui'
+        elif self.ligacao == "START_TALK":
+            return u'conversou'
+        else:
+            return u'combinou'
     
     #def get_ligacao(self):
     #    if self.object
