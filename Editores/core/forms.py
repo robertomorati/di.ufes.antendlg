@@ -5,8 +5,7 @@ Created on 23/10/2013
 @author: Roberto Gumarães  Morati Junior
 '''
 from django import forms 
-from editor_objetos.models import Aventura, Autor, PosicaoGeografica, InstanciaObjeto, Objeto, TipoImagem, Icone, Missao, Avatar,\
-    Enredo
+from editor_objetos.models import Aventura, Autor, PosicaoGeografica, InstanciaObjeto, Objeto, TipoImagem, Icone, Missao, Avatar,Enredo
 from editor_objetos.models import CondicaoObjeto,CondicaoDialogo,CondicaoJogador, Agente
 from editor_objetos.models import Agressivo, Passivo,Colaborativo, Mensagem, Competitivo
 from django.forms.extras.widgets import SelectDateWidget 
@@ -392,7 +391,7 @@ class InstanciaObjetoUpdateForm(forms.ModelForm):
                 #self.fields['dialogo'].widget = forms.HiddenInput()
                 self.fields.pop('dialogo')
             else:
-                if dialog_tam > 80:#xml editado tem tamanho superior a 80
+                if dialog_tam < 60:#xml editado tem tamanho superior a 80
                     dialogo = "<dialogo id_instancia='" + str(instance.id) + "' nome='"+ instance.nome +"'>\n"
                     #dialogo +="<npc tipo='dialogoInicial'>\n Digite a fala inicial do personagem aqui.\n </npc>"
                     #dialogo +="<avatar tipo='confirmacao'>\nDigite a fala do jogador aqui.\n"
@@ -565,3 +564,13 @@ class InstancesComportamentoAddForm(forms.ModelForm):
     class Meta:
         model = Mensagem
         exclude = ['colaborativo','competitivo',] 
+        
+        
+'''
+Form para ocultar select aventura
+'''
+class  EnredoForm(forms.ModelForm):
+    class Meta:
+        model = Enredo
+        exclude = ['aventura',] 
+        

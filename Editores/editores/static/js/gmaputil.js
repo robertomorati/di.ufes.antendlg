@@ -60,7 +60,7 @@ function carregaPos (){
 }
 
 /**
- * Função que inicializa o gllge maps. 
+ * Função que inicializa o google maps. 
  * API v3 está sendo utilizada, sendo tal em HTML 5.
  * 
  */
@@ -552,92 +552,97 @@ function createMarkerToPolygon(poly,event,path,markers){
 }
 
 /**
+ * Função que lida com a atualização dos dados de uma instância,
+ * com mais de 1 posição geográfica.
  * 
- * @param poly - Polygon Instance 
- * @param marker - marcador a receber infowindow
- * @param iconTime - icone de tempo para carregamento dos dados da instância
+ * @param poly - Instância Polygon 
+ * @param marker - marcador que receve a infowindow
+ * @param iconTime - ícone de tempo para carregamento dos dados da instância
  * @param markers - lista de marcadores
  * @param path - MVCArray
  * @param nome_marker - nome do marcador
  */
 function infoWindowMarkersPolygon(poly,marker,iconTime,markers,path,nome_marker){
 	
-			var iconTime = "" + '<i class=" icon-download-alt"></i>';
-			  
-			 //getting of following link:
-			 //http://jsfiddle.net/kjy112/3CvaD/
-			 var nameInfo = 'infoWindow' + nome_marker;
-			 marker[nameInfo] = new google.maps.InfoWindow({ 
-				    maxWidth: 600,
-				    content: iconTime,
-		     });
-			  
-	       var urlIO = '/editor_objetos/instancia_objeto/update_instancia/' +  marker.get("id_instancia") + '/';
-	      
-		   marker[nameInfo].open($map, marker);
-		   info = marker[nameInfo];
-		   
-	       var rmMaker = marker;
-	       
-	       //De acordo com "fontes" no stackoverflow, a forma mais eficiente para carregar o conteúdo na infowindow é por meio de ajax.
-	       $.ajax({	
-	    	    type: 'GET',
-	    	    url: urlIO,
-	    	    success: function(data){
-	    	    	
-	    	    	//adiciona um evento ao conteúdo da infowindo relacionado ao DOM.
-	    	    	google.maps.event.addListener(info, 'domready', function(event) {
-	    	    	  
-	    	    	  var options = {
-	    	  				target : '#contentInstance',
-	    	  				success : showResponse,
-	    	  				error: showsomething,
-	    	  				async: false 
-	    	  			};
-	    	    	  
-	    	  			// post-submit callback 
-	    	  			function showResponse(responseText, statusText, xhr, $form) {
-	    	  				
-	    	  				var ct = xhr.getResponseHeader("content-type") || "";
-	    	  				
-	    	  				if(responseText.response == "delete"){
-	    	  					info.close();//fecha infowindow
-	    	  					//rmMaker.setMap(null);//remover marcadores
-	    	  					flagLoadBackupInstancesMoreOfPos = false;//set flag to upadte instances
-	    	  					loadInstancias();//update isntances
-	    	  					
-	    	  					//marker.setMap(null);
-	    	  					for (var i = 0; i <= markers.length; i++){
-	    	  						var delMarker = markers[i];
-	    	  						//markers.splice(i, (i+1));
-	    	  						delMarker.setMap(null);
-	    	  						poly.setMap(null);
-	    	  					}
-	    	  					
-	    	  				}else if (ct.indexOf('json') > -1) {
-	    	  					 info.close();//após atualizar fecha a infowindow
-	    	  				}
-	    	  			}
-	    	  			
-	    	  			function showsomething(){
-	    	  				alert("Ocorreu um erro ao recuperar o conteúdo da instância. Por gentileza, tente a operação novamente!");
-	    	  			}
-	    	  			
-	    	  			//add evento nos forms
-	    	  			$('#instancia_objeto_update_view').ajaxForm(options);
-	    	  			$('#instancia_objeto_delete_view').ajaxForm(options);
-	    	    	  
-	    	      });//fim do script para tratar o json e domready
-	    	    	
-	    	       info.setContent(data);//atualiza conteúdo;
-	    	       
-	    	    },
-			     error: function(xhr) {
-			        	alert("Ocorreu um erro ao carregar os dados da instância!");
-			     }
-	    	});
-	       //volta com o icone de carregamento para o usuário
-	       info.setContent(iconTime);
+	//Icone para fornecer feedback ao usuário de que os dados da instância estão sendo carregados
+	iconTime = "" + '<i class=" icon-download-alt"></i>';
+	  
+	 
+	 //Criação da infoWindows, 
+	 //fonte:http://jsfiddle.net/kjy112/3CvaD/
+	 var nameInfo = 'infoWindow' + nome_marker;
+	 marker[nameInfo] = new google.maps.InfoWindow({ 
+		    maxWidth: 600,
+		    content: iconTime,
+     });
+   
+   //Url para recuperar dados da instância que será atualizada
+   var urlIO = '/editor_objetos/instancia_objeto/update_instancia/' +  marker.get("id_instancia") + '/';
+  
+   marker[nameInfo].open($map, marker);
+   info = marker[nameInfo];
+   
+   var rmMaker = marker;
+   
+   //Carregando conteúdo da infoWindow por meio de uma requisição Ajax
+   $.ajax({	
+	    type: 'GET',
+	    url: urlIO,
+	    success: function(data){
+	    	
+	    	//Adiciona um evento ao conteúdo da infowindo relacionado ao DOM.
+	    	google.maps.event.addListener(info, 'domready', function(event) {
+	    	  
+	    	var options = {
+  				target : '#contentInstance', 
+  				success : showResponse,
+  				error: showsomething, 
+  				async: false 
+  			};
+    	  
+  			// post-submit callback 
+  			function showResponse(responseText, statusText, xhr, $form) {
+				var ct = xhr.getResponseHeader("content-type") || "";
+				
+				if(responseText.response == "delete"){
+				    
+					//Fecha a infoWindow se a instância for deletada
+					info.close();
+					//atualiza flag para atualizar buffer de instâncias
+					flagLoadBackupInstancesMoreOfPos = false;
+					//atualiza instâncias
+					loadInstancias();
+					
+					for (var i = 0; i <= markers.length; i++){
+						var delMarker = markers[i];
+						//markers.splice(i, (i+1));
+						delMarker.setMap(null);
+						poly.setMap(null);
+					}
+					
+				}else if (ct.indexOf('json') > -1) {
+					 //instância atualizada com sucesso, fecha infowindow
+					 info.close();
+				}
+  			}
+  			
+  			function showsomething(){
+  				alert("Ocorreu um erro ao recuperar o conteúdo da instância. Por gentileza, tente a operação novamente!");
+  			}
+  			
+  			//add evento nos forms
+  			$('#instancia_objeto_update_view').ajaxForm(options);
+  			$('#instancia_objeto_delete_view').ajaxForm(options);
+	    	  
+	      });//fim do script para tratar o json e domready
+	      //atualiza conteúdo
+	      info.setContent(data); 
+	    },
+	     error: function(xhr) {
+	        	alert("Ocorreu um erro ao carregar os dados da instância!");
+	    }
+	});
+   info.setContent(iconTime);
 }
 
 /**
@@ -798,7 +803,7 @@ function placeInstancesGoogleMaps(location,icon, id_instancia, name_objeto){
 	    	  			}
 	    	  			
 	    	  			function showsomething(){
-	    	  				alert("Ocorreu um erro ao recuperar o conteúdo da instância. Por gentileza, tente a operação novamente!");
+	    	  				alert("Ocorreu um erro ao recuperar o conteúdo da instância ou durante a atualização da mesma. Por gentileza, tente a operação novamente!");
 	    	  			}
 	    	  			
 	    	  			//add evento nos forms

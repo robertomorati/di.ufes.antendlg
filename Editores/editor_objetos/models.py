@@ -442,7 +442,8 @@ Missao - representa algo que o jogador deve fazer. Uma missão possui um conjunt
 class Missao(models.Model):
     nome = models.CharField(max_length=30,default="", )
     descricao = models.CharField(max_length=200,verbose_name="Descrição",default="descreva o objetivo da missão",)
-    tempo = models.TimeField(_(u"Tempo para Missão"),null=True,)#auto_now_add=True,
+    #tempo = models.TimeField(_(u"Tempo para Missão"),null=True,)#auto_now_add=True,
+    tempo = models.IntegerField(_(u"Tempo para Missão"),null=True,)
     enredo = models.ForeignKey(Enredo,verbose_name="Enredo", related_name="enredo_missao", blank=True, default="", null=True, )
     #condicoes =  models.ForeignKey(CondicoesMissao,verbose_name="Condições para Missão",related_name="condicoes", blank=True, default="", null=True, )
     aventuras = models.ForeignKey(Aventura,verbose_name="Aventura",related_name="aventuras", blank=True, default="", null=True, )

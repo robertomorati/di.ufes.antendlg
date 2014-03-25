@@ -47,7 +47,7 @@
 				// fecha o modal
 			
 				$('#missao').modal('hide');
-				refreshDiv('{% url enredo_list_view %}','content');
+				refreshDiv('{% url missao_list_view %}','content');
 			}else{
 				openModal('{% url missao_update_view object.pk %}','missao');
 			}

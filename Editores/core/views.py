@@ -29,7 +29,7 @@ from editor_objetos.models import Enredo, Missao, Condicao,CondicaoDialogo,Condi
 from editor_objetos.models import Avatar, Agente, Agressivo, Comportamento, Passivo, Colaborativo, Mensagem, Competitivo
 
 from forms import AventuraForm, AventuraWithoutFieldsForm,AvatarRoleListForm, InstanciaObjetoCreateForm, PosicaoGeograficaCreateForm, InstanciaObjetoUpdateForm, UpdateObjetoForm, CreateMissaoForm,CreateAvatarForm,CondicaoObjetoForm, CondicaoDialogoForm,CondicaoJogadorForm,AgenteCreateForm
-from forms import AgenteWithoutFieldsForm,AgressivoCreateForm,PassivoCreateForm, ColaborativoCreateForm, InstancesComportamentoAddForm, CompetitivoCreateForm
+from forms import AgenteWithoutFieldsForm,AgressivoCreateForm,PassivoCreateForm, ColaborativoCreateForm, InstancesComportamentoAddForm, CompetitivoCreateForm, EnredoForm
 
 import os
 import json
@@ -387,6 +387,10 @@ class InstanciaObjetoGetJsonView(ListView):
              
         
         json_inst_objetos += ']';
+        
+        print "Instâncias de Objetos em JSON"
+        print json_inst_objetos
+        
         return HttpResponse(json_inst_objetos)
 
 #Pendencia: validacao manua do form.
@@ -402,8 +406,7 @@ class InstanciaObjetoUpdateView(UpdateView):
     #    return reverse('gmaps_view')
     
     def form_valid(self, form):
-        print form
-        
+        print str(form)
         self.object = form.save()  
         #return HttpResponseRedirect(self.get_success_url())
         return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")
@@ -985,7 +988,7 @@ class EnredoListView(ListView):
 class EnredoCreateView(CreateView):
     template_name = 'editor_enredos/enredos/create.html'
     model = Enredo
-    
+    form_class = EnredoForm
     #Override no form
     def form_valid(self, form):
         
@@ -1059,6 +1062,7 @@ class EnredoCreateView(CreateView):
 class  EnredoUpdateView(UpdateView):
     template_name = 'editor_enredos/enredos/update.html'
     model = Enredo
+    form_class = EnredoForm
     
     def get_success_url(self):
         return reverse('enredo_list_view')
@@ -1188,6 +1192,7 @@ class MissaoCreateView(CreateView):
 class MissaoUpdateView(UpdateView):
     template_name = 'editor_missao/missao/update.html'
     model = Missao
+    form_class = CreateMissaoForm
     
     def form_valid(self, form):
         self.object = form.save()   
