@@ -33,11 +33,11 @@ class TipoObjeto(models.Model):
     
     #return o tipo
     def __unicode__(self):
-        return u'%s' % (self.tipo)
+        return u"%s" % (self.tipo)
     
     # return o bool do dialogo
     def get_attribute_dialogo(self):
-        return u'%d'%(self.dialogo)
+        return u"%s"%(self.dialogo)
     
     #verifica se o tipo de objeto não possui objetos do seu tipo
     def delete(self):
@@ -62,11 +62,11 @@ class Icone (models.Model):
     
     #retorna o icone (dir)
     def __unicode__(self):
-        return u'%s' % (self.icone)
+        return u"%s" % (self.icone)
         #return u'<img class="avatar" src="%s" alt="avatar">' % (self.icone)
 
     def get_nome_icone(self):
-        return u'%s' % (self.nome)
+        return u"%s" % (self.nome)
     
     #verifica se ícone nao esta sendo utilizado por algum objeto
     def delete(self, *args, **kwargs):
@@ -111,7 +111,7 @@ class Sugestao(models.Model):
     proximidade = models.IntegerField(max_length=3,default=1)
     
     def __unicode__(self):
-        return u'%s' % (self.nome) 
+        return u"%s" % (self.nome) 
    
     #verifica se sugestao nao esta sendo utilizado por alguma instancia
     def delete(self, *args, **kwargs):
@@ -155,7 +155,7 @@ class Objeto (models.Model):
     #img = models.ImageField(upload_to='../media/imagens/',verbose_name="Imagem Autoria")
     
     def _unicode_(self):
-        return u'%s' % (self.nome)
+        return u"%s" % (self.nome)
   
 '''
 Autor - é o individuo que cria a aventura.
@@ -173,7 +173,7 @@ class Autor(User, models.Model):
     
     #retorna o dir do autor
     def __unicode__(self):
-        return u'%s' % (self.icone_autor)
+        return u"%s" % (self.icone_autor)
 
 
 '''
@@ -199,7 +199,7 @@ class Aventura(models.Model):
     #autores = models.ManyToManyField(Autor, related_name="autores_aventura",)
     
     def __unicode__(self):
-        return u'%s' % (self.nome)
+        return u"%s" % (self.nome)
 
 '''
 TipoImagem representa o tipo de imagem para a instância de objeto.
@@ -221,10 +221,10 @@ class TipoImagem(models.Model):
     descricao = models.CharField(max_length=100, default="")
     
     def __unicode__(self):
-        return u'%s' % (self.nome_img)
+        return u"%s" % (self.nome_img)
     
     def get_nome_tipo_imagem(self):
-        return u'%s' % (self.nome_img)
+        return u"%s" % (self.nome_img)
     
     #verifica se sugestao nao esta sendo utilizado por alguma instancia
     def delete(self, *args, **kwargs): 
@@ -290,10 +290,10 @@ class InstanciaObjeto(models.Model):
     #sugestao_objeto =  models.ForeignKey(Sugestao, related_name="sugestao_instancia_objeto", )
     
     def __unicode__(self):
-        return u'%s' % (self.nome)
+        return u"%s" % (self.nome)
     
     def get_nome_instancia(self):
-        return u'%s' % (self.nome)
+        return u"%s" % (self.nome)
 
 '''
 Posições Geográficas para instâncias de objetos.
@@ -311,7 +311,7 @@ class PosicaoGeografica(models.Model):
 
     def get_nome_instancia(self,posn):
         nomepos = "POS " + str(posn)
-        return u'%s' % (nomepos)
+        return u"%s" % (nomepos)
 
 '''
 Jogador - representar um jogador cadastrado com seu dispositivo movel
@@ -342,11 +342,11 @@ class Avatar(models.Model):
     
     #retorna o icone (dir)
     def __unicode__(self):
-        return u'%s' % (self.avatar)
+        return u"%s" % (self.avatar)
         #return u'<img class="avatar" src="%s" alt="avatar">' % (self.icone)
 
     def get_nome_avatar(self):
-        return u'%s' % (self.nome)
+        return u"%s" % (self.nome)
     
     #verifica se um avatar está ou não sendo utilizado em alguma condição. 
     def delete(self, *args, **kwargs):
@@ -395,10 +395,10 @@ class Enredo(models.Model):
     aventura = models.ForeignKey(Aventura,verbose_name="Aventura",related_name="aventura_enredo", blank=True, default="", null=True, )
     
     def __unicode__(self):
-        return u'%s' % (self.nome)
+        return u"%s" % (self.nome)
     
     def get_nome_enredo(self):
-        return u'%s' % (self.nome)
+        return u"%s" % (self.nome)
     
     #verifica se o enredo esta sendo utilizado por Condições Missão
     def delete(self, *args, **kwargs): 
@@ -449,10 +449,10 @@ class Missao(models.Model):
     aventuras = models.ForeignKey(Aventura,verbose_name="Aventura",related_name="aventuras", blank=True, default="", null=True, )
  
     def __unicode__(self):
-        return u'%s' % (self.nome)
+        return u"%s" % (self.nome)
     
     def get_nome_missao(self):
-        return u'%s' % (self.nome)
+        return u"%s" % (self.nome)
     
     
 '''
@@ -483,11 +483,11 @@ class Condicao(models.Model):
     
     def get_ligacao(self):   
         if self.ligacao == "GET_OBJ":
-            return u'possui'
+            return u"possui"
         elif self.ligacao == "START_TALK":
-            return u'conversou'
+            return u"conversou"
         else:
-            return u'combinou'
+            return u"combinou"
     
     #def get_ligacao(self):
     #    if self.object

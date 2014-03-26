@@ -1545,7 +1545,6 @@ class AvataresCreateView(CreateView):
         if self.request.session[SESSION_AVENTURA] != '-1':
             form.instance.aventura_avatar_id =  self.request.session[SESSION_AVENTURA].id
             self.object = form.save()
-            form.encode('ascii', 'ignore')
             return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")
         else:
             ValidationError
