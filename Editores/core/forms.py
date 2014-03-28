@@ -557,7 +557,8 @@ class InstancesComportamentoAddForm(forms.ModelForm):
         id_aventura = kwargs['initial']['aventura_id']
         
         
-        self.fields['instancia_objeto'] = InstanciaObjetoRoleModelChoiceField(queryset=InstanciaObjeto.objects.filter(aventura_id=id_aventura,encenacao="DS"),)
+        #encenacao="DS"   irá recuperar todos os tipos de instâncias
+        self.fields['instancia_objeto'] = InstanciaObjetoRoleModelChoiceField(queryset=InstanciaObjeto.objects.filter(aventura_id=id_aventura,),)
         self.fields['instancia_objeto'].required = True
         self.fields['instancia_objeto'].label = 'Instances'
         
