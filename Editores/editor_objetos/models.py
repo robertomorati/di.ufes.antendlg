@@ -477,7 +477,7 @@ class Condicao(models.Model):
         (OR, 'OR'),)
     nome = models.CharField(max_length=30,default="", )
     operador = models.CharField(max_length=10, verbose_name="Operador Lógico", choices=OPERADOR ,default=AND)
-    ligacao = models.CharField(max_length=10, verbose_name="Ligação", choices=LIGACAO ,default=GET_OBJ)
+    ligacao = models.CharField(max_length=20, verbose_name="Ligação", choices=LIGACAO ,default=GET_OBJ)
     enredo = models.ForeignKey(Enredo,verbose_name="Enredo", related_name="enredos", blank=True, default="", null=True, )
     missao = models.ForeignKey(Missao,verbose_name="Missão",related_name="condicoes_missao", blank=True, default="", null=True, )
     
@@ -535,7 +535,7 @@ class CondicaoDialogo(Condicao, models.Model):
         (ACEITO, 'Aceito'),
         (NEGACAO, 'Negação'),)
     prefixo = models.ForeignKey(Avatar,verbose_name="Avatares",related_name="prefixo_cd_avateres", blank=True, default="", null=True, )
-    sufixo =  models.CharField(max_length=10, choices=ESTADOS_DIALOGO ,default=DIALOGO_INICIAL)
+    sufixo =  models.CharField(max_length=20, choices=ESTADOS_DIALOGO ,default=DIALOGO_INICIAL)
     referencia_sufixo = models.ForeignKey(InstanciaObjeto,verbose_name="Instâncias de Objetos", related_name="ref_sufixo_cd_inst_obj", blank=True, default="", null=True, )
     
 '''

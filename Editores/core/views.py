@@ -199,6 +199,7 @@ class ObjetoListView(ListView):
 class ObjetoCreateView(CreateView):
     template_name = 'editor_objetos/objeto/create.html'
     model = Objeto
+    form_class = UpdateObjetoForm
     
     def get_success_url(self):
         return reverse('objeto_list_view')
@@ -1500,13 +1501,15 @@ class CondicaoDeleteView(DeleteView):
         #if self.object == CondicaoJogador:
         #    print "Condicao Jogador"
          
-        if hasattr(self.object, 'condicaojogador'): 
+        if hasattr(self.object, 'condicaojogador'):
+            self.object.delete()
             return HttpResponse(json.dumps({'response': 'condicaojogador'}), content_type="application/json") 
         elif hasattr(self.object, 'condicaoobjeto'):
+            self.object.delete()
             return HttpResponse(json.dumps({'response': 'condicaoobjeto'}), content_type="application/json")
         elif hasattr(self.object, 'condicaodialogo'):
+            self.object.delete()
             return HttpResponse(json.dumps({'response': 'condicaodialogo'}), content_type="application/json")
-        #self.object.delete()
         #except ValidationError as e:
             #messages.error(request, "".join(e.messages))
             #return HttpResponse(json.dumps({'response': 'exception delete'}), content_type="text")
