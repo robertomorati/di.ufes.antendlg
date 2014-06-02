@@ -419,6 +419,18 @@ class Enredo(models.Model):
         super(Enredo, self).save(*args, **kwargs)   
 
 
+#Classes a serem adicionadas
+'''
+class EnredoFile(Enredo, models.Model):
+    enredo_file = models.FileField(upload_to ='enredo/', help_text="Elemente que auxilia na contextualição da tomada de decisão..",default="", ) 
+    
+class EnredoInstancia(Enredo, models.Model):
+    enredo_instancia = models.ForeignKey(InstanciaObjeto, related_name="enredo_instancia",blank=True,default="",)
+    
+class EnredoMensagem(Enredo,models.Model):
+    #enredo_mensagem = 
+    pass
+'''
 
 '''
 CondicoesMissao - representa uma composicao de condicoes para uma missao

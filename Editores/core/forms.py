@@ -379,8 +379,8 @@ class InstanciaObjetoUpdateForm(forms.ModelForm):
         instance = kwargs.get('instance', None)
         
         #get_nome_tipo_imagem
-        self.fields['imagem_mapa'] = InstanciaObjetoModelChoiceField(queryset=TipoImagem.objects.filter(tipo='IC'),)
-        self.fields['imagem_camera'] = InstanciaObjetoModelChoiceField(queryset=TipoImagem.objects.filter(tipo='IM'),)
+        self.fields['imagem_mapa'] = InstanciaObjetoModelChoiceField(queryset=TipoImagem.objects.filter(tipo='IM'),)
+        self.fields['imagem_camera'] = InstanciaObjetoModelChoiceField(queryset=TipoImagem.objects.filter(tipo='IC'),)
         self.fields['imagem_mapa'].required = False
         self.fields['imagem_camera'].required = False
         self.fields['sugestao_objeto'].required = False
