@@ -48,7 +48,7 @@ urlpatterns = patterns('',
     
 
     
-    url(r'^', include(router.urls)),
+    #url(r'^', include(router.urls)),
     url(r'^auth_services/', include('rest_framework.urls', namespace='rest_framework')),
     
     
