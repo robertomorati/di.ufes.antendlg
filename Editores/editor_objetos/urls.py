@@ -24,8 +24,8 @@ admin.autodiscover()
 # Routers provide an easy way of automatically determining the URL conf.#
 #router = routers.DefaultRouter()
 #router.register(r'aventuras', AventuraViewSet)
-#from core_services.views import MyRESTView
-#from django.conf.urls.defaults import *
+from core_services.views import MyRESTView
+from django.conf.urls.defaults import *
 
 urlpatterns = patterns('',        
                        
@@ -34,8 +34,8 @@ urlpatterns = patterns('',
     #url(r'^api-auth/aventuras/$', AventuraViewSet.as_view(), name='aventuras-resource'),  
     
     # this URL passes resource_id in **kw to MyRESTView
-    #url(r'^api/v1.0/resource/(?P<resource_id>\d+)[/]?$', MyRESTView.as_view(), name='my_rest_view'),
-    #url(r'^api/v1.0/resource[/]?$', MyRESTView.as_view(), name='my_rest_view'), 
+    url(r'^api/v1.0/resource/(?P<resource_id>\d+)[/]?$', MyRESTView.as_view(), name='my_rest_view'),
+    url(r'^api/v1.0/resource[/]?$', MyRESTView.as_view(), name='my_rest_view'), 
     
     #urls para tipo de objeto
     url(r'^tipo_objeto/$', TipoObjetoListView.as_view(), name='tipo_objeto_list_view'),

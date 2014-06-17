@@ -8,19 +8,19 @@ from editores.views import LoginView, LoginCreateView, AutorGetJsonView
 from rest_framework import viewsets, routers
 from editor_objetos.models import Autor
 
-#from core.viewsset import MyRESTView
+from core.viewsset import MyRESTView
 admin.autodiscover()
 
 
 #rest framework
-#router = routers.DefaultRouter()
+router = routers.DefaultRouter()
 #router.register(r'users', Autor)
 
 urlpatterns = patterns('',
 
      # this URL passes resource_id in **kw to MyRESTView
-     #url(r'^api/v1.0/resource/(?P<resource_id>\d+)[/]?$', login_required(MyRESTView.as_view()), name='my_rest_view'),
-     #url(r'^api/v1.0/resource[/]?$', login_required(MyRESTView.as_view()), name='my_rest_view'),
+     url(r'^api/v1.0/resource/(?P<resource_id>\d+)[/]?$', login_required(MyRESTView.as_view()), name='my_rest_view'),
+     url(r'^api/v1.0/resource[/]?$', login_required(MyRESTView.as_view()), name='my_rest_view'),
     
      # Login / logout.
      url(r"^autendlg/login/$",LoginView.as_view(), name="login",),
@@ -48,8 +48,8 @@ urlpatterns = patterns('',
     
 
     
-    #url(r'^', include(router.urls)),
-    #url(r'^auth_services/', include('rest_framework.urls', namespace='rest_framework')),
+    url(r'^', include(router.urls)),
+    url(r'^auth_services/', include('rest_framework.urls', namespace='rest_framework')),
     
     
     
