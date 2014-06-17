@@ -407,11 +407,16 @@ Forms para criação para Comportamentos
 '''
 
 class PosGeoRoleModelChoiceField(ModelChoiceField):
-    def label_from_instance(self, obj):
-        nome = obj.get_nome_instancia(0)
-        print nome
-        return nome
     
+    def __init__(self, *args, **kwargs):
+        self.pos = 0     
+        super(PosGeoRoleModelChoiceField, self).__init__(*args, **kwargs)
+    
+    def label_from_instance(self, obj):
+        self.pos += 1
+        return "POS #%i" % self.pos
+
+     
 class AgressivoCreateForm(forms.ModelForm):
         
         def __init__(self,  *args, **kwargs):

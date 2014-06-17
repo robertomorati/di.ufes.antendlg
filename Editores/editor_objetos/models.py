@@ -14,6 +14,19 @@ from django.contrib.auth.models import User
 from django.utils.translation import gettext as _
 #from imagekit.models import ImageSpecField
 
+
+
+class CalcClass(object):
+
+    def __init__(self, *args, **kw):
+        # Initialize any variables you need from the input you get
+        pass
+
+    def do_work(self):
+        # Do some calculations here
+        # returns a tuple ((1,2,3, ), (4,5,6,))
+        result = ((1,2,3, ), (4,5,6,)) # final result
+        return result
 '''
 Class TipoObjeto 
 
@@ -309,6 +322,7 @@ class PosicaoGeografica(models.Model):
     instancia_objeto = models.ForeignKey(InstanciaObjeto, related_name="pos_inst_objeto",blank=True,default="",)
     #instancia_objeto = models.ManyToManyField(InstanciaObjeto, related_name="pos_inst_objeto",blank=True,) 
 
+    
     def get_nome_instancia(self,posn):
         nomepos = "POS " + str(posn)
         return u'%s' % (nomepos)
@@ -455,6 +469,7 @@ class Missao(models.Model):
     nome = models.CharField(max_length=30,default="", )
     descricao = models.CharField(max_length=200,verbose_name="Descrição",default="descreva o objetivo da missão",)
     #tempo = models.TimeField(_(u"Tempo para Missão"),null=True,)#auto_now_add=True,
+    #tempo = models.IntegerField(_(u"Tempo para Missão"),null=True,)
     tempo = models.IntegerField(_(u"Tempo para Missão"),null=True,)
     enredo = models.ForeignKey(Enredo,verbose_name="Enredo", related_name="enredo_missao", blank=True, default="", null=True, )
     #condicoes =  models.ForeignKey(CondicoesMissao,verbose_name="Condições para Missão",related_name="condicoes", blank=True, default="", null=True, )

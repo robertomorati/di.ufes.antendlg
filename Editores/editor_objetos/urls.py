@@ -16,7 +16,27 @@ from core.views import TipoImagemListView, TipoImagemCreateView, TipoImagemUpdat
 from django.contrib import admin
 admin.autodiscover()
 
-urlpatterns = patterns('',                           
+
+
+#from django.conf.urls import url, patterns, include
+#from rest_framework import viewsets, routers
+
+# Routers provide an easy way of automatically determining the URL conf.#
+#router = routers.DefaultRouter()
+#router.register(r'aventuras', AventuraViewSet)
+from core_services.views import MyRESTView
+from django.conf.urls.defaults import *
+
+urlpatterns = patterns('',        
+                       
+    #url(r'^', include(router.urls)),
+    #url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),     
+    #url(r'^api-auth/aventuras/$', AventuraViewSet.as_view(), name='aventuras-resource'),  
+    
+    # this URL passes resource_id in **kw to MyRESTView
+    url(r'^api/v1.0/resource/(?P<resource_id>\d+)[/]?$', MyRESTView.as_view(), name='my_rest_view'),
+    url(r'^api/v1.0/resource[/]?$', MyRESTView.as_view(), name='my_rest_view'), 
+    
     #urls para tipo de objeto
     url(r'^tipo_objeto/$', TipoObjetoListView.as_view(), name='tipo_objeto_list_view'),
     url(r'^tipo_objeto/criar_tipo_objeto/$', TipoObjetoCreateView.as_view(), name='tipo_objeto_create_view'),
@@ -82,7 +102,6 @@ urlpatterns = patterns('',
     url(r'^gmaps/$', GMapView.as_view(), name='gmaps_view'),
     url(r'^gmap/msg/$', MsgShowView.as_view(), name='posicao_aventura_view'),#msg que posicao da aventura foi alterada
     #url(r'^gmaps/$', GMapView.as_view(), name='gmaps_view'), com id da aventura
-    
     
     
 )

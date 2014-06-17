@@ -7,7 +7,7 @@ Created on 18/09/2013
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
 from django.contrib.auth.models import User
-from editor_objetos.models import TipoObjeto,Autor
+from editor_objetos.models import TipoObjeto,Autor,CalcClass
 
 
 class AutorInline(admin.TabularInline):
@@ -18,7 +18,13 @@ class UserAdmin(DjangoUserAdmin):
 
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
+''''
+class Calc(DjangoUserAdmin):
+    inlines = (AutorInline,)
 
+admin.site.unregister(CalcClass)
+admin.site.register(CalcClass, Calc)
+'''
 
 class TipoObjetoAdmin(admin.ModelAdmin):
     pass
