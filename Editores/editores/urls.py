@@ -13,7 +13,7 @@ admin.autodiscover()
 
 
 #rest framework
-router = routers.DefaultRouter()
+#router = routers.DefaultRouter()
 #router.register(r'users', Autor)
 
 urlpatterns = patterns('',
@@ -49,7 +49,7 @@ urlpatterns = patterns('',
 
     
     #url(r'^', include(router.urls)),
-    url(r'^auth_services/', include('rest_framework.urls', namespace='rest_framework')),
+    #url(r'^auth_services/', include('rest_framework.urls', namespace='rest_framework')),
     
     
     
