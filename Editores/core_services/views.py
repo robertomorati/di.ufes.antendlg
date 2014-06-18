@@ -11,6 +11,7 @@ from django.http import HttpResponse
 from django.core import serializers
 import json
 
+
 from editor_objetos.models import CalcClass, Aventura
 
 from rest_framework import permissions
@@ -29,6 +30,7 @@ class MyRESTView(APIView):
         # Any URL parameters get passed in **kw
         myClass = CalcClass(get_arg1, get_arg2, *args, **kw)
         result = myClass.do_work()
+        print result
         response = Response(result, status=status.HTTP_200_OK)
         return response
     
@@ -44,4 +46,5 @@ class AventuraViewSet(APIView):
         #retornar as aventuras
         data = serializers.serialize('json', aventuras,)
         response = Response(data, status=status.HTTP_200_OK)
-        return response
+        #return response
+        return HttpResponse(data, content_type="application/json")
