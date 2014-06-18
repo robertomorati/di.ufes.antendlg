@@ -2,9 +2,7 @@
 # Django settings for Editores project.
 import os
 
-
 DEBUG = True
-
 
 #SESSION_COOKIE_SECURE = True
 #CSRF_COOKIE_SECURE = True
@@ -150,6 +148,8 @@ TEMPLATE_DIRS = (
  
 AUTH_PROFILE_MODULE = 'editores_objetos.Autor'
 
+
+#instalação das aplicações
 INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -186,14 +186,6 @@ PASSWORD_HASHERS = (
     'django.contrib.auth.hashers.CryptPasswordHasher',
 )
 
-#REST_FRAMEWORK = {
-#    'DEFAULT_AUTHENTICATION_CLASSES': (
-#        'rest_framework.authentication.BasicAuthentication',
-#        'rest_framework.authentication.SessionAuthentication',
-#    )
-#}
-
-
 #AUTHENTICATION_BACKENDS = (
 #    'editores.auth_backends.CustomUserModelBackend',
 #)
@@ -229,6 +221,8 @@ LOGGING = {
     }
 }
 
+
+#rest framerwork
 REST_FRAMEWORK = {
     # Use hyperlinked styles by default.
     # Only used if the `serializer_class` attribute is not set on a view.

@@ -88,6 +88,7 @@ class LoginView(FormView):
             if user is None:
                 user = request.user
         # TODO: It would be nice to support different login methods, like signed cookies.
+        #Autenticando usuário na seção
         if SESSION_KEY in request.session:
             if request.session[SESSION_KEY] != user.id:
                 # To avoid reusing another user's session, create a new, empty

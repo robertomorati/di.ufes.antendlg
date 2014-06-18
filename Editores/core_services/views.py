@@ -7,14 +7,16 @@ Created on 17/06/2014
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from django.http import HttpResponse
+from django.core import serializers
+import json
 
-from editor_objetos.models import CalcClass
+from editor_objetos.models import CalcClass, Aventura
 
 from rest_framework import permissions
 
 
 class MyRESTView(APIView):
-    
     
     permission_classes = (permissions.IsAuthenticated,)
     def get(self, request, *args, **kw):
@@ -28,4 +30,18 @@ class MyRESTView(APIView):
         myClass = CalcClass(get_arg1, get_arg2, *args, **kw)
         result = myClass.do_work()
         response = Response(result, status=status.HTTP_200_OK)
+        return response
+    
+#Teste para retornar lista de aventuras
+class AventuraViewSet(APIView):
+    
+    "Lista as enquetes cadastradas"
+    permission_classes = (permissions.IsAuthenticated,)
+    def get(self, request, *args, **kw):
+        #recupera todas as aventuras
+        aventuras = Aventura.objects.all()
+
+        #retornar as aventuras
+        data = serializers.serialize('json', aventuras,)
+        response = Response(data, status=status.HTTP_200_OK)
         return response

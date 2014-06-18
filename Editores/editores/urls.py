@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
 from editores.views import IndexView, logout_page
@@ -5,22 +7,35 @@ from editores.settings import MEDIA_ROOT
 from django.contrib.auth.decorators import login_required
 from editores.views import LoginView, LoginCreateView, AutorGetJsonView
 
-from rest_framework import viewsets, routers
-from editor_objetos.models import Autor
+from django.views.generic import RedirectView
 
-from core.viewsset import MyRESTView
+from rest_framework import routers
+
+#Teste com o framework rest
+from core_services.views import MyRESTView,AventuraViewSet
+
+
 admin.autodiscover()
 
 
-#rest framework
+#framework rest
+#Router permite declrar de forma simples as rotas comuns para um determinado controlador de recursos
+#O uso do DefaultRouter difere do SimpleRouveter. Adicionalmente o SimpleRouter permite o uso de autenticação.
 router = routers.DefaultRouter()
 #router.register(r'users', Autor)
 
 urlpatterns = patterns('',
 
      # this URL passes resource_id in **kw to MyRESTView
-     url(r'^api/v1.0/resource/(?P<resource_id>\d+)[/]?$', login_required(MyRESTView.as_view()), name='my_rest_view'),
+     #url(r'^api/v1.0/resource/(?P<resource_id>\d+)[/]?$', login_required(MyRESTView.as_view()), name='my_rest_view'),
      url(r'^api/v1.0/resource[/]?$', login_required(MyRESTView.as_view()), name='my_rest_view'),
+     
+     url(r'^api/aventuras[/]?$', login_required(AventuraViewSet.as_view()), name='aventuras-resource'),
+    
+    # this URL passes resource_id in **kw to MyRESTView
+    #url(r'^api/v1.0/resource/(?P<resource_id>\d+)[/]?$', MyRESTView.as_view(), name='my_rest_view'),
+    #url(r'^api/v1.0/resource[/]?$', MyRESTView.as_view(), name='my_rest_view'), 
+    
     
      # Login / logout.
      url(r"^autendlg/login/$",LoginView.as_view(), name="login",),
