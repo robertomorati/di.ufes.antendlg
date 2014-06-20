@@ -26,6 +26,7 @@ router = routers.DefaultRouter()
 
 urlpatterns = patterns('',
 
+
      # this URL passes resource_id in **kw to MyRESTView
      #url(r'^api/v1.0/resource/(?P<resource_id>\d+)[/]?$', login_required(MyRESTView.as_view()), name='my_rest_view'),
      url(r'^api/v1.0/resource[/]?$', login_required(MyRESTView.as_view()), name='my_rest_view'),
