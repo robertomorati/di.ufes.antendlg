@@ -8,9 +8,7 @@ Created on 17/06/2014
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from django.http import HttpResponse
 from django.core import serializers
-import json
 
 
 from editor_objetos.models import CalcClass, Aventura
