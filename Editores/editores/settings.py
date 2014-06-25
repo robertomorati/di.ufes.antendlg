@@ -2,7 +2,7 @@
 # Django settings for Editores project.
 import os
 
-DEBUG = False
+DEBUG = True
 
 #SESSION_COOKIE_SECURE = True
 #CSRF_COOKIE_SECURE = True

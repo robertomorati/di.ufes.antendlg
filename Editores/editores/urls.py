@@ -14,7 +14,6 @@ from rest_framework import routers
 #Teste com o framework rest
 from core_services.views import MyRESTView,AventuraView,InstanciasObjetoView
 
-
 admin.autodiscover()
 
 

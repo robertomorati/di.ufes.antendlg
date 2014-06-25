@@ -4,7 +4,6 @@ Created on 17/06/2014
 
 @author: Roberto Guimaraes Morati Junior
 '''
-
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
