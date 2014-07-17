@@ -12,10 +12,49 @@
  */
 function openModal(url,idDiv) {
 	$.get(url, function( data ) {
+		
 		$("#"+idDiv).html(data);
+		
+		
+		
+		
+		//apenas algumas modais v�o ter o tamanho alterado de acordo com a necessidade
+			var id_form = $('#'+idDiv).find('form').attr('id');
+
+			if(id_form == "condicoes_missao_list_view"){
+				modalChange(idDiv);
+			}
+		
 	});
 };
 
+
+/**
+ * change dynamically size modal 
+ */
+function modalChange(idDiv){
+	
+	$("#"+idDiv).css({
+		width:'auto',
+        height:'auto', 
+       'max-height':'100%',
+      // 'margin-top': function () { //vertical centering
+     //      return -($(this).height() / 2);
+      // },
+       'margin-left': function () { //Horizontal centering
+           return -($(this).width() / 2);
+       }
+    	   
+	});
+
+
+	$("#"+idDiv).draggable({
+	    handle: "."+idDiv
+	});
+	
+
+	
+}
 
 /**
  * Função que trata a criação de comportamento para o agente em questão.
@@ -362,7 +401,81 @@ function refreshDiv(urlView,idDiv) {
 		        });
  }
  
-	 
+function createPosInstanciaAtiva(json_instancias){
+    var urlView = '/editor_objetos/estado_aventura/create_instances_activates/';
+    
+    
+    //atualiza a localização da aventura
+    $.ajax({
+		 headers: { "X-CSRFToken": getCookie("csrftoken") },//token django
+	     type:"POST",
+	     url:urlView,
+	     data: json_instancias,
+	     success: function(data,status){	  	 
+	    	 //uso da flag
+	      	 
+	    	
+	     },
+	     error: function(xhr) {
+
+	        }
+	 });
+	
+}
+
+function createAvatarAtivo(json_avatars){
+    var urlView = '/editor_objetos/estado_aventura/create_avatars_activates/';
+    
+    $.ajax({
+		 headers: { "X-CSRFToken": getCookie("csrftoken") },//token django
+	     type:"POST",
+	     url:urlView,
+	     data: json_avatars,
+	     success: function(data,status){	  	 
+
+	     },
+	     error: function(xhr) {
+
+	        }
+	 });
+	
+}
+
+function createMissaoAtiva(json_missoes){
+    var urlView = '/editor_objetos/estado_aventura/create_missions_activates/';
+    
+    $.ajax({
+		 headers: { "X-CSRFToken": getCookie("csrftoken") },//token django
+	     type:"POST",
+	     url:urlView,
+	     data: json_missoes,
+	     success: function(data,status){	  	 
+
+	     },
+	     error: function(xhr) {
+
+	        }
+	 });
+	
+}
+
+function createCondicaoAtiva(json_condicoes){
+    var urlView = '/editor_objetos/estado_aventura/create_conditions_activates/';
+    
+    $.ajax({
+		 headers: { "X-CSRFToken": getCookie("csrftoken") },//token django
+	     type:"POST",
+	     url:urlView,
+	     data: json_condicoes,
+	     success: function(data,status){	  	 
+
+	     },
+	     error: function(xhr) {
+
+	        }
+	 });
+	
+}
 /*=========================================================================================================================
  |  							    		Rascunhos	Códigos com problema      						      			  |
  ==========================================================================================================================/

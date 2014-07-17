@@ -1,0 +1,73 @@
+
+{% block content %} 
+		 
+	  <form id="condicoes_missao_list_view" class="form-actions" method="post" action="{% url condicoes_missao_list_view 2 %}">
+		  <div class="modal-header">
+		    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" action="">×</button>
+		    <h3 id="myModalLabel">Conditions of the Mission</h3>
+		  </div>
+		  <div class="modal-body">
+				<table class="table table-bordered">
+				<tr>
+					<th>Name</th>
+					<th>Prefix</th>
+					<th>Link</th>
+					<th>Suffix</th>
+					<th>Story</th>
+					<th>Operator</th>
+					<th>Quantity</th>
+				</tr>
+					<tbody>
+					{% for object in object_list %}
+						<tr class="success">
+							<td>{{ object.nome }}</td>
+							<td>{{ object.prefixo }}</td>
+							<td>{{ object.ligacao }}</td>		
+							<td>{{ object.sufixo }}</td>
+							<td>{{ object.enredo }}</td>
+							<td>{{ object.operador }}</td>
+							
+							{% if object.quantidade > 0 %}	
+							<td>{{ object.quantidade }}</td>
+							{% else %}	
+							<td>-</td>
+							{% endif %}	
+						</tr>
+						{% empty %}
+						<tr>
+							<td colspan="6"><i style="margin-right: 10px;"
+								class="icon-warning-sign"></i><strong>Attention!</strong>There are no registered missions for the adventure, or, there is no adventure being edited.</td>
+						</tr>
+						
+						{% endfor %}
+					</tbody>
+				</table>
+		  </div>
+
+	  </form>
+
+
+		<script type="text/javascript">
+			var options = {
+				target : '#condicoes_missao',
+				success : showResponse
+			};
+		
+			// post-submit callback 
+			function showResponse(responseText, statusText, xhr, $form) {
+				var ct = xhr.getResponseHeader("content-type") || "";
+				// se a resposta for um json, significa que o objeto foi criado com sucesso,
+				if (ct.indexOf('json') > -1) {
+					// fecha o modal
+					$('#condicoes_missao').modal('hide');
+					openModal('{% url condicoes_missao_list_view 2 %}','condicoes_missao');
+				}else if (ct == 'text'){
+					//openModal('{% url instance_list_view %}','agente');
+				}
+			}
+
+			$('#condicoes_missao_list_view').ajaxForm(options);
+		</script>
+{% endblock %}
+
+

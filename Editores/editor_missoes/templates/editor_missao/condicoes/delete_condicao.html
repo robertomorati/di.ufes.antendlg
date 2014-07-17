@@ -45,17 +45,21 @@
 				var ct = xhr.getResponseHeader("content-type") || "";
 		
 				//verificar qual o tipo de deleção para listar corretamente	            
-				if ( responseText.response  == 'condicaoobjeto') {
+				if ( responseText.response  == 'CondicaoInstanciaObjeto') {
 					// fecha o modal
 					$('#condicoes').modal('hide');
 					refreshDiv('{% url condicao_objeto_list_view %}','content');
-				}else if ( responseText.response  == 'condicaojogador') {
+				}else if ( responseText.response  == 'CondicaoJogadorInstancia') {
 					$('#condicoes').modal('hide');
-					refreshDiv('{% url condicao_jogador_list_view %}','content');
+					refreshDiv('{% url condicao_jogador_instancia_list_view %}','content');
 						//openModal('{% url avatar_delete_view object.pk %}','avatares');
-				}else if ( responseText.response  == 'condicaodialogo') {
+				}else if ( responseText.response  == 'CondicaoDialogoInstancia') {
 					$('#condicoes').modal('hide');
 					refreshDiv('{% url condicao_dialogo_list_view %}','content');
+						//openModal('{% url avatar_delete_view object.pk %}','avatares');
+				}else if ( responseText.response  == 'CondicaoJogadorObjeto') {
+					$('#condicoes').modal('hide');
+					refreshDiv('{% url condicao_jogador_objeto_list_view  %}','content');
 						//openModal('{% url avatar_delete_view object.pk %}','avatares');
 				}
 			}

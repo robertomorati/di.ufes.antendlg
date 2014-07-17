@@ -82,6 +82,7 @@
 												<ul id="ulNoMaker">
 													<li><i class="icon-edit"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url aventura_list_view user.id %}">Adventure Edit</a></li>
 													<li><i class="icon-map-marker"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url gmaps_view %}">Map Adventure Edit</a></li>
+													<li><i class="icon-edit"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url avtentura_ativas_list_view %}">Activate Adventure Edit</a></li>
 												</ul>
 											</div>
 										</div>
@@ -118,8 +119,9 @@
 											<div class="accordion-inner">
 												<ul id="ulNoMaker">
 													<li><i class="icon-edit"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url missao_list_view %}">Mission Edit</a></li>
-													<li><i class="icon-list-alt"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url condicao_objeto_list_view %}">Conditions of Instances Edit</a></li>
-													<li><i class="icon-list-alt"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url condicao_jogador_list_view %}">Conditions Between Avatars Edit</a></li>
+													<li><i class="icon-list-alt"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url condicao_objeto_list_view %}">Conditions with Instances Edit</a></li>
+													<li><i class="icon-list-alt"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url condicao_jogador_instancia_list_view %}">Conditions with Avatars Edit</a></li>
+													<li><i class="icon-list-alt"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url condicao_jogador_objeto_list_view %}">Conditions withObjects Edit</a></li>
 													<li><i class="icon-list-alt"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url condicao_dialogo_list_view %}">Conditions with Dialogues Edit</a></li>					
 												</ul>
 											</div>
@@ -169,7 +171,9 @@
 											style="height: 0px;">
 											<div class="accordion-inner">
 												<ul id="ulNoMaker">
-													<li><i class="icon-edit"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url enredo_list_view %}">Story Edit</a></li>
+													<li><i class="icon-edit"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url enredo_file_list_view	 %}">Story File Edit</a></li>
+													<li><i class="icon-edit"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url enredo_instancia_list_view	 %}">Story Instance Edit</a></li>
+													<li><i class="icon-edit"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url enredo_mensagem_list_view	 %}">Story Message Edit</a></li>
 												</ul>
 											</div>
 										</div>

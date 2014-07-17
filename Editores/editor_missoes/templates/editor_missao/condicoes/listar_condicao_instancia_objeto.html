@@ -1,6 +1,6 @@
 <div class="form-actions">
 	<h3>
-		<strong>Conditions with Avatars</strong>
+		<strong>Conditions between Object's Instances</strong>
 	</h3>
 	<div id="condicao_objeto">
 		<table class="table table-bordered">
@@ -9,7 +9,6 @@
 				<th>Prefix</th>
 				<th>Link</th>
 				<th>Suffix</th>
-				<th>Amount</th>
 				<th>Story</th>
 				<th>Operator</th>
 				<th>Mission</th>
@@ -19,13 +18,12 @@
 					<tr class="success">
 						<td>
 							<!-- Modal para atualização de objetos   --> <a data-toggle="modal"
-							onClick="openModal('{% url  condicao_jogador_update_view object.pk %}','condicoes')"
+							onClick="openModal('{% url  condicao_objeto_update_view object.pk %}','condicoes')"
 							href="#condicoes">{{ object.nome }}</a> 
 						</td>
-						<td>{{ object.prefixo.nome }}</td>
+						<td>{{ object.prefixo }}</td>
 						<td>{{ object.ligacao }}</td>		
 						<td>{{ object.sufixo }}</td>
-						<td>{{ object.quantidade }}</td>
 						<td>{{ object.enredo }}</td>
 						<td>{{ object.operador }}</td>	
 						<td>{{ object.missao }}</td>	
@@ -44,14 +42,11 @@
 					</tr>
 					{% endfor %}
 			</tbody>
-		</table>
+		</table>	
 	</div>
 	
 	<!-- Modal para criação de objetos -->
-	<a role="button" onClick="openModal('{% url condicao_jogador_create_view %}','condicoes')" class="btn btn-small btn-primary" data-toggle="modal" href="#condicoes">Create Condition</a>
-	<p class="text-info">
-	Condição entre instâncias permite o autor da aventura cria uma condição entre duas instâncias de objetos que sejam colatáveis na aventura.
-	</p>
+	<a role="button" onClick="openModal('{% url condicao_objeto_create_view %}','condicoes')" class="btn btn-small btn-primary" data-toggle="modal" href="#condicoes">Create Condition</a>
 	<div id="condicoes" class="modal hide fade"></div>
 </div>
 

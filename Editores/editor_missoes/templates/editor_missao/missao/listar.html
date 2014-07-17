@@ -8,6 +8,7 @@
 			<th>Description</th>
 			<th>Time</th>
 			<th>Story</th>
+			<th>Conditions</th>
 		</tr>
 		<tbody>
 				{% for object in object_list %}
@@ -19,7 +20,10 @@
 					</td>
 					<td>{{ object.descricao }}</td>
 					<td>{{ object.tempo }}</td>		
-					<td>{{ object.enredo_missao }}</td>
+					<td>{{ object.enredo }}</td>
+					<td><a class="btn btn-block btn btn-small" data-toggle="modal"
+								onClick="openModal('{% url  condicoes_missao_list_view object.pk %}','condicoes_missao')"
+								href="#condicoes_missao">See</a></td>
 					<td>
 							{% csrf_token %}
 							<!--<input type="submit" class="btn btn-block btn-small btn-danger " value="Deletar">-->
@@ -39,5 +43,6 @@
 	<!-- Modal para criação de objetos -->
 	<a role="button" onClick="openModal('{% url missao_create_view %}','missao')" class="btn btn-small btn-primary" data-toggle="modal" href="#missao">Create Mission</a>
 	<div id="missao" class="modal hide fade"></div>
+	<div id="condicoes_missao" class="modal hide fade"></div>
 </div>
 

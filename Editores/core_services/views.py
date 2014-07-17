@@ -5,33 +5,50 @@ Created on 17/06/2014
 @author: Roberto Guimaraes Morati Junior
 '''
 from rest_framework.views import APIView
+from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework import status
 from django.core import serializers
 
 
-from editor_objetos.models import CalcClass, Aventura
-from editor_objetos.models import Objeto, Icone, TipoObjeto, InstanciaObjeto, PosicaoGeografica
+from editor_objetos.models import Aventura
+from editor_objetos.models import Objeto, Icone, TipoObjeto, InstanciaObjeto, PosicaoGeografica, Jogador
 
 from rest_framework import permissions
 
 
-class MyRESTView(APIView):
-    
-    permission_classes = (permissions.IsAuthenticated,)
-    def get(self, request, *args, **kw):
-        # Process any get params that you may need
-        # If you don't need to process get params,
-        # you can skip this part
-        get_arg1 = request.GET.get('arg1', None)
-        get_arg2 = request.GET.get('arg2', None)
 
-        # Any URL parameters get passed in **kw
-        myClass = CalcClass(get_arg1, get_arg2, *args, **kw)
-        result = myClass.do_work()
-        print result
-        response = Response(result, status=status.HTTP_200_OK)
-        return response
+"""
+Views para Jogador
+
+class JogadorLoginCreateView(generics.ListCreateAPIView):
+    model = Jogador
+    #serializer_class = UserSerializer
+
+    def create(self, request, *args, **kwargs):
+        data = request.DATA
+
+        # note: transaction.atomic was introduced in Django 1.6
+        with transaction.atomic():
+            user = User(
+                profit_and_loss=data['component_comments'],
+                name=data['name']
+            )
+            user.clean()
+            user.save()
+
+            UserProfile.objects.create(
+                user=user,
+                name=data['profile']['name']
+            )
+
+        serializer = UserSerializer(user)
+        headers = self.get_success_headers(serializer.data)
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED,
+                        headers=headers)
+"""    
+
     
 """
 Retorna lista de aventuras por autor
@@ -44,8 +61,11 @@ class AventuraView(APIView):
         aventuras = Aventura.objects.all().filter(autor=self.kwargs['autor_id'])
 
         #retornar as aventuras
+        aventuras = aventuras
         data = serializers.serialize('json', aventuras,)
         response = Response(data, status=status.HTTP_200_OK)
+        
+        #print u'%s' % response
         return response
         #return HttpResponse(data, content_type="application/json")
     

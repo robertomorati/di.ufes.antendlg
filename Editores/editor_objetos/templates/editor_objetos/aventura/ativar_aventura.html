@@ -1,0 +1,44 @@
+<!-- {% load bootstrap_toolkit %} -->
+	  <form id="ativar_aventura_create_view" class="form-actions" method="post" action="{% url ativar_aventura_create_view %}">
+		  <div class="modal-header">
+		    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" action="">×</button>
+		    <h3 id="myModalLabel">Activate Adventure
+		  </div>
+		  <div class="modal-body">  
+				 {% csrf_token %}
+				 {{ form|as_bootstrap }}
+				 
+		  </div>
+		  <div class="modal-footer">
+		    <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+		    <button type="submit" class="btn btn-primary">Activate</button>
+		  </div>
+	  </form>
+
+
+		<script type="text/javascript">
+			var options = {
+				target : '#aventura',
+				success : showResponse
+			};
+		
+			// post-submit callback 
+			function showResponse(responseText, statusText, xhr, $form) {
+				var ct = xhr.getResponseHeader("content-type") || "";
+				// se a resposta for um json, significa que o objeto foi criado com sucesso,
+				if (ct.indexOf('json') > -1) {
+					// fecha o modal
+					$('#aventura').modal('hide');
+					refreshDiv('{% url avtentura_ativas_list_view %}','content');
+					
+					//dados da aventura ativa sendo enviados para salvar
+					createPosInstanciaAtiva(responseText.PosInstanciaAtiva);
+					createAvatarAtivo(responseText.AvatarAtivo);
+					createMissaoAtiva(responseText.MissaoAtiva);
+					createCondicaoAtiva(responseText.CondicaoAtiva);
+					
+				}
+			}
+		
+			$('#ativar_aventura_create_view').ajaxForm(options);
+		</script>

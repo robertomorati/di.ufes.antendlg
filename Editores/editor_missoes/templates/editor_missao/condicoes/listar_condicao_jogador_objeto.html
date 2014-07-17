@@ -1,6 +1,6 @@
 <div class="form-actions">
 	<h3>
-		<strong>Conditions with Dialogues</strong>
+		<strong>Conditions between Avatars and Objects</strong>
 	</h3>
 	<div id="condicao_objeto">
 		<table class="table table-bordered">
@@ -8,10 +8,10 @@
 				<th>Name</th>
 				<th>Prefix</th>
 				<th>Link</th>
-				<th>Dialogue Type</th>
-				<th>Reference Instance</th>
+				<th>Suffix</th>
 				<th>Story</th>
 				<th>Operator</th>
+				<th>Quantity</th>
 				<th>Mission</th>
 			</tr>
 			<tbody>
@@ -19,15 +19,15 @@
 					<tr class="success">
 						<td>
 							<!-- Modal para atualização de objetos   --> <a data-toggle="modal"
-							onClick="openModal('{% url  condicao_dialogo_update_view object.pk %}','condicoes')"
+							onClick="openModal('{% url  condicao_jogador_update_view object.pk %}','condicoes')"
 							href="#condicoes">{{ object.nome }}</a> 
 						</td>
 						<td>{{ object.prefixo.nome }}</td>
 						<td>{{ object.ligacao }}</td>		
 						<td>{{ object.sufixo }}</td>
-						<td>{{ object.referencia_sufixo }}</td>
 						<td>{{ object.enredo }}</td>
 						<td>{{ object.operador }}</td>	
+						<td>{{ object.quantidade }}</td>
 						<td>{{ object.missao }}</td>	
 						<td>
 								{% csrf_token %}
@@ -40,7 +40,7 @@
 					{% empty %}
 					<tr>
 						<td colspan="6"><i style="margin-right: 10px;"
-							class="icon-warning-sign"></i><strong>Attention!</strong>There are no registered conditions for the adventure, or there is no adventure being edited.</td>
+							class="icon-warning-sign"></i><strong>Attention!</strong>There are no registered missions for the adventure, or, there is no adventure being edited.</td>
 					</tr>
 					{% endfor %}
 			</tbody>
@@ -48,8 +48,9 @@
 	</div>
 	
 	<!-- Modal para criação de objetos -->
-	<a role="button" onClick="openModal('{% url condicao_dialogo_create_view %}','condicoes')" class="btn btn-small btn-primary" data-toggle="modal" href="#condicoes">Create Condition</a>
+	<a role="button" onClick="openModal('{% url condicao_jogador_objeto_create_view %}','condicoes')" class="btn btn-small btn-primary" data-toggle="modal" href="#condicoes">Create Condition</a>
 	<p class="text-info">
+	Condição entre instâncias permite o autor da aventura cria uma condição entre duas instâncias de objetos que sejam colatáveis na aventura.
 	</p>
 	<div id="condicoes" class="modal hide fade"></div>
 </div>

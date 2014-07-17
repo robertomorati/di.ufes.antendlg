@@ -21,16 +21,35 @@ from core.ajax import AjaxableResponseMixin
 
 #imports para objeto, tipos de objetos, icones utilizados no momento de autoria, instancias dos objetos.
 #Also, imports para posições geográficas que as instâncias possuem, bem como a sugestão e o tipo de imagem
-from editor_objetos.models import Objeto, TipoObjeto, Icone, Aventura, InstanciaObjeto, PosicaoGeografica, Sugestao, TipoImagem
+from editor_objetos.models import Objeto, TipoObjeto, Icone, Aventura, InstanciaObjeto, PosicaoGeografica, Sugestao, TipoImagem,\
+    Jogador
 
 #impost para Enredo, criação de missões e tipos de condições que compoõem missões
-from editor_objetos.models import Enredo, Missao, Condicao,CondicaoDialogo,CondicaoJogador,CondicaoObjeto
+from editor_objetos.models import Missao, Condicao,CondicaoDialogoInstancia,CondicaoJogadorInstancia,CondicaoJogadorObjeto, CondicaoInstanciaObjeto
+
+from editor_objetos.models import Enredo, EnredoFile, EnredoInstancia, EnredoMensagem
 
 #imports para avatar e criação de agentes com seus tipos de comportamentps
 from editor_objetos.models import Avatar, Agente, Agressivo, Comportamento, Passivo, Colaborativo, Mensagem, Competitivo
 
-from forms import AventuraForm, AventuraWithoutFieldsForm,AvatarRoleListForm, InstanciaObjetoCreateForm, PosicaoGeograficaCreateForm, InstanciaObjetoUpdateForm, UpdateObjetoForm, CreateMissaoForm,CreateAvatarForm,CondicaoObjetoForm, CondicaoDialogoForm,CondicaoJogadorForm,AgenteCreateForm
-from forms import AgenteWithoutFieldsForm,AgressivoCreateForm,PassivoCreateForm, ColaborativoCreateForm, InstancesComportamentoAddForm, CompetitivoCreateForm, EnredoForm
+from editor_objetos.models import AventuraAtiva,CondicaoAtiva,MissaoAtiva,PosInstanciaAtiva,AvatarAtivo
+
+from forms import PosInstanciaAtivaCreateForm,AvatarAtivoCreateForm, MissaoAtivaCreateForm,CondicaoAtivaCreateForm
+
+from forms import AventuraForm, AventuraWithoutFieldsForm,AvatarRoleListForm, InstanciaObjetoCreateForm 
+from forms import PosicaoGeograficaCreateForm, InstanciaObjetoUpdateForm, UpdateObjetoForm, CreateMissaoForm,CreateAvatarForm
+from forms import CondicaoInstanciaObjetoForm, CondicaoDialogoInstanciaForm,CondicaoJogadorInstanciaForm,AgenteCreateForm
+from forms import AgenteWithoutFieldsForm,AgressivoCreateForm,PassivoCreateForm, ColaborativoCreateForm, InstancesComportamentoAddForm, CompetitivoCreateForm
+from forms import EnredoFileForm, EnredoInstanciaForm, EnredoMensagemForm, CondicaoJogadorObjetoForm,AventuraAtivaWithoutFieldsForm
+
+from itertools import chain
+
+import string, random
+
+from django import template
+from rest_framework.urls import template_name
+ 
+register = template.Library()
 
 import os
 import json
@@ -568,7 +587,7 @@ class AventuraListView(ListView):
         object_list = Aventura.objects.all().filter(autor=self.kwargs['pk'])
         #self.model.objects.filter(pk = self.kwargs['pk'])
         return object_list
-    
+
 #Criação das aventuras
 class AventuraCreateView(CreateView):
     template_name = 'editor_objetos/aventura/create.html'
@@ -604,8 +623,7 @@ class AventuraUpdateView(UpdateView):
        
         return HttpResponse(json.dumps({'response': nome ,'id' : id_av }), content_type="application/json")
 
-#Adiciona objeto da aventura na SESSION
-#class AventuraEditarView(DeleteView):
+#ativar aventura para autoria
 class AventuraAtivarView(UpdateView):
     template_name = 'editor_objetos/aventura/message.html'
     model = Aventura
@@ -711,8 +729,217 @@ class AventuraGetJsonView(ListView):
     
     def render_to_response(self, context, **response_kwargs):
         return HttpResponse(serializers.serialize('json', Aventura.objects.all().filter(pk=self.kwargs['pk'])))
+
+
+#############################################################################
+#       Views que tratam da instanciacao de uma aventura para ser jogada    #
+#############################################################################
+
+#view que lista as aventuras ativas
+class AventuraAtivaListView(ListView):
+    model = AventuraAtiva
+    template_name = 'editor_objetos/aventura/listar_aventuras_ativas.html'
     
+    def get_queryset(self):
+        if self.request.session[SESSION_AVENTURA] != '-1':
+            object_list= AventuraAtiva.objects.all().filter(aventura_id = self.request.session[SESSION_AVENTURA].id)
+        else:  
+            object_list= AventuraAtiva.objects.all().filter(aventura_id = '-1')#sem aventuras ativas
+            
+        return object_list
     
+def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
+        return ''.join(random.choice(chars) for _ in range(size))
+    
+#ativação da aventura para ser jogada
+class AtivarAventuraView(CreateView):
+    template_name = 'editor_objetos/aventura/ativar_aventura.html' 
+    model = AventuraAtiva
+    form_class = AventuraAtivaWithoutFieldsForm
+    
+    def get_success_url(self):
+        return reverse('aventuras_ativas_list_view')
+    
+    #Override no form. 
+    def form_valid(self, form):
+        
+        #uma aventura só pode ser ativa se estiver em modo de autoria
+        if self.request.session[SESSION_AVENTURA] != '-1':
+            
+            flag = 1
+            #verificando quantidade de aventuras ativas
+            object_list= AventuraAtiva.objects.all().filter(aventura_id = self.request.session[SESSION_AVENTURA].id)
+            
+            for obj in object_list:
+                flag = flag + 1
+                
+            
+            if form.instance.publica == False:
+                form.instance.chave_acesso = id_generator()
+                
+            form.instance.aventura_id = self.request.session[SESSION_AVENTURA].id
+            
+            form.instance.instancia = flag
+            
+           
+            #ativa aventura
+            self.object = form.save()  
+            #recuperando id da aventura ativa
+            aventura_ativa_id = self.object.pk
+           
+           
+            #recuperando dados da aventura que está sendo ativa
+            instancias = InstanciaObjeto.objects.all().filter(aventura_id = self.request.session[SESSION_AVENTURA].id)
+            
+            posicoes_instancias = ''
+            flag = 0
+            for obj in instancias:
+                if flag == 0:
+                    posicoes_instancias = PosicaoGeografica.objects.all().filter(instancia_objeto_id = obj.id)
+                    flag = 1
+                elif flag == 1:
+                    posicoes_instancias = posicoes_instancias | PosicaoGeografica.objects.all().filter(instancia_objeto_id = obj.id)
+                    
+            avatares = Avatar.objects.all().filter(aventura_avatar_id = self.request.session[SESSION_AVENTURA].id)
+            
+            missoes = Missao.objects.all().filter(aventuras_id = self.request.session[SESSION_AVENTURA].id)
+            
+            
+            
+            flag = 0
+            for obj in missoes:
+                if flag == 0:
+                    condicoes = Condicao.objects.all().filter(missao_id = obj.id)
+                    flag = 1
+                elif flag ==1:
+                    condicoes = condicoes | Condicao.objects.all().filter(missao_id = obj.id)
+          
+
+            json_instancias = '{"aventura_ativa_id":"'+str(aventura_ativa_id)+'","PosInstanciaAtiva":['
+            
+            flag = 0
+            for obj in posicoes_instancias:
+                if flag == 0:
+                    json_instancias = json_instancias + ' {"instancia_id":' + '"' + str(obj.instancia_objeto_id) + '",'
+                    json_instancias = json_instancias + ' "lat":' + '"' + str(obj.latitude) + '",'
+                    json_instancias = json_instancias + ' "log":' + '"' + str(obj.longitude) + '",'
+                    json_instancias = json_instancias + ' "alt":' + '"' + str(obj.altitude) + '"}'
+                    flag = 1
+                elif flag == 1:
+                    json_instancias = json_instancias + ',{"instancia_id":' + '"' + str(obj.instancia_objeto_id) + '",'
+                    json_instancias = json_instancias + ' "lat":' + '"' + str(obj.latitude) + '",'
+                    json_instancias = json_instancias + ' "log":' + '"' + str(obj.longitude) + '",'
+                    json_instancias = json_instancias + ' "alt":' + '"' + str(obj.altitude) + '"}'
+                    
+            json_instancias = json_instancias + ']}'
+            
+            json_avatares = '{"aventura_ativa_id":"'+str(aventura_ativa_id)+'","AvatarAtivo":['
+            flag = 0
+            for obj in avatares:
+                if flag == 0:
+                    json_avatares = json_avatares + ' {"avatar_id":' + '"' + str(obj.id) + '"}'
+                    flag = 1
+                elif flag == 1:
+                    json_avatares = json_avatares + ',{"avatar_id":' + '"' + str(obj.id) + '"}'
+            
+            json_avatares = json_avatares + ']}'
+            
+            
+            json_missoes = '{"aventura_ativa_id":"'+str(aventura_ativa_id)+'","MissaoAtiva":['
+            flag = 0
+            for obj in missoes:
+                if flag == 0:
+                    json_missoes = json_missoes + ' {"missao_id":' + '"' + str(obj.id) + '"}'
+                    flag = 1
+                elif flag == 1:
+                    json_missoes = json_missoes + ',{"missao_id":' + '"' + str(obj.id) + '"}'
+            
+            json_missoes = json_missoes + ']}'
+            
+            
+            json_condicoes = '{"aventura_ativa_id":"'+str(aventura_ativa_id)+'","CondicaoAtiva":['
+            flag = 0
+            for obj in condicoes:
+                if flag == 0:
+                    json_condicoes = json_condicoes + ' {"condicao_id":' + '"' + str(obj.id) + '",'
+                    json_condicoes = json_condicoes + ' "missao_id":' + '"' + str(obj.missao_id) + '"}'
+                    flag = 1
+                elif flag == 1:
+                    json_condicoes = json_condicoes + ',{"condicao_id":' + '"' + str(obj.id) + '",'
+                    json_condicoes = json_condicoes + ' "missao_id":' + '"' + str(obj.missao_id) + '"}'
+            
+            json_condicoes = json_condicoes + ']}'           
+            
+            
+        return HttpResponse(json.dumps({'PosInstanciaAtiva' : json_instancias,'AvatarAtivo':json_avatares, 'MissaoAtiva' : json_missoes, 'CondicaoAtiva': json_condicoes}), content_type="application/json")
+
+#ativação da aventura para ser jogada
+class AventuraAtivaUpdateView(UpdateView):
+    template_name = 'editor_objetos/aventura/update_aventura_ativa.html' 
+    model = AventuraAtiva
+    form_class = AventuraAtivaWithoutFieldsForm
+    
+    def get_success_url(self):
+        return reverse('aventuras_ativas_list_view')
+    
+    #Override no form. 
+    def form_valid(self, form):
+        
+        if self.request.session[SESSION_AVENTURA] != '-1':
+            
+            #verifica se o atributo publico foi alterado    
+            if form.instance.publica == True:
+                form.instance.chave_acesso = ""
+            elif  form.instance.publica == False: 
+                form.instance.chave_acesso = id_generator() 
+            form.instance.aventura_id = self.request.session[SESSION_AVENTURA].id
+            
+            #ativa aventura
+            self.object = form.save()  
+   
+        return HttpResponse(json.dumps({'response' : 'ok'}), content_type="application/json")
+
+class AventuraAtivaDeleteView(DeleteView):
+    template_name = 'editor_objetos/aventura/delete_aventura_ativa.html' 
+    model = AventuraAtiva
+    form_class = AventuraAtivaWithoutFieldsForm
+    
+    def get_success_url(self):
+        return reverse('aventuras_ativas_list_view')
+    
+    def delete(self, request, *args, **kwargs):
+        
+        
+        if self.request.session[SESSION_AVENTURA] != '-1':
+            
+            
+            avatares_ativos = AvatarAtivo.objects.all().filter(aventura_ativa_avatar_id = self.kwargs['pk'],)
+            
+            flag =0
+            for obj in avatares_ativos:    
+                if flag ==0:
+                    object_list = Avatar.objects.all().filter(pk = obj.avatar_id, )
+                    flag = 1
+                elif flag == 1:
+                    object_list = object_list | Avatar.objects.all().filter(pk = obj.avatar_id, )
+            
+            flag = 0
+            for obj in object_list:
+                
+                if str(obj.aventureiro_id) == "None":
+                    flag = flag + 1      
+                    
+            self.object = self.get_object()
+
+            if flag > 0:   
+                self.object.delete()
+            else:
+                ValidationError
+                messages.error(request, "".join("Não é possível deletar a Aventura Ativa, pois existem Jogadores vinculados a mesma!"))
+                return HttpResponse(json.dumps({'response': 'exception delete'}), content_type="text")
+            return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")
+
+
 ''''
 ====================================================================
                         Views para Sugestao
@@ -796,7 +1023,6 @@ class SugestaoUpdateView(UpdateView):
         #arquivos devem ser txt, jpeg, png ou fbx (extensões de objetos 3D para Wikitude SDK Android para AR)
         tipo = form.cleaned_data['tipo']#recupera tipo de sugestao
         arquivo = form.cleaned_data['sugestao']#recupera file
-        
         if hasattr(arquivo,"content_type"):
             if tipo == 'STX':
                 #valida arquivo de texto para salvar sugestao
@@ -985,12 +1211,73 @@ class EnredoListView(ListView):
             #for obj in object_list:
                 #print obj
         return object_list
+    
+#listagem de enredos
+class EnredoFileListView(ListView):
+    template_name = 'editor_enredos/enredos/listar_enredo_file.html'
+    model = EnredoFile
+    
+    def get_queryset(self):
+        
+        object_list = ''
+        if self.request.session[SESSION_AVENTURA] != '-1':
+            object_list = EnredoFile.objects.all().filter(aventura_id=self.request.session[SESSION_AVENTURA].id)
+            
+            print object_list
+            
+            #object_list = Enredo.objects.all().filter(aventura_id=self.request.session[SESSION_AVENTURA].id)
+            
+            print object_list
+            #for obj in object_list:
+                #print obj
+        return object_list
 
-#create Enredo
-class EnredoCreateView(CreateView):
-    template_name = 'editor_enredos/enredos/create.html'
-    model = Enredo
-    form_class = EnredoForm
+#listagem de enredos
+class EnredoInstanciaListView(ListView):
+    template_name = 'editor_enredos/enredos/listar_enredo_instancia.html'
+    model = EnredoInstancia
+    
+    def get_queryset(self):
+        
+        object_list = ''
+        if self.request.session[SESSION_AVENTURA] != '-1':
+            object_list = EnredoInstancia.objects.all().filter(aventura_id=self.request.session[SESSION_AVENTURA].id)
+            
+            print object_list
+            
+            #object_list = Enredo.objects.all().filter(aventura_id=self.request.session[SESSION_AVENTURA].id)
+            
+            print object_list
+            #for obj in object_list:
+                #print obj
+        return object_list
+
+#listagem de enredos
+class EnredoMessageListView(ListView):
+    template_name = 'editor_enredos/enredos/listar_enredo_mensagem.html'
+    model = EnredoMensagem
+    
+    def get_queryset(self):
+        
+        object_list = ''
+        if self.request.session[SESSION_AVENTURA] != '-1':
+            object_list = EnredoMensagem.objects.all().filter(aventura_id=self.request.session[SESSION_AVENTURA].id)
+            
+            print object_list
+            
+            #object_list = Enredo.objects.all().filter(aventura_id=self.request.session[SESSION_AVENTURA].id)
+            
+            print object_list
+            #for obj in object_list:
+                #print obj
+        return object_list
+
+#create EnredoFile
+class EnredoFileCreateView(CreateView):
+    template_name = 'editor_enredos/enredos/create_enredo_file.html'
+    model = EnredoFile
+    form_class = EnredoFileForm
+    
     #Override no form
     def form_valid(self, form):
         
@@ -998,21 +1285,9 @@ class EnredoCreateView(CreateView):
             
             #arquivos devem ser txt, jpeg, png ou fbx (extensões de objetos 3D para Wikitude SDK Android para AR)
             tipo = form.cleaned_data['tipo']#recupera tipo de imagem
-            arquivo = form.cleaned_data['enredo']#recupera file
+            arquivo = form.cleaned_data['enredo_file']#recupera file
             if arquivo:
-                if tipo == 'STX':
-                #valida arquivo de texto para salvar sugestao
-                    if not os.path.splitext(arquivo.name)[1] in [".txt"]:
-                        ValidationError
-                        msg = "O arquivo deve ser *.txt...."
-                        messages.error(self.request, "".join(msg))
-                        return HttpResponse(json.dumps({'response': 'exception create'}), content_type="text")
-                    elif not arquivo.content_type == 'text/plain':
-                        ValidationError
-                        msg = "Não é um arquivo de texto válido!"
-                        messages.error(self.request, "".join(msg))
-                        return HttpResponse(json.dumps({'response': 'exception create'}), content_type="text")
-                elif tipo == 'SAU':
+                if tipo == 'SAU':
                 #valida arquivo de audio para salvar sugestao
                 #if not file.content-type in ["audio/mpeg","audio/..."]:
                     if not os.path.splitext(arquivo.name)[1] in [".mp3"]:
@@ -1051,6 +1326,7 @@ class EnredoCreateView(CreateView):
                     
             #add id da aventura no enredo
             form.instance.aventura_id = self.request.session[SESSION_AVENTURA].id
+            print form.instance
             self.object = form.save()   
             return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")
         
@@ -1060,90 +1336,198 @@ class EnredoCreateView(CreateView):
             messages.error(self.request, "".join(msg))
             return HttpResponse(json.dumps({'response': 'exception created'}), content_type="application/json")
             
+            
+class EnredoInstanciaCreateView(CreateView):
+    template_name = 'editor_enredos/enredos/create_enredo_instancia.html'
+    model = EnredoInstancia
+    form_class = EnredoInstanciaForm
     
-class  EnredoUpdateView(UpdateView):
-    template_name = 'editor_enredos/enredos/update.html'
-    model = Enredo
-    form_class = EnredoForm
     
-    def get_success_url(self):
-        return reverse('enredo_list_view')
+    def get_initial(self):
+        initial = super(EnredoInstanciaCreateView, self).get_initial()
+        initial['aventura_id'] = self.request.session[SESSION_AVENTURA].id
+        return initial
+    #Override no form
+    def form_valid(self, form):
+        
+        if self.request.session[SESSION_AVENTURA] != '-1':
+            
+         
+            #add id da aventura no enredo
+            form.instance.aventura_id = self.request.session[SESSION_AVENTURA].id
+            self.object = form.save()   
+            return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")
+        
+        else:
+            ValidationError
+            msg = "Please. Activate an adventure for authoring!"
+            messages.error(self.request, "".join(msg))
+            return HttpResponse(json.dumps({'response': 'exception created'}), content_type="application/json")
+
+class EnredoMensagemCreateView(CreateView):
+    template_name = 'editor_enredos/enredos/create_enredo_mensagem.html'
+    model = EnredoMensagem
+    form_class = EnredoMensagemForm
     
     #Override no form
     def form_valid(self, form):
-        #arquivos devem ser txt, jpeg, png ou fbx (extensões de objetos 3D para Wikitude SDK Android para AR)
-        tipo = form.cleaned_data['tipo']#recupera tipo de imagem
-        arquivo = form.cleaned_data['enredo']#recupera file
-        if hasattr(arquivo,"content_type"):
+        
+        if self.request.session[SESSION_AVENTURA] != '-1':
+            
+            #add id da aventura no enredo
+            form.instance.aventura_id = self.request.session[SESSION_AVENTURA].id
+            self.object = form.save()   
+            return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")
+        
+        else:
+            ValidationError
+            msg = "Please. Activate an adventure for authoring!"
+            messages.error(self.request, "".join(msg))
+            return HttpResponse(json.dumps({'response': 'exception created'}), content_type="application/json")   
+              
+class  EnredoFileUpdateView(UpdateView):
+    template_name = 'editor_enredos/enredos/update_enredo_file.html'
+    model = EnredoFile  
+    form_class = EnredoFileForm
+    
+    def get_success_url(self):
+        return reverse('enredo_file_list_view')
+    
+    #Override no form
+    def form_valid(self, form):
+        
+        if self.request.session[SESSION_AVENTURA] != '-1':
+            
+            #arquivos devem ser txt, jpeg, png ou fbx (extensões de objetos 3D para Wikitude SDK Android para AR)
+            tipo = form.cleaned_data['tipo']#recupera tipo de imagem
+            arquivo = form.cleaned_data['enredo_file']#recupera file
+
             if arquivo:
-                if tipo == 'STX':
-                #valida arquivo de texto para salvar sugestao
-                    if not os.path.splitext(arquivo.name)[1] in [".txt"]:
-                        ValidationError
-                        msg = "O arquivo deve ser *.txt...."
-                        messages.error(self.request, "".join(msg))
-                        return HttpResponse(json.dumps({'response': 'exception create'}), content_type="text")
-                    elif not arquivo.content_type == 'text/plain':
-                        ValidationError
-                        msg = "Não é um arquivo de texto válido!"
-                        messages.error(self.request, "".join(msg))
-                        return HttpResponse(json.dumps({'response': 'exception create'}), content_type="text")
-                elif tipo == 'SAU':
-                #valida arquivo de audio para salvar sugestao
-                #if not file.content-type in ["audio/mpeg","audio/..."]:
-                    if not os.path.splitext(arquivo.name)[1] in [".mp3"]:
-                        ValidationError
-                        msg = "O arquivo deve ser *.mp3...."
-                        messages.error(self.request, "".join(msg))
-                        return HttpResponse(json.dumps({'response': 'exception create'}), content_type="text")
-                    elif not arquivo.content_type == 'audio/mp3':
-                        ValidationError
-                        msg = "Não é um arquivo de áudio válido!"
-                        messages.error(self.request, "".join(msg))
-                        return HttpResponse(json.dumps({'response': 'exception create'}), content_type="text")
-                if tipo == 'IMGC':
-                    if not os.path.splitext(arquivo.name)[1] in [".fbx"]:
-                        ValidationError
-                        msg = "O arquivo deve ser *.fbx...."
-                        messages.error(self.request, "".join(msg))
-                        return HttpResponse(json.dumps({'response': 'exception create'}), content_type="text")
-                    elif not arquivo.content_type == 'application/octet-stream':
-                        ValidationError
-                        msg = "Imagens para serem visualizadas câmera, a mesma deve ser de extensão fbx!"
-                        messages.error(self.request, "".join(msg))
-                        return HttpResponse(json.dumps({'response': 'exception create'}), content_type="text")
-                elif tipo == 'IMGM':
-                    if not os.path.splitext(arquivo.name)[1] in [".png",".jpeg",".jpg"]:
-                        ValidationError
-                        msg = "O arquivo deve ser *.png ou *.jpeg...."
-                        messages.error(self.request, "".join(msg))
-                        return HttpResponse(json.dumps({'response': 'exception create'}), content_type="text")
-                    elif not arquivo.content_type == 'image/png':
-                        if not arquivo.content_type == 'image/jpeg':
+                if hasattr(arquivo,"content_type"):
+                    if tipo == 'SAU':
+                    #valida arquivo de audio para salvar sugestao
+                    #if not file.content-type in ["audio/mpeg","audio/..."]:
+                        if not os.path.splitext(arquivo.name)[1] in [".mp3"]:
                             ValidationError
-                            msg = "Não é um arquivo de imagem válido!"
+                            msg = "O arquivo deve ser *.mp3...."
                             messages.error(self.request, "".join(msg))
                             return HttpResponse(json.dumps({'response': 'exception create'}), content_type="text")
-
-        #add id da aventura no enredo
-        form.instance.aventura_id = self.request.session[SESSION_AVENTURA].id
+                        elif not arquivo.content_type == 'audio/mp3':
+                            ValidationError
+                            msg = "Não é um arquivo de áudio válido!"
+                            messages.error(self.request, "".join(msg))
+                            return HttpResponse(json.dumps({'response': 'exception create'}), content_type="text")
+                    if tipo == 'IMGC':
+                        if not os.path.splitext(arquivo.name)[1] in [".fbx"]:
+                            ValidationError
+                            msg = "O arquivo deve ser *.fbx...."
+                            messages.error(self.request, "".join(msg))
+                            return HttpResponse(json.dumps({'response': 'exception create'}), content_type="text")
+                        elif not arquivo.content_type == 'application/octet-stream':
+                            ValidationError
+                            msg = "Imagens para serem visualizadas câmera, a mesma deve ser de extensão fbx!"
+                            messages.error(self.request, "".join(msg))
+                            return HttpResponse(json.dumps({'response': 'exception create'}), content_type="text")
+                    elif tipo == 'IMGM':
+                        if not os.path.splitext(arquivo.name)[1] in [".png",".jpeg",".jpg"]:
+                            ValidationError
+                            msg = "O arquivo deve ser *.png ou *.jpeg...."
+                            messages.error(self.request, "".join(msg))
+                            return HttpResponse(json.dumps({'response': 'exception create'}), content_type="text")
+                        elif not arquivo.content_type == 'image/png':
+                            if not arquivo.content_type == 'image/jpeg':
+                                ValidationError
+                                msg = "Não é um arquivo de imagem válido!"
+                                messages.error(self.request, "".join(msg))
+                                return HttpResponse(json.dumps({'response': 'exception create'}), content_type="text")
+                        
+                    
+            #add id da aventura no enredo
+            form.instance.aventura_id = self.request.session[SESSION_AVENTURA].id
+            print form.instance
+            self.object = form.save()   
+            return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")
         
-        self.object = form.save()   
-        return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")
-   
+        else:
+            ValidationError
+            msg = "Please. Activate an adventure for authoring!"
+            messages.error(self.request, "".join(msg))
+            return HttpResponse(json.dumps({'response': 'exception created'}), content_type="application/json")
+
+
+class EnredoInstanciaUpdateView(UpdateView):
+    template_name = 'editor_enredos/enredos/update_enredo_instancia.html'
+    model = EnredoInstancia
+    form_class = EnredoInstanciaForm
+    
+    
+    def get_initial(self):
+        initial = super(EnredoInstanciaUpdateView, self).get_initial()
+        initial['aventura_id'] = self.request.session[SESSION_AVENTURA].id
+        return initial
+    #Override no form
+    def form_valid(self, form):
+        
+        if self.request.session[SESSION_AVENTURA] != '-1':
+            
+            #add id da aventura no enredo
+            form.instance.aventura_id = self.request.session[SESSION_AVENTURA].id
+            self.object = form.save()   
+            return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")
+        
+        else:
+            ValidationError
+            msg = "Please. Activate an adventure for authoring!"
+            messages.error(self.request, "".join(msg))
+            return HttpResponse(json.dumps({'response': 'exception created'}), content_type="application/json")
+
+
+class EnredoMensagemUpdateView(UpdateView):
+    template_name = 'editor_enredos/enredos/update_enredo_mensagem.html'
+    model = EnredoMensagem
+    form_class = EnredoMensagemForm
+    
+    #Override no form
+    def form_valid(self, form):
+        
+        if self.request.session[SESSION_AVENTURA] != '-1':
+            
+            #add id da aventura no enredo
+            form.instance.aventura_id = self.request.session[SESSION_AVENTURA].id
+            self.object = form.save()   
+            return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")
+        
+        else:
+            ValidationError
+            msg = "Please. Activate an adventure for authoring!"
+            messages.error(self.request, "".join(msg))
+            return HttpResponse(json.dumps({'response': 'exception created'}), content_type="application/json") 
+        
+          
 #delete enredo
 class EnredoDeleteView(DeleteView):
     template_name = 'editor_enredos/enredos/delete.html'
     model = Enredo
     
     def delete(self, request, *args, **kwargs):
+        
         self.object = self.get_object()
+        id_enredo = self.kwargs['pk']
+        tipo_enredo = ''
+        if EnredoFile.objects.all().filter(enredo_ptr_id=id_enredo).exists():
+            tipo_enredo = "EnredoFile"
+        elif EnredoInstancia.objects.all().filter(enredo_ptr_id=id_enredo).exists(): 
+            tipo_enredo = "EnredoInstancia"
+        elif EnredoMensagem.objects.all().filter(enredo_ptr_id=id_enredo).exists(): 
+            tipo_enredo = "EnredoMensagem"
+      
+            
         try:
             self.object.delete()
         except ValidationError as e:
             messages.error(request, "".join(e.messages))
             return HttpResponse(json.dumps({'response': 'exception delete'}), content_type="text")
-        return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")
+        return HttpResponse(json.dumps({'response': tipo_enredo}), content_type="application/json")
     
     def get_success_url(self):
         return reverse('enredo_list_view') 
@@ -1153,7 +1537,7 @@ class EnredoDeleteView(DeleteView):
                         Views para Missão/Condições
 ====================================================================
 '''
-#lista de missoes
+#Lista as missões
 class MissaoListView(ListView):
     template_name = 'editor_missao/missao/listar.html'
     model = Missao
@@ -1168,7 +1552,7 @@ class MissaoListView(ListView):
         return object_list
     
     
-#criação de missao   
+#cria uma missão
 class MissaoCreateView(CreateView):
     template_name = 'editor_missao/missao/create.html'
     model = Missao
@@ -1190,7 +1574,7 @@ class MissaoCreateView(CreateView):
             messages.error(self.request, "".join(msg))
             return HttpResponse(json.dumps({'response': 'exception created'}), content_type="pplication/json")
 
-#update missao
+#atualiza um missão
 class MissaoUpdateView(UpdateView):
     template_name = 'editor_missao/missao/update.html'
     model = Missao
@@ -1200,7 +1584,7 @@ class MissaoUpdateView(UpdateView):
         self.object = form.save()   
         return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")
 
-#delete missao
+#deleta uma missão
 class MissaoDeleteView(DeleteView):
     template_name = 'editor_missao/missao/delete.html'
     model = Missao
@@ -1214,45 +1598,227 @@ class MissaoDeleteView(DeleteView):
             #return HttpResponse(json.dumps({'response': 'exception delete'}), content_type="text")
         return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")
 
-
-#lista condicoesmissao
-#class CondicoesMissaoListView(ListView):
-#    template_name = 'editor_missao/condicoes/list.html'
-#    model = CondicoesMissao
-
+class SetVarNode(template.Node):
  
-#cria condicoes missao
-#class CondicoesMissaoCreateView(ListView):
-#    template_name = 'editor_missao/condicoes/createcm.html'
-#    model = CondicoesMissao
-    
-#    def get_success_url(self):
-#        return reverse('condicoes_missao_list_view')
-    
-#    def form_valid(self, form):
-          
-#        form.instance.aventuras_id =  self.request.session[SESSION_AVENTURA].id
-#        self.object = form.save() 
-#        return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")  
+    def __init__(self, var_name, var_value):
+        self.var_name = var_name
+        self.var_value = var_value
+ 
+    def render(self, context):
+        try:
+            value = template.Variable(self.var_value).resolve(context)
+        except template.VariableDoesNotExist:
+            value = ""
+        context[self.var_name] = value
+        return u""
+ 
+def set_var(parser, token):
+    """
+        {% set <var_name>  = <var_value> %}
+    """
+    parts = token.split_contents()
+    if len(parts) < 4:
+        raise template.TemplateSyntaxError("'set' tag must be of the form:  {% set <var_name>  = <var_value> %}")
+    return SetVarNode(parts[1], parts[3])
+ 
+register.tag('set', set_var)
 
-
-#update missao
-#class CondicoesMissaoUpdateView(UpdateView):
-#    template_name = 'editor_missao/condicoes/updatecm.html'
-#    model = CondicoesMissao
+class CondicoesMissaoListView(ListView):
+    template_name = 'editor_missao/condicoes/listar_condicoes_missao.html'
+    model = Condicao
     
-#    def form_valid(self, form):
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get a context
+        context = super(CondicoesMissaoListView, self).get_context_data(**kwargs)
         
-#        form.instance.aventuras_id =  self.request.session[SESSION_AVENTURA].id
+        object_list = ''
+        if self.request.session[SESSION_AVENTURA] != '-1':
+                      
+            missao_list = Missao.objects.all().filter(id=self.kwargs['pk'],aventuras_id=self.request.session[SESSION_AVENTURA].id)
+
+
+            flag = 0
+            condicao_list = ''
+            for obj in missao_list:
+                if flag ==0:
+                    condicao_list = Condicao.objects.all().filter(missao_id=obj.id,)
+                    flag = 1
+                elif flag == 1:
+                    condicao_list = condicao_list | Condicao.objects.all().filter(missao_id=obj.id,)
+
+            
+            flag = 0
+            condicao_jogador_instancia = ''
+            for obj in  condicao_list:
+                if flag ==0:
+                    condicao_jogador_instancia = CondicaoJogadorInstancia.objects.all().filter(condicao_ptr_id=obj.id,)
+                    flag = 1
+                elif flag == 1:
+                    condicao_jogador_instancia = condicao_jogador_instancia | CondicaoJogadorInstancia.objects.all().filter(condicao_ptr_id=obj.id,)
+             
+            
+            flag = 0
+            condicao_instancia = ''
+            for obj in  condicao_list:
+                if flag ==0:
+                    condicao_instancia = CondicaoInstanciaObjeto.objects.all().filter(condicao_ptr_id=obj.id,)
+                    flag = 1
+                elif flag == 1:
+                    condicao_instancia = condicao_instancia | CondicaoInstanciaObjeto.objects.all().filter(condicao_ptr_id=obj.id,)
+             
+            flag = 0
+            condicao_avatar_objeto = ''
+            for obj in  condicao_list:
+                if flag ==0:
+                    condicao_avatar_objeto = CondicaoJogadorObjeto.objects.all().filter(condicao_ptr_id=obj.id,)
+                    flag = 1
+                elif flag == 1:
+                    condicao_avatar_objeto = condicao_avatar_objeto | CondicaoJogadorObjeto.objects.all().filter(condicao_ptr_id=obj.id,)
+            
+            flag = 0
+            condicao_dialogo  = ''
+            for obj in  condicao_list:
+                if flag ==0:
+                    condicao_dialogo = CondicaoDialogoInstancia.objects.all().filter(condicao_ptr_id=obj.id,)
+                    flag = 1
+                elif flag == 1:
+                    condicao_dialogo = condicao_dialogo | CondicaoDialogoInstancia.objects.all().filter(condicao_ptr_id=obj.id,)
+  
+           
+            condicoes_tipos = ''
+            condicoes_tipos = chain(condicao_jogador_instancia, condicao_instancia)
+            condicoes_tipos = chain(condicoes_tipos, condicao_avatar_objeto)
+            condicoes_tipos = chain(condicoes_tipos, condicao_dialogo)
+            
+
+            #atualizando field link
+            '''
+            for obj in condicoes_tipos:
+                if obj.ligacao == "JOIN_OBJ":
+                    obj.ligacao = "combinou"
+                elif obj.ligacao == "GET_OBJ":
+                    obj.ligacao = "possui"
+                else:
+                    obj.ligacao = "conversou"
+             '''
         
-#        self.object = form.save()   
-#        return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")
+            # Add in a QuerySet of all the books
+            context['buffer'] = 0
+            context['missao_list'] = missao_list
+            context['object_list'] = condicoes_tipos
+            context['condicao_jogador_instancia'] = condicao_jogador_instancia
+            context['condicao_instancia'] = condicao_instancia
+            context['condicao_avatar_objeto'] = condicao_avatar_objeto
+            context['condicao_dialogo'] = condicao_dialogo
+            
+        
+        return context 
+    
+    
+#recupera a lista de condicoes 
+class CondicoesListView(ListView,template.Node):
+    template_name = 'editor_missao/condicoes/listar_condicoes.html'
+    model = Condicao
+  
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get a context
+        context = super(CondicoesListView, self).get_context_data(**kwargs)
+        
+        object_list = ''
+        if self.request.session[SESSION_AVENTURA] != '-1':
+                        
+            missao_list = Missao.objects.all().filter(aventuras_id=self.request.session[SESSION_AVENTURA].id)
 
 
-#Lista condicoes entre instancias de objetos
+            flag = 0
+            condicao_list = ''
+            for obj in missao_list:
+                if flag ==0:
+                    condicao_list = Condicao.objects.all().filter(missao_id=obj.id,)
+                    flag = 1
+                elif flag == 1:
+                    condicao_list = condicao_list | Condicao.objects.all().filter(missao_id=obj.id,)
+
+            flag = 0
+            condicao_jogador_instancia = ''
+            for obj in  condicao_list:
+                if flag ==0:
+                    condicao_jogador_instancia = CondicaoJogadorInstancia.objects.all().filter(condicao_ptr_id=obj.id,)
+                    flag = 1
+                elif flag == 1:
+                    condicao_jogador_instancia = condicao_jogador_instancia | CondicaoJogadorInstancia.objects.all().filter(condicao_ptr_id=obj.id,)
+             
+            
+            flag = 0
+            condicao_instancia = ''
+            for obj in  condicao_list:
+                if flag ==0:
+                    condicao_instancia = CondicaoInstanciaObjeto.objects.all().filter(condicao_ptr_id=obj.id,)
+                    flag = 1
+                elif flag == 1:
+                    condicao_instancia = condicao_instancia | CondicaoInstanciaObjeto.objects.all().filter(condicao_ptr_id=obj.id,)
+             
+            flag = 0
+            condicao_avatar_objeto = ''
+            for obj in  condicao_list:
+                if flag ==0:
+                    condicao_avatar_objeto = CondicaoJogadorObjeto.objects.all().filter(condicao_ptr_id=obj.id,)
+                    flag = 1
+                elif flag == 1:
+                    condicao_avatar_objeto = condicao_avatar_objeto | CondicaoJogadorObjeto.objects.all().filter(condicao_ptr_id=obj.id,)
+            
+            flag = 0
+            condicao_dialogo  = ''
+            for obj in  condicao_list:
+                if flag ==0:
+                    condicao_dialogo = CondicaoDialogoInstancia.objects.all().filter(condicao_ptr_id=obj.id,)
+                    flag = 1
+                elif flag == 1:
+                    condicao_dialogo = condicao_dialogo | CondicaoDialogoInstancia.objects.all().filter(condicao_ptr_id=obj.id,)
+  
+           
+            condicoes_tipos = ''
+            condicoes_tipos = chain(condicao_jogador_instancia, condicao_instancia)
+            condicoes_tipos = chain(condicoes_tipos, condicao_avatar_objeto)
+            condicoes_tipos = chain(condicoes_tipos, condicao_dialogo)
+            
+
+            #atualizando field link
+            '''
+            for obj in condicoes_tipos:
+                if obj.ligacao == "JOIN_OBJ":
+                    obj.ligacao = "combinou"
+                elif obj.ligacao == "GET_OBJ":
+                    obj.ligacao = "possui"
+                else:
+                    obj.ligacao = "conversou"
+             '''
+        
+            # Add in a QuerySet of all the books
+            context['buffer'] = 0
+            context['missao_list'] = missao_list
+            context['object_list'] = condicoes_tipos
+            context['condicao_jogador_instancia'] = condicao_jogador_instancia
+            context['condicao_instancia'] = condicao_instancia
+            context['condicao_avatar_objeto'] = condicao_avatar_objeto
+            context['condicao_dialogo'] = condicao_dialogo
+            
+            
+            print condicoes_tipos
+            c1 = condicoes_tipos
+            c2 = condicoes_tipos
+            for m in missao_list:
+                print m.nome
+                for c in condicao_instancia:       
+                    print c.nome
+               
+            
+        return context 
+
+#lista condição entre instâncias de objetos
 class CondicaoObjetoListView(ListView):
-    template_name = 'editor_missao/condicoes/listarco.html'
-    model = CondicaoObjeto
+    template_name = 'editor_missao/condicoes/listar_condicao_instancia_objeto.html'
+    model = CondicaoInstanciaObjeto
     
     def get_queryset(self):
 
@@ -1260,10 +1826,13 @@ class CondicaoObjetoListView(ListView):
         if self.request.session[SESSION_AVENTURA] != '-1':
             missao_list = Missao.objects.all().filter(aventuras_id=self.request.session[SESSION_AVENTURA].id)
             
-            #flag = 0;
+            flag = 0;
             for obj in missao_list:
-                object_list = CondicaoObjeto.objects.all().filter(missao_id=obj.id).order_by('missao')
-                
+                if flag ==0:
+                    object_list = CondicaoInstanciaObjeto.objects.all().filter(missao_id=obj.id).order_by('missao')
+                    flag = 1
+                elif flag == 1:
+                    object_list = object_list | CondicaoInstanciaObjeto.objects.all().filter(missao_id=obj.id).order_by('missao')
             #atualizando field link
             for obj in object_list:
                 if obj.ligacao == "JOIN_OBJ":
@@ -1275,15 +1844,15 @@ class CondicaoObjetoListView(ListView):
 
         return object_list
     
-    
-#Cria condição entre objetos
-class CondicaoObjetoCreateView(CreateView):
-    template_name = 'editor_missao/condicoes/createco.html'
-    model = CondicaoObjeto
-    form_class = CondicaoObjetoForm
+
+#cria condições entre instancias deobjetos
+class CondicaoInstanciaObjetoCreateView(CreateView):
+    template_name = 'editor_missao/condicoes/create_condicao_instancia_objeto.html'
+    model = CondicaoInstanciaObjeto
+    form_class = CondicaoInstanciaObjetoForm
     
     def get_initial(self):
-        initial = super(CondicaoObjetoCreateView, self).get_initial()
+        initial = super(CondicaoInstanciaObjetoCreateView, self).get_initial()
         if self.request.session[SESSION_AVENTURA] != '-1':
             initial['aventura_id'] = self.request.session[SESSION_AVENTURA].id
         else:
@@ -1307,14 +1876,14 @@ class CondicaoObjetoCreateView(CreateView):
             return HttpResponse(json.dumps({'response': 'exception created'}), content_type="pplication/json") 
 
 
-#update condicao entre instancias
-class CondicaObjetoUpdateView(UpdateView):
-    template_name = 'editor_missao/condicoes/updateco.html'
-    model = CondicaoObjeto
-    form_class = CondicaoObjetoForm
+#atualiza condições entre instâncias de objeto
+class CondicaoInstanciaObjetoUpdateView(UpdateView):
+    template_name = 'editor_missao/condicoes/update_condicao_instancia_objeto.html'
+    model = CondicaoInstanciaObjeto
+    form_class = CondicaoInstanciaObjetoForm
     
     def get_initial(self):
-        initial = super(CondicaObjetoUpdateView, self).get_initial()
+        initial = super(CondicaoInstanciaObjetoUpdateView, self).get_initial()
         initial['aventura_id'] = self.request.session[SESSION_AVENTURA].id
         return initial
     
@@ -1323,10 +1892,10 @@ class CondicaObjetoUpdateView(UpdateView):
         return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")
 
 
-#Lista condicoes entre jogador e instâncias
-class CondicaoJogadorListView(ListView):
-    template_name = 'editor_missao/condicoes/listarcj.html'
-    model = CondicaoJogador
+#lista condicoes entre jogador e instâncias
+class CondicaoJogadorInstanciaListView(ListView):
+    template_name = 'editor_missao/condicoes/listar_condicao_jogador_instancias.html'
+    model = CondicaoJogadorInstancia
     
     def get_queryset(self):
 
@@ -1334,9 +1903,13 @@ class CondicaoJogadorListView(ListView):
         if self.request.session[SESSION_AVENTURA] != '-1':
             missao_list = Missao.objects.all().filter(aventuras_id=self.request.session[SESSION_AVENTURA].id)
 
-            #flag = 0;
+            flag = 0;
             for obj in missao_list:
-                object_list = CondicaoJogador.objects.all().filter(missao_id=obj.id).order_by('missao')
+                if flag ==0:
+                    object_list = CondicaoJogadorInstancia.objects.all().filter(missao_id=obj.id).order_by('missao')
+                    flag = 1
+                elif flag == 1:
+                    object_list = object_list | CondicaoJogadorInstancia.objects.all().filter(missao_id=obj.id).order_by('missao')
                 
             #atualizando field link
             for obj in object_list:
@@ -1351,13 +1924,13 @@ class CondicaoJogadorListView(ListView):
         return object_list
     
 #Cria condição entre um determinado avatar da aventura e a instância de objeto
-class CondicaoJogadorCreateView(CreateView):
-    template_name = 'editor_missao/condicoes/createcj.html'
-    model = CondicaoJogador
-    form_class = CondicaoJogadorForm
+class CondicaoJogadorInstanciaCreateView(CreateView):
+    template_name = 'editor_missao/condicoes/create_condicao_jogador_instancias.html'
+    model = CondicaoJogadorInstancia
+    form_class = CondicaoJogadorInstanciaForm
     
     def get_initial(self):
-        initial = super(CondicaoJogadorCreateView, self).get_initial()
+        initial = super(CondicaoJogadorInstanciaCreateView, self).get_initial()
         if self.request.session[SESSION_AVENTURA] != '-1':
             initial['aventura_id'] = self.request.session[SESSION_AVENTURA].id
         else:
@@ -1383,14 +1956,14 @@ class CondicaoJogadorCreateView(CreateView):
 
 
 #update condicao entre instancias
-class CondicaoJogadorUpdateView(UpdateView):
-    template_name = 'editor_missao/condicoes/updatecj.html'
-    model = CondicaoJogador
-    form_class = CondicaoJogadorForm
+class CondicaoJogadorInstanciaUpdateView(UpdateView):
+    template_name = 'editor_missao/condicoes/update_condicao_jogador_instancia.html'
+    model = CondicaoJogadorInstancia
+    form_class = CondicaoJogadorInstanciaForm
     
     
     def get_initial(self):
-        initial = super(CondicaoJogadorUpdateView, self).get_initial()
+        initial = super(CondicaoJogadorInstanciaUpdateView, self).get_initial()
         initial['aventura_id'] = self.request.session[SESSION_AVENTURA].id
         return initial
     
@@ -1413,25 +1986,28 @@ class CondicaoJogadorUpdateView(UpdateView):
     #def form_invalid(self, form):
     #    return UpdateView.form_invalid(self, form)
     
-    
-#Lista condicoes de avatares e dialogos
-class CondicaoDialogoListView(ListView):
-    template_name = 'editor_missao/condicoes/listarcd.html'
-    model = CondicaoDialogo
+#Lista condicoes entre jogador e objetos
+class CondicaoJogadorObjetoListView(ListView):
+    template_name = 'editor_missao/condicoes/listar_condicao_jogador_objeto.html'
+    model = CondicaoJogadorObjeto
     
     def get_queryset(self):
 
         object_list = ''
         if self.request.session[SESSION_AVENTURA] != '-1':
             missao_list = Missao.objects.all().filter(aventuras_id=self.request.session[SESSION_AVENTURA].id)
-            
-            #flag = 0;
+
+            flag = 0;
             for obj in missao_list:
-                object_list = CondicaoDialogo.objects.all().filter(missao_id=obj.id).order_by('missao')
+                if flag ==0:
+                    object_list = CondicaoJogadorObjeto.objects.all().filter(missao_id=obj.id).order_by('missao')
+                    flag = 1
+                elif flag ==1:
+                    object_list = object_list | CondicaoJogadorObjeto.objects.all().filter(missao_id=obj.id).order_by('missao')
                 
             #atualizando field link
             for obj in object_list:
-
+                
                 if obj.ligacao == "JOIN_OBJ":
                     obj.ligacao = "combinou"
                 elif obj.ligacao == "GET_OBJ":
@@ -1439,25 +2015,105 @@ class CondicaoDialogoListView(ListView):
                 else:
                     obj.ligacao = "conversou"
                 
-                if obj.sufixo ==  "DIALOGO_INICIAL":
-                    obj.sufixo = "Dialogo Inicial"
-                elif obj.sufixo ==  "DIALOGO_FINAL":
-                    obj.sufixo = "Dialogo Final"
-                elif obj.sufixo == "ACEITO":
-                    obj.sufixo = "aceito"
+        return object_list
+
+#Cria condição entre um determinado avatar da aventura e um objeto
+class CondicaoJogadorObjetoCreateView(CreateView):
+    template_name = 'editor_missao/condicoes/create_condicao_jogador_objeto.html'
+    model = CondicaoJogadorObjeto
+    form_class = CondicaoJogadorObjetoForm
+    
+    def get_initial(self):
+        initial = super(CondicaoJogadorObjetoCreateView, self).get_initial()
+        if self.request.session[SESSION_AVENTURA] != '-1':
+            initial['aventura_id'] = self.request.session[SESSION_AVENTURA].id
+        else:
+            initial['aventura_id'] = '0'
+        return initial
+    
+    def get_success_url(self):
+        return reverse('condicao_jogador_objeto_list_view')
+    
+    def form_valid(self, form):
+
+        #verifica se aventura está ativa
+        if self.request.session[SESSION_AVENTURA] != '-1':
+            form.instance.aventuras_id =  self.request.session[SESSION_AVENTURA].id
+            self.object = form.save() 
+            return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")
+        else:
+            ValidationError
+            msg = "For the creating a condition it's necessary activate an adventure!"
+            messages.error(self.request, "".join(msg))
+            return HttpResponse(json.dumps({'response': 'exception created'}), content_type="pplication/json") 
+
+#update condicao entre objetos
+class CondicaoJogadorObjetoUpdateView(UpdateView):
+    template_name = 'editor_missao/condicoes/update_condicao_jogador_objeto.html'
+    model = CondicaoJogadorObjeto
+    form_class = CondicaoJogadorObjetoForm
+    
+    
+    def get_initial(self):
+        initial = super(CondicaoJogadorObjetoUpdateView, self).get_initial()
+        initial['aventura_id'] = self.request.session[SESSION_AVENTURA].id
+        return initial
+
+    def form_valid(self, form):
+        self.object = form.save()   
+        return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")
+    
+    #def form_invalid(self, form):
+    #    return UpdateView.form_invalid(self, form)  
+
+#Lista condicoes de avatares e dialogos
+class CondicaoDialogoInstanciaListView(ListView):
+    template_name = 'editor_missao/condicoes/listar_condicoes_dialogo_instancia_objeto.html'
+    model = CondicaoDialogoInstancia
+    
+    def get_queryset(self):
+
+        object_list = ''
+        if self.request.session[SESSION_AVENTURA] != '-1':
+            missao_list = Missao.objects.all().filter(aventuras_id=self.request.session[SESSION_AVENTURA].id)
+            
+            flag = 0;
+            for obj in missao_list:
+                if flag ==0:
+                    object_list = CondicaoDialogoInstancia.objects.all().filter(missao_id=obj.id).order_by('missao')
+                    flag = 1
+                elif flag ==1:
+                    object_list = object_list | CondicaoDialogoInstancia.objects.all().filter(missao_id=obj.id).order_by('missao')
+                
+            #atualizando field link
+            for obj in object_list:
+
+                if obj.ligacao == "JOIN_OBJ":
+                    obj.ligacao = u"combinou"
+                elif obj.ligacao == "GET_OBJ":
+                    obj.ligacao = u"possui"
                 else:
-                    obj.sufixo = "Negação"
+                    obj.ligacao = u"conversou"
+                
+                if obj.sufixo ==  "DIALOGO_INICIAL":
+                    obj.sufixo = u"Dialogo Inicial"
+                elif obj.sufixo ==  "DIALOGO_FINAL":
+                    obj.sufixo = u"Dialogo Final"
+                elif obj.sufixo == "ACEITO":
+                    obj.sufixo = u"confirmação"
+                else:
+                    obj.sufixo = u"negação"
                     
         return object_list
     
 #Cria a dondição entre um Avatar e uma parte de diálogo de uma dada instância.
-class CondicaoDialogoCreateView(CreateView):
-    template_name = 'editor_missao/condicoes/createcd.html'
-    model = CondicaoDialogo
-    form_class = CondicaoDialogoForm
+class CondicaoDialogoInstanciaCreateView(CreateView):
+    template_name = 'editor_missao/condicoes/create_condicao_dialogo_instancia.html'
+    model = CondicaoDialogoInstancia
+    form_class = CondicaoDialogoInstanciaForm
     
     def get_initial(self):
-        initial = super(CondicaoDialogoCreateView, self).get_initial()
+        initial = super(CondicaoDialogoInstanciaCreateView, self).get_initial()
         if self.request.session[SESSION_AVENTURA] != '-1':
             initial['aventura_id'] = self.request.session[SESSION_AVENTURA].id
         else:
@@ -1474,12 +2130,12 @@ class CondicaoDialogoCreateView(CreateView):
 
 
 #update condicao dialogos
-class CondicaoDialogoUpdateView(UpdateView):
-    template_name = 'editor_missao/condicoes/updatecd.html'
-    model = CondicaoDialogo
-    form_class = CondicaoDialogoForm
+class CondicaoDialogoInstanciaUpdateView(UpdateView):
+    template_name = 'editor_missao/condicoes/update_condicao_dialogo_instancia.html'
+    model = CondicaoDialogoInstancia
+    form_class = CondicaoDialogoInstanciaForm
     def get_initial(self):
-        initial = super(CondicaoDialogoUpdateView, self).get_initial()
+        initial = super(CondicaoDialogoInstanciaUpdateView, self).get_initial()
         initial['aventura_id'] = self.request.session[SESSION_AVENTURA].id
         return initial
     
@@ -1489,9 +2145,10 @@ class CondicaoDialogoUpdateView(UpdateView):
 
 
 
+
 #Deleção de todas os três tipos de condições
 class CondicaoDeleteView(DeleteView):
-    template_name = 'editor_missao/condicoes/delete.html'
+    template_name = 'editor_missao/condicoes/delete_condicao.html'
     model = Condicao
     
     def delete(self, request, *args, **kwargs):
@@ -1500,16 +2157,20 @@ class CondicaoDeleteView(DeleteView):
         
         #if self.object == CondicaoJogador:
         #    print "Condicao Jogador"
-         
-        if hasattr(self.object, 'condicaojogador'):
-            self.object.delete()
-            return HttpResponse(json.dumps({'response': 'condicaojogador'}), content_type="application/json") 
-        elif hasattr(self.object, 'condicaoobjeto'):
-            self.object.delete()
-            return HttpResponse(json.dumps({'response': 'condicaoobjeto'}), content_type="application/json")
-        elif hasattr(self.object, 'condicaodialogo'):
-            self.object.delete()
-            return HttpResponse(json.dumps({'response': 'condicaodialogo'}), content_type="application/json")
+        
+        id_condicao = self.kwargs['pk']
+        tipo_condicao = ''
+        if CondicaoJogadorInstancia.objects.all().filter(condicao_ptr_id=id_condicao).exists():
+            tipo_condicao = "CondicaoJogadorInstancia"
+        elif CondicaoInstanciaObjeto.objects.all().filter(condicao_ptr_id=id_condicao).exists(): 
+            tipo_condicao = "CondicaoInstanciaObjeto"
+        elif CondicaoDialogoInstancia.objects.all().filter(condicao_ptr_id=id_condicao).exists(): 
+            tipo_condicao = "CondicaoDialogoInstancia"
+        elif CondicaoJogadorObjeto.objects.all().filter(condicao_ptr_id=id_condicao).exists(): 
+            tipo_condicao = "CondicaoJogadorObjeto"
+            
+        self.object.delete()
+        return HttpResponse(json.dumps({'response': tipo_condicao}), content_type="application/json")
         #except ValidationError as e:
             #messages.error(request, "".join(e.messages))
             #return HttpResponse(json.dumps({'response': 'exception delete'}), content_type="text")
@@ -1683,6 +2344,11 @@ class AgenteCreateView(CreateView):
     def get_success_url(self):
         return reverse('agente_list_view')
     
+    def get_initial(self):
+        initial = super(AgenteCreateView, self).get_initial()
+        initial['aventura_id'] = self.request.session[SESSION_AVENTURA].id
+        return initial
+    
     def form_valid(self, form):
         
         if self.request.session[SESSION_AVENTURA] != '-1':
@@ -1701,6 +2367,11 @@ class AgenteUpdateView(UpdateView):
     template_name = 'editor_movimentos/agentes/update.html'   
     model = Agente
     form_class = AgenteCreateForm
+    
+    def get_initial(self):
+        initial = super(AgenteUpdateView, self).get_initial()
+        initial['aventura_id'] = self.request.session[SESSION_AVENTURA].id
+        return initial
     
     def get_success_url(self):
         return reverse('agente_list_view')
@@ -2069,3 +2740,133 @@ class AgenteDeleteView(DeleteView):
     
     def get_success_url(self):
         return reverse('agente_list_view') 
+    
+    
+ 
+'''
+====================================================================
+                        Views para Models de Estado do Jogo
+====================================================================
+''' 
+   
+class PosInstanciaAtivaCreateView(AjaxableResponseMixin, CreateView):  
+    model = PosInstanciaAtiva
+    form_class = PosInstanciaAtivaCreateForm
+    
+    def get_success_url(self):
+        return reverse('avtentura_ativas_list_view') 
+    
+    def form_valid(self, form,*args, **kwargs):
+       
+        pos = json.loads(self.request.body)#get json post
+        #exemplo de acesso, pos[0]['id_objeto']
+        
+
+        for ins in pos['PosInstanciaAtiva']:
+            posinstanciaativa = PosInstanciaAtiva()
+            posinstanciaativa.latitude = ins['lat']
+            posinstanciaativa.longitude = ins['log']
+            posinstanciaativa.altitude = ins['alt']
+            posinstanciaativa.instancia_objeto_ativa_id = ins['instancia_id']
+            posinstanciaativa.aventura_ativa_instancia_id = pos['aventura_ativa_id'] 
+            posinstanciaativa.save()
+            #form.instance.latitude = ins['lat']
+            #form.instance.longitude = ins['log']
+            #form.instance.altitude = ins['alt']
+            #form.instance.instancia_objeto_ativa_id = ins['instancia_id']
+            #form.instance.aventura_ativa_instancia_id = pos['aventura_ativa_id'] 
+            #self.object = form.save()
+            
+
+        #form.instance.nome = pos[0]['nome']
+        #form.instance.objeto_id = pos[0]['id_objeto']
+        #form.instance.aventura_id =  self.request.session[SESSION_AVENTURA].id
+        #form.instance.instancia_cont = qntde_new_inst_obj
+        #self.object = form.save()
+        #response = super(AjaxableResponseMixin, self).form_valid(form)
+                       
+        #qntde_pos = 1
+
+               
+        data_return = {'response': 'ok',}         
+
+        return self.render_to_json_response(data_return)
+
+class AvatarAtivoCreateView(AjaxableResponseMixin, CreateView):  
+    model = AvatarAtivo
+    form_class = AvatarAtivoCreateForm
+    
+    def get_success_url(self):
+        return reverse('avtentura_ativas_list_view') 
+    
+    def form_valid(self, form,*args, **kwargs):
+       
+        pos = json.loads(self.request.body)#get json post
+        #exemplo de acesso, pos[0]['id_objeto']
+        
+        for ins in pos['AvatarAtivo']:
+            posavatarativo = AvatarAtivo()
+            posavatarativo.latitude = 0.0
+            posavatarativo.longitude = 0.0
+            posavatarativo.avatar_id = ins['avatar_id']
+            posavatarativo.aventura_ativa_avatar_id = pos['aventura_ativa_id'] 
+            posavatarativo.save()
+
+               
+        data_return = {'response': 'ok',}         
+
+        return self.render_to_json_response(data_return)
+    
+class MissaoAtivaCreateView(AjaxableResponseMixin, CreateView):  
+    model = MissaoAtiva
+    form_class = MissaoAtivaCreateForm
+    
+    def get_success_url(self):
+        return reverse('avtentura_ativas_list_view') 
+    
+    def form_valid(self, form,*args, **kwargs):
+       
+        pos = json.loads(self.request.body)#get json post
+        #exemplo de acesso, pos[0]['id_objeto']
+        
+
+        for ins in pos['MissaoAtiva']:
+            posmissaoativa = MissaoAtiva()
+            posmissaoativa.estado_missao = False
+            posmissaoativa.missao_id = ins['missao_id']
+            posmissaoativa.aventura_ativa_missao_id = pos['aventura_ativa_id'] 
+            posmissaoativa.save()
+
+               
+        data_return = {'response': 'ok',}         
+
+        return self.render_to_json_response(data_return)
+
+class CondicaoAtivaCreateView(AjaxableResponseMixin, CreateView):  
+    model = CondicaoAtiva
+    form_class = CondicaoAtivaCreateForm
+    
+    def get_success_url(self):
+        return reverse('avtentura_ativas_list_view') 
+    
+    def form_valid(self, form,*args, **kwargs):
+       
+        pos = json.loads(self.request.body)#get json post
+        #exemplo de acesso, pos[0]['id_objeto']
+        
+
+        for ins in pos['CondicaoAtiva']:
+            poscondicaoativa = CondicaoAtiva()
+            poscondicaoativa.estado_condicao = False
+            missaoativa = MissaoAtiva.objects.all().filter(missao_id =ins['missao_id'],aventura_ativa_missao_id =pos['aventura_ativa_id'] )
+            for m in missaoativa:
+                print m.pk
+                poscondicaoativa.missao_ativa_id = m.pk
+            poscondicaoativa.aventura_ativa_condicao_id = pos['aventura_ativa_id'] 
+            poscondicaoativa.condicao_id = ins['condicao_id'] 
+            poscondicaoativa.save()
+
+               
+        data_return = {'response': 'ok',}         
+
+        return self.render_to_json_response(data_return)

@@ -1,0 +1,64 @@
+<div class="form-actions">
+	<h3>
+		<strong>Conditions</strong>
+	</h3>
+	<div id="condicao_objeto">
+		<table class="table table-bordered">
+			<tr>
+				<th>Name</th>
+				<th>Prefix</th>
+				<th>Link</th>
+				<th>Suffix</th>
+				<th>Story</th>
+				<th>Operator</th>
+				<th>Quantity</th>
+			</tr>
+			<tbody>
+					{%for missao in missao_list %}
+						<tr class="success">
+						<td><strong>Missão: {{  missao.nome }}</strong></td>
+						</tr> 
+						
+						{% for condicao in condicao_instancia %}
+						
+						{% if missao.id == condicao.missao_id %}
+						<tr class="success">
+							<td>
+								<!-- moda atualizacao condicoes--> 
+								<a data-toggle="modal"
+								onClick="openModal('{% url  condicao_objeto_update_view condicao.pk %}','condicoes')"
+								href="#condicoes">{{ condicao.nome }}</a> 
+							</td>
+							<td>{{ condicao.prefixo }}</td>
+							<td>{{ condicao.ligacao }}</td>		
+							<td>{{ condicao.sufixo }}</td>
+							<td>{{ condicao.enredo }}</td>
+							<td>{{ condicao.operador }}</td>	
+							<td>{{ condicao.quantidade }}</td>
+							<td>
+									{% csrf_token %}
+									<!--<input type="submit" class="btn btn-block btn-small btn-danger " value="Deletar">-->
+									<a class="btn btn-block btn-small btn-danger" data-toggle="modal"
+										onClick="openModal('{% url  condicao_delete_view condicao.pk %}','condicoes')"
+										href="#condicoes">Delete</a>
+							</td>
+						</tr>
+						{% endif %}
+						{% empty %}
+						<tr>
+							<td colspan="6"><i style="margin-right: 10px;"
+								class="icon-warning-sign"></i><strong>Attention!</strong>There are no registered missions for the adventure, or, there is no adventure being edited.</td>
+						</tr>
+						
+						{% endfor %}
+					{% endfor %}
+					
+			</tbody>
+		</table>
+	</div>
+	
+	<!-- Modal para criação de objetos -->
+	<a role="button" onClick="openModal('{% url condicao_objeto_create_view %}','condicoes')" class="btn btn-small btn-primary" data-toggle="modal" href="#condicoes">Create Condition</a>
+	<div id="condicoes" class="modal hide fade"></div>
+</div>
+

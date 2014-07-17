@@ -2,7 +2,11 @@
 '''
 Created on 16/09/2013
 
-Models para o Ambiente de Autoria de DLG
+Modelo para o ambiente AutEnvLDG
+
+Class with  com the nomenclature nameOfClassAtiva represent the state of the game.
+
+Normal nomenclature for classes is: nameOfClass, for example InstanceObject
 
 @author: Roberto Guimaraes Morati Junior
 '''
@@ -15,18 +19,6 @@ from django.utils.translation import gettext as _
 #from imagekit.models import ImageSpecField
 
 
-
-class CalcClass(object):
-
-    def __init__(self, *args, **kw):
-        # Initialize any variables you need from the input you get
-        pass
-
-    def do_work(self):
-        # Do some calculations here
-        # returns a tuple ((1,2,3, ), (4,5,6,))
-        result = ((1,2,3, ), (4,5,6,)) # final result
-        return result
 '''
 Class TipoObjeto 
 
@@ -34,15 +26,17 @@ Representa o tipo de um objeto, ou seja, o autor da aventura ao criar um objeto 
 Por exemplo, o objeto Cascumpus é do tipo de objeto Monstro.
 
 @param tipo: representa o nome do tipo de objeto
-@param descricao: apresenta uma descrição do tipo de objeto
-@param posicoes_geograficas: remete a quantidade de posições geográficas que um objeto de um dado tipo poderá assumi. 
+@param descricao: descrição do tipo de objeto
+@param posicoes_geograficas: remete a quantidade de posições geográficas que a instância de um objeto de um dado tipo poderá assumir. 
                              Por exemplo, objeto do tipo Limite do Labirinto, esse objeto pode assumir 4 posições geográficas. 
                              Assim delimitando a área do geografica do jogo, por meio de uma sugestão.
+@param publico: quando True, esse atributo referece a possibilidade do Tipo de Objeto criado pelo autor ser visivel para outras aventuras.
 '''
 class TipoObjeto(models.Model):
     tipo = models.CharField(max_length=30)
     descricao = models.CharField(max_length=100)
     posicoes_geograficas = models.IntegerField(max_length=3,default=1, help_text=u"Delimita a quantidade de posições geográficas da instância do objeto.")
+    publico = models.BooleanField(default='True')
     
     #return o tipo
     def __unicode__(self):
@@ -67,7 +61,6 @@ Em outras palavras, quanto o objeto é arrastado para o mapa, a imagem do icone 
 @param icone: é o diretorio para imagem do icone
 
 Pendências: Redimensionar o icone para tamanho padrão.
-
 '''
 class Icone (models.Model):
     nome =  models.CharField(max_length=30,)
@@ -108,7 +101,7 @@ Por exemplo, a proximidade com o Cascumpus pode ser indicada por um áudio de ru
 @param sugestao: url da sugestão.
 @param proximidade: é a distância que o jogador tem que estar da sugestão para que ele tenha percepção da mesma.   
 
-Pendências nessa classe: Identificar tipos de arquivos.
+Pendências nessa classe: Identificar tipos de arquivos e atualizar a forma de criar sugestões.
 '''
 class Sugestao(models.Model):
     TEXTO = 'STX'
@@ -119,6 +112,7 @@ class Sugestao(models.Model):
         (AUDIO, 'Áudio'),
         (IMAGEM, 'Imagem'),)
     nome = models.CharField(max_length=30,default="", )
+    publico = models.BooleanField(default='True')
     tipo = models.CharField(max_length=10, choices=TIPO_SUGESTAO ,default=TEXTO)
     sugestao = models.FileField(upload_to ='sugestao/', help_text="Sugestão para tomada de decisão.",default="", )
     proximidade = models.IntegerField(max_length=3,default=1)
@@ -143,6 +137,40 @@ class Sugestao(models.Model):
                 this.sugestao.delete(save=False)
         except: pass # when new photo then we do nothing, normal case          
         super(Sugestao, self).save(*args, **kwargs)
+        
+'''
+Sugestão de Arquivos
+
+
+class SugestaoFile(Sugestao, models.Model):
+    sugestao = models.FileField(upload_to ='sugestao/', help_text="Sugestão para tomada de decisão.",default="", )
+    descricao = models.CharField(max_length=100)
+    
+    #verifica se sugestao nao esta sendo utilizado por alguma instancia
+    def delete(self, *args, **kwargs):
+        if not self.sugestoes.all():
+            storage, path = self.sugestao.storage, self.sugestao.path
+            super(SugestaoFile, self).delete(*args, **kwargs)
+            return storage.delete(path)
+        raise ValidationError(u"Não é possível remover esta sugestão pois existem instâncias de objetos que fazem uso da mesma!")
+    
+    #deleta o arquivo antigo
+    def save(self, *args, **kwargs):
+        # delete old file when replacing by updating the file
+        try:
+            this = SugestaoFile.objects.get(id=self.id)
+            if this.sugestao != self.sugestao:
+                this.sugestao.delete(save=False)
+        except: pass # when new photo then we do nothing, normal case          
+        super(SugestaoFile, self).save(*args, **kwargs)
+
+'''
+'''
+Sugestão do Tipo Texto
+
+class SugestaoMensagem(Sugestao,models.Model):
+    mensagem = models.CharField(max_length=250)
+'''   
     
 '''
 Objeto tem um tipo de objeto. O objeto representa algo como, placa, fruta, perigo ou personagens que são instânciados na aventura.
@@ -165,10 +193,16 @@ class Objeto (models.Model):
     tipo_objeto = models.ForeignKey(TipoObjeto, related_name="objetos",)
     icone_objeto = models.ForeignKey(Icone, related_name="icones", default="", )
     dialogo = models.BooleanField(default=True, help_text=u"Delimita se a instancia de um objeto pode ter um dialogo.")
+    #publico = models.BooleanField(default=True, help_text=u"Delimita se esse objeto será publico para outras aventuras.")
+    
     #img = models.ImageField(upload_to='../media/imagens/',verbose_name="Imagem Autoria")
     
     def _unicode_(self):
         return u'%s' % (self.nome)
+    
+    def get_nome_objeto(self):
+        return u'%s' % (self.nome)
+
   
 '''
 Autor - é o individuo que cria a aventura.
@@ -213,12 +247,14 @@ class Aventura(models.Model):
     
     def __unicode__(self):
         return u'%s' % (self.nome)
-
+    
+    
 '''
 TipoImagem representa o tipo de imagem para a instância de objeto.
            a imagem pode ser 2D ou 3D. 
            2D - uso do google maps para jogar
            3D - uso da camera do dispositivo móvel.
+           
 @param tipo: tipo de imnagem cadastrada
 @param img: url da imagem 
 '''
@@ -267,7 +303,8 @@ class TipoImagem(models.Model):
 
 
 '''
-InstanciaObjeto representa um objeto que é arrastado para o mapa da aventura
+InstanciaObjeto representa um objeto que é arrastado para o mapa da aventura.
+
 @param nome:nome da instancia do objeto
 @param proximidade: distância que o jogador deve estar do objeto para que possa ver o mesmo
 @param visivel: este atributo permite indicar se determinado objeto deve estar visivel na aventura, para o jogador.
@@ -327,17 +364,60 @@ class PosicaoGeografica(models.Model):
         nomepos = "POS " + str(posn)
         return u'%s' % (nomepos)
 
+
 '''
 Jogador - representar um jogador cadastrado com seu dispositivo movel
 
+@param dica_senha: dica de senha
+@param nickname:   
 '''
-class Jogador(models.Model):
-    nome = models.CharField(max_length=30)
-    dica_senha = models.CharField(max_length=100)
-    password = models.CharField(_('Password'), max_length=128)
-    aventura = models.ManyToManyField(Aventura, related_name="aventuras_jogador",blank=True,default="",)
-    #aventura = models.ForeignKey(Aventura, related_name="aventura", blank=True, default="", null=True,)
+class Jogador(User, models.Model):
+    dica_senha = models.CharField(max_length=200, verbose_name="Dica de Senha",default="",blank=True,)
+    nickname = models.CharField(max_length=100, verbose_name="Nickname",default="",blank=True,)
+
+    #icone_jogador = models.ImageField(upload_to ='avatar_jogador/', help_text="Avatar do jogador.", default="", blank=True,)
     
+
+    def __unicode__(self):
+        return u'%s' % (self.nickname)
+
+
+'''
+class AventuraAtiva - representa um aventura que está ativa, ou seja, uma aventura que poderá ser jogada.
+
+@param aventura: representa a aventura que foi ativada. 
+@param publica: se esse atributo for False, significa que o jogador irá precisar da chave de acesso.
+@param joadores_aventura_ativa: jogadores vinculados a aventura ativa
+@param chave_acesso: chave para acessar uma aventura com publico como False
+'''
+class AventuraAtiva(models.Model):
+    instancia = models.IntegerField(max_length=2,default=1,)
+    aventura = models.ForeignKey(Aventura, related_name="aventura", blank=True, default="", null=True, )
+    publica = models.BooleanField(default=True, help_text=u"Informa se a aventura ativa é de livre acesso.")
+    joadores_aventura_ativa =  models.ManyToManyField(Jogador, related_name="joadores_aventura_ativa", blank=True, default="", null=True, )
+    chave_acesso = models.CharField(max_length=10,default="",blank=True,)#XPTO2014
+
+    #inicio = models.DateField(_("Data Inicio"), default=date.today)
+    #fim = models.DateField(_("Data Fim"), default=date.today,)
+    #latitude = models.FloatField(blank=True,default=0.0)
+    #longitude = models.FloatField(blank=True,default=0.0)
+    #jogador = models.ForeignKey(User, related_name="Jogador",default="", blank=True,)
+
+
+'''
+PosInstanciaAtiva - representa instâncias de aventuras que estão ativas, ou seja, aventuras sendo jogadas. 
+
+@param    latitude,longitude e altitude: inicialmente possui as posiçòes de uma aventura criada. São alteradas no decorrer do jogo.
+@param    instancia_objeto_ativa: referência a uma instância de objeto
+@param    aventura_ativa_instacia: referência a  aventura ativa
+'''
+class PosInstanciaAtiva(models.Model):
+    latitude = models.FloatField()
+    longitude = models.FloatField()
+    altitude = models.FloatField()
+    instancia_objeto_ativa = models.ForeignKey(InstanciaObjeto, related_name="instancia_objeto_ativa",blank=True,default="",)
+    aventura_ativa_instancia = models.ForeignKey(AventuraAtiva, related_name="aventura_ativa_instancia",blank=True,default="",)
+     
 '''
 Avatar - representa os persongens criados para uma determinada aventura.
 
@@ -345,14 +425,15 @@ Avatar - representa os persongens criados para uma determinada aventura.
 '''  
 class Avatar(models.Model):
     nome = models.CharField(max_length=30)
-    latitude = models.FloatField(default="0",)
-    longitude = models.FloatField(default="0",)
+    #latitude = models.FloatField(default="0",)
+    #longitude = models.FloatField(default="0",)
     avatar = models.ImageField(upload_to ='imagens/avatares_jogadores/', help_text="Avatar", blank=True,)
     publico = models.BooleanField(default=False, help_text=u"Informa se o avatar pode ser utilizado em outras aventuras.")
     #aventureiro = models.ForeignKey(Autor, related_name="aventureiro",blank=True,default="",) #autor
     aventureiro = models.ForeignKey(Jogador, related_name="aventureiro",blank=True,default="",null=True,)
     aventura_avatar = models.ForeignKey(Aventura, related_name="aventura_avatar",blank=True,default="",null=True,)
-    inst_objeto = models.ForeignKey(InstanciaObjeto, related_name="inst_objeto",null=True,blank=True,default=None,)
+    inst_objeto = models.ForeignKey(InstanciaObjeto, related_name="inst_objeto",null=True,blank=True,default=None,)#caso seja possivel o avatar controlar alguma isntância de objeto
+    
     
     #retorna o icone (dir)
     def __unicode__(self):
@@ -382,8 +463,18 @@ class Avatar(models.Model):
                 this.avatar.delete(save=False)
         except: pass # when new photo then we do nothing, normal case          
         super(Avatar, self).save(*args, **kwargs)
-    
 
+'''
+class AvatarAtivo  -  persistencia dos dados de um avatar ativo
+
+@param latitude, longitude - guarda a posição ao qual o jogado parou na aventura
+'''
+class AvatarAtivo(models.Model):
+    aventura_ativa_avatar = models.ForeignKey(AventuraAtiva, related_name="aventura_ativa_avatar",null=True,blank=True,default=None,)
+    latitude = models.FloatField(default="0",)
+    longitude = models.FloatField(default="0",)
+    avatar = models.ForeignKey(Avatar, related_name="avatar_ativo",null=True,blank=True,default=None,)
+    
 '''
 Enredo - elemento apresentado ao jogador quando o mesmo toma uma decisão.
 
@@ -393,58 +484,90 @@ Enredo - elemento apresentado ao jogador quando o mesmo toma uma decisão.
 @param descricao: qual a finalidade do enredo na aventura    
 '''
 class Enredo(models.Model):
-    TEXTO = 'STX'
-    AUDIO = 'SAU'
-    IMGC = 'IMGC' 
-    IMGM = 'IMGM' 
-    TIPO_SUGESTAO = (
-        (TEXTO, 'Texto'),
-        (AUDIO, 'Áudio'),
-        (IMGC, 'Imagem Câmera'),
-        (IMGM, 'Imagem Mapa'),)
+    #TEXTO = 'STX'
+    #AUDIO = 'SAU'
+    #IMGC = 'IMGC' 
+    #IMGM = 'IMGM' 
+    #TIPO_SUGESTAO = (
+    #    (TEXTO, 'Texto'),
+    #    (AUDIO, 'Áudio'),
+    #    (IMGC, 'Imagem Câmera'),
+    #    (IMGM, 'Imagem Mapa'),)
     nome = models.CharField(max_length=30,default="", )
-    tipo = models.CharField(max_length=10, choices=TIPO_SUGESTAO ,default=TEXTO)
-    enredo = models.FileField(upload_to ='enredo/', help_text="Elemente que auxilia na contextualição da tomada de decisão..",default="", )
+    #tipo = models.CharField(max_length=10, choices=TIPO_SUGESTAO ,default=TEXTO)
+    #enredo = models.FileField(upload_to ='enredo/', help_text="Elemente que auxilia na contextualição da tomada de decisão..",default="", )
     descricao = models.CharField(max_length=200, default="")
     aventura = models.ForeignKey(Aventura,verbose_name="Aventura",related_name="aventura_enredo", blank=True, default="", null=True, )
+    
+    #verifica se o enredo esta sendo utilizado por Condições Missão
+    def delete(self, *args, **kwargs): 
+        
+        #recupera id
+        id_enredo = self.id
+        
+        object = EnredoFile.objects.all().filter(enredo_ptr_id=id_enredo)
+        
+        buffer = ''
+        for obj in object:
+            buffer = obj 
+        
+        if isinstance(buffer, EnredoFile):
+            if not self.enredos.all():#two times
+                storage, path = buffer.enredo_file.storage, buffer.enredo_file.path
+                super(Enredo, buffer).delete(*args, **kwargs)
+                return storage.delete(path)
+            raise ValidationError(u"Não é possível remover este enredo, pois o mesmo está sendo utilizado!")
+        
+        if not self.enredos.all():#two times
+            return super(Enredo, self).delete(*args, **kwargs)
+        raise ValidationError(u"Não é possível remover este enredo, pois o mesmo está sendo utilizado!")
     
     def __unicode__(self):
         return u'%s' % (self.nome)
     
     def get_nome_enredo(self):
         return u'%s' % (self.nome)
-    
-    #verifica se o enredo esta sendo utilizado por Condições Missão
-    def delete(self, *args, **kwargs): 
-        if not self.enredos.all():#two times
-            storage, path = self.enredo.storage, self.enredo.path
-            super(Enredo, self).delete(*args, **kwargs)
-            return storage.delete(path)
-        raise ValidationError(u"Não é possível remover este enredo, pois o mesmo está sendo utilizado!")
+ 
+
+
+#Classes a serem adicionadas
+'''
+class EnredoFile - representa uma imagem ou áudio
+'''
+class EnredoFile(Enredo, models.Model):
+    AUDIO = 'SAU'
+    IMGC = 'IMGC' 
+    IMGM = 'IMGM' 
+    TIPO_SUGESTAO = (
+        (AUDIO, 'Áudio'),
+        (IMGC, 'Imagem Câmera'),
+        (IMGM, 'Imagem Mapa'),)
+    tipo = models.CharField(max_length=10, choices=TIPO_SUGESTAO ,default=AUDIO)
+    enredo_file = models.FileField(upload_to ='enredo/', help_text="Elemente que auxilia na contextualição da tomada de decisão..",default="", ) 
+
     
     #deleta o arquivo antigo
     def save(self, *args, **kwargs):
         # delete old file when replacing by updating the file
         try:
-            this = Enredo.objects.get(id=self.id)
-            if this.enredo != self.enredo:
-                this.enredo.delete(save=False)
+            this = EnredoFile.objects.get(id=self.id)
+            if this.enredo_file != self.enredo_file:
+                this.enredo_file.delete(save=False)
         except: pass # when new photo then we do nothing, normal case          
-        super(Enredo, self).save(*args, **kwargs)   
+        super(EnredoFile, self).save(*args, **kwargs)  
 
-
-#Classes a serem adicionadas
 '''
-class EnredoFile(Enredo, models.Model):
-    enredo_file = models.FileField(upload_to ='enredo/', help_text="Elemente que auxilia na contextualição da tomada de decisão..",default="", ) 
-    
+class EnredoInstancia - Uma instancia como enredo
+'''
 class EnredoInstancia(Enredo, models.Model):
     enredo_instancia = models.ForeignKey(InstanciaObjeto, related_name="enredo_instancia",blank=True,default="",)
-    
-class EnredoMensagem(Enredo,models.Model):
-    #enredo_mensagem = 
-    pass
+
 '''
+class class EnredoMensagem - uma mensagem como enredo
+'''    
+class EnredoMensagem(Enredo,models.Model):
+    enredo_mensagem = models.CharField(max_length=200, default="")
+
 
 '''
 CondicoesMissao - representa uma composicao de condicoes para uma missao
@@ -481,7 +604,21 @@ class Missao(models.Model):
     def get_nome_missao(self):
         return u'%s' % (self.nome)
     
-    
+ 
+'''
+class MissaoAtiva - representa persistencia de dados de ma missão ativa
+
+@param missao: missao que foi ativa
+@param aventura_ativa_missao: aventura ativa
+@param estado_missao: qndo True a missão foi completada
+'''
+class MissaoAtiva(models.Model):
+    missao = models.ForeignKey(Missao,related_name="missao",blank=True, default="", null=True, )
+    aventura_ativa_missao = models.ForeignKey(AventuraAtiva,related_name="aventura_ativa_missao",blank=True, default="", null=True,) 
+    estado_missao = models.BooleanField(default=False)  
+
+
+
 '''
 Condicao - classe que representa atributos comuns para os três tipos de conções definidas no trabalho.
 
@@ -522,45 +659,73 @@ class Condicao(models.Model):
         
     
 '''
-CondicaoObjeto - representa a necessidade de relação entre dois objetos para satisfazer uma condição.
+class CondicaoAtiva - condicao ativa
+
+@param condicao: representa a condicacao que foi ativa
+@param missao_ativa: ligacao com a missao ativa
+@param aventura_ativa_condicao: representa a aventura que foi ativa
+@param estado_condicao: presenta a estado da condicao
+'''
+class CondicaoAtiva(models.Model):
+    condicao = models.ForeignKey(Condicao,related_name="condicao",blank=True, default="", null=True,) 
+    missao_ativa = models.ForeignKey(MissaoAtiva,related_name="missao_ativa",blank=True, default="", null=True, )
+    aventura_ativa_condicao = models.ForeignKey(AventuraAtiva,related_name="aventura_ativa_condicao",blank=True, default="", null=True,) 
+    estado_condicao = models.BooleanField(default=False) 
+    
+    
+       
+'''
+CondicaoInstanciaObjeto - representa a necessidade de relação entre dois objetos para satisfazer uma condição.
 
 @param prefixo: nesta condicao refere-se a uma instancia de objeto
 @param sufixo: nesta condicao refere-se a uma outra instancia de objeto 
 
 Exemplo: instancia de objeto combinada com outra: tesouro combinou Caixa. Ou seja, tesouro esta na caixa.
 '''
-class CondicaoObjeto(Condicao, models.Model):
+class CondicaoInstanciaObjeto(Condicao, models.Model):
     prefixo = models.ForeignKey(InstanciaObjeto,verbose_name="Instâncias de Objetos",related_name="prefixo_co_inst_obj", blank=True, default="", null=True, )
     sufixo = models.ForeignKey(InstanciaObjeto,verbose_name="Instâncias de Objetos", related_name="sufixo_co_inst_obj", blank=True, default="", null=True, )
     
 
 '''
-CondicaoJogador - estabelece a condicao entre um Avatar de um jogador e um item (instancia Objeto)
+CondicaoJogadorInstancia - estabelece a condicao entre um Avatar de um jogador e um item (instancia Objeto)
 
 @param prefixo: representa os avatares cadastrados naquela aventura
 @param sufixo: representa as instancias de onjetos
-@param quantidade: pode ser utilizado para espefcificar a quantidade de um determinado item 
 '''
-class CondicaoJogador(Condicao, models.Model):
-    prefixo = models.ForeignKey(Avatar,verbose_name="Avatares",related_name="prefixo_cj_avateres", blank=True, default="", null=True, )
-    sufixo = models.ForeignKey(InstanciaObjeto,verbose_name="Instâncias de Objetos", related_name="sufixo_cj_inst_obj", blank=True, default="", null=True, )
+class CondicaoJogadorInstancia(Condicao, models.Model):
+    prefixo = models.ForeignKey(Avatar,verbose_name="Avatares",related_name="prefixo_cji_avateres", blank=True, default="", null=True, )
+    sufixo = models.ForeignKey(InstanciaObjeto,verbose_name="Instâncias de Objetos", related_name="sufixo_cji_inst_obj", blank=True, default="", null=True, )
+    #quantidade = models.IntegerField(max_length=3,default=1)
+ 
+'''
+CondicaoJogadorObjeto - estabelece a condicao entre um Avatar de um jogador e Objeto
+
+@param prefixo: representa os avatares cadastrados naquela aventura
+@param sufixo: representa os objetos
+@param  quantidade: representa a quantidade de objetos 
+'''
+class CondicaoJogadorObjeto(Condicao, models.Model):
+    prefixo = models.ForeignKey(Avatar,verbose_name="Avatares",related_name="prefixo_cjo_avateres", blank=True, default="", null=True, )
+    sufixo = models.ForeignKey(Objeto,verbose_name="Objetos", related_name="sufixo_cjo__obj", blank=True, default="", null=True, )
     quantidade = models.IntegerField(max_length=3,default=1)
-    
+ 
+     
 '''
 CondicaoDialogo - representa a condição que envolve tipos de dialogo, que são Dialogo Inicial, Dialogo Final, confirmação e negacao.
 
 @param prefixo: representa os avatares dos jogadores
 '''
-class CondicaoDialogo(Condicao, models.Model):
+class CondicaoDialogoInstancia(Condicao, models.Model):
     DIALOGO_INICIAL = 'DIALOGO_INICIAL'#inicia o dialogo
     DIALOGO_FINAL = 'DIALOGO_FINAL'#finaliza o dialogo
     ACEITO = 'ACEITO'#aceita algo dito pelo npc
     NEGACAO = 'NEGACAO'#aceita algo dito pelo npc 
     ESTADOS_DIALOGO = (
-        (DIALOGO_INICIAL, 'Diálogo Inicial'),
-        (DIALOGO_FINAL, 'Diálogo Final'),
-        (ACEITO, 'Aceito'),
-        (NEGACAO, 'Negação'),)
+        (DIALOGO_INICIAL, u'Diálogo Inicial'),
+        (DIALOGO_FINAL, u'Diálogo Final'),
+        (ACEITO, u'Confirmação'),
+        (NEGACAO, u'Negação'),)
     prefixo = models.ForeignKey(Avatar,verbose_name="Avatares",related_name="prefixo_cd_avateres", blank=True, default="", null=True, )
     sufixo =  models.CharField(max_length=20, choices=ESTADOS_DIALOGO ,default=DIALOGO_INICIAL)
     referencia_sufixo = models.ForeignKey(InstanciaObjeto,verbose_name="Instâncias de Objetos", related_name="ref_sufixo_cd_inst_obj", blank=True, default="", null=True, )
@@ -581,10 +746,10 @@ class NivelAutor(models.Model):
         (PRINCIPAL, 'Principal'),
         (SECUNDARIO, 'Secundário'),)
     autor = models.ForeignKey(Autor, related_name="autor", blank=True, default="", null=True, )
-    aventura =  models.ForeignKey(Aventura, related_name="aventura", blank=True, default="", null=True, )
+    aventura_autor =  models.ForeignKey(Aventura, related_name="aventura_autor", blank=True, default="", null=True, )
     nivel = models.CharField(max_length=1, choices=NIVEL_AUTOR ,default=PRINCIPAL)
 
-
+    
 '''
 Agente - classe responsavem por conter o nome do agente e o tipo de comportamento.
 '''
@@ -649,6 +814,20 @@ class Mensagem(models.Model):
     instancia_objeto =  models.ForeignKey(InstanciaObjeto, related_name="instancia_objeto", blank=True, default="", null=True, )
     colaborativo =  models.ForeignKey(Colaborativo, related_name="colaborativo", blank=True, default="", null=True, )
     competitivo =  models.ForeignKey(Competitivo, related_name="competitivo", blank=True, default="", null=True, )
+    
+
+'''
+Mochila -  os itens do avatar do jogador são guardados na mochila
+
+@param instancia_mochila: instancias guardadas na mochila.
+                          Quando uma instância de objeto é guarda na mochila,
+                          sua posicao em PosDinamicInstancia (lat,log e alt são nulas)
+@param avatar_mochila: o avatar que possui a respectiva mochila 
+'''
+class Mochila(models.Model):
+    instancia_mochila =  models.ManyToManyField(InstanciaObjeto, related_name="instancia_mochila", blank=True, default="", null=True, )   
+    avatar_mochila =  models.ForeignKey(AvatarAtivo, related_name="avatar_mochila", blank=True, default="", null=True, )
+    
     
 '''
 Mensagemcp - mensagem usada nos agente Colaborativos e Competitivos

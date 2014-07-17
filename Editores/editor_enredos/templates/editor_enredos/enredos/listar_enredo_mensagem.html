@@ -1,0 +1,61 @@
+<div class="form-actions">
+	<h3>
+		<strong>Story Message</strong>
+	</h3>
+	<table class="table table-bordered">
+		<tr>
+			<th>Name</th>
+			<th>Story</th>
+		</tr>
+		<tbody>
+			{% for object in object_list %}
+			<tr class="success">
+				<td>
+					<!-- Modal para atualização de objetos   --> <a data-toggle="modal"
+					onClick="openModal('{% url  enredo_mensagem_update_view object.pk %}','enredo')"
+					href="#enredo">{{ object.nome }}</a> 
+				</td>
+				<td>{{ object.enredo_mensagem }}</td>
+				<td>
+						{% csrf_token %}
+						<!--<input type="submit" class="btn btn-block btn-small btn-danger " value="Deletar">-->
+						<a class="btn btn-block btn-small btn-danger" data-toggle="modal"
+							onClick="openModal('{% url  enredo_delete_view object.pk %}','enredo')"
+							href="#enredo">Delete</a>
+				</td>
+			</tr>
+			{% empty %}
+			<tr>
+				<td colspan="6"><i style="margin-right: 10px;"
+					class="icon-warning-sign"></i><strong>Attention!</strong>There are not registered storys.</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+	<!-- Modal para criaÃ§Ã£o de objetos -->
+	<a role="button" onClick="openModal('{% url enredo_mensagem_create_view %}','enredo')" class="btn btn-small btn-primary" data-toggle="modal" href="#enredo">Create Story</a>
+	
+	<!-- Modal para criaÃ§Ã£o de Ã­cones 
+		<a role="button" onClick="openModal('{% url  objeto_create_view %}','objeto')" class="btn btn-small btn-primary" data-toggle="modal" href="#objeto">Criar Ã�cone</a>
+	-->
+
+	<!-- <a class="create" role="button" class="btn btn-small btn-primary create" data-toggle="modal" title="{% url objeto_create_view %}"  href="#objeto">Criar Objeto</a>   -->
+	<div id="enredo" class="modal hide fade"></div>
+</div>
+
+<!--CÃ³digo antigo, pode servir para algo em outras pÃ¡ginas. NÃ£o deletar.  
+	<script type="text/javascript">
+		$('#create').click(function() {
+			$.get("{% url objeto_create_view %}", function(data) {
+				$("#criarObjeto").html(data);
+
+			});
+		});
+
+		$('#update').click(function(url) {
+			$.get(url, function(data) {
+				$("#atualizarObjeto").html(data);
+			});
+		});
+	</script>
+-->

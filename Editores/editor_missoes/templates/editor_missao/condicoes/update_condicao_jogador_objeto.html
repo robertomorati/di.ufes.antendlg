@@ -1,0 +1,76 @@
+
+<!-- {% load bootstrap_toolkit %} -->
+{% block content %} 
+
+	  <form id="condicao_jogador_objeto_update_view" class="form-actions" method="post" tabindex="-1"  action="{% url condicao_jogador_objeto_update_view object.pk %}">
+		  <div class="modal-header">
+		    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" action="">×</button>
+		    <h3 id="myModalLabel">Update Conditions with Avatars and Objects</h3>
+		  </div>
+		  <div class="modal-body">  
+			  {% if messages %}
+						<div class="alert alert-error" width="30">
+							<button type="button" class="close" data-dismiss="alert">
+								<span class="badge badge-important">x</span>
+							</button>
+							<ul class="messages">
+								{% for message in messages %}
+									<li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li> 
+								{% endfor %}
+							</ul>
+						</div>
+				 {% endif %}
+				 {% csrf_token %}
+				  <div class="row-fluid">
+					 	<div class="span6">
+	                		<div class="form-group">  
+					 			{{ form.nome|as_bootstrap }}
+						 		{{ form.missao|as_bootstrap}}
+						 		{{ form.enredo|as_bootstrap}}
+						 	</div>
+						</div>
+						<div class="span6">
+	                		<div class="form-group">
+					 			{{ form.prefixo|as_bootstrap }}
+						 		{{ form.ligacao|as_bootstrap}}
+						 		{{ form.sufixo|as_bootstrap }}
+						 		{{ form.quantidade|as_bootstrap }}
+						 		{{ form.operador|as_bootstrap }}
+						 	</div>
+						</div>
+				  </div>
+		  </div>
+		  <div class="modal-footer">
+		    <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+		    <button type="submit" class="btn btn-primary">Save</button>
+		  </div>
+	  </form>
+
+
+	<script type="text/javascript">
+		var options = {
+				
+			target : '#condicoes',
+			success : showResponse
+		};
+	
+		// post-submit callback 
+		function showResponse(responseText, statusText, xhr, $form) {
+			var ct = xhr.getResponseHeader("content-type") || "";
+			// se a resposta for um json, significa que o objeto foi criado com sucesso
+
+			if (ct.indexOf('json') > -1) {
+				// fecha o modal
+			  
+				$('#condicoes').modal('hide');
+				refreshDiv('{% url condicao_jogador_list_view %}','content');
+			}else{
+				openModal('{% url condicao_jogador_objeto_update_view object.pk %}','condicoes');
+			}
+		}
+		
+		$('#condicao_jogador_objeto_update_view').ajaxForm(options);
+	</script>
+{% endblock %}
+
+

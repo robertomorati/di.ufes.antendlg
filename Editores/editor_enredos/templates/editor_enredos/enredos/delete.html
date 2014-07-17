@@ -46,9 +46,19 @@
 				// se a resposta for um json, significa que o objeto foi criado com sucesso
 		
 				if (ct == 'application/json') {
-					// fecha o modal
-					$('#enredo').modal('hide');
-					refreshDiv('{% url enredo_list_view %}','content');
+					
+					if ( responseText.response  == 'EnredoFile') {
+						// fecha o modal
+						$('#enredo').modal('hide');
+						refreshDiv('{% url enredo_file_list_view %}','content');
+					}else if ( responseText.response  == 'EnredoInstancia') {
+						$('#enredo').modal('hide');
+						refreshDiv('{% url enredo_instancia_list_view %}','content');
+					}else if ( responseText.response  == 'EnredoMensagem') {
+						$('#enredo').modal('hide');
+						refreshDiv('{% url enredo_mensagem_list_view %}','content');	
+					}
+							
 				}else if (ct == 'text'){
 						openModal('{% url enredo_delete_view object.pk %}','enredo');
 				}

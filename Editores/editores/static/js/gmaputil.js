@@ -1,11 +1,11 @@
 /**
  * Created on --/10/2013
  * 
- * Arquivo responsável por:
+ * Arquivo responsavel por:
  * 			; Inicializar o google maps - v3;
- * 			; Validar se a aventura está ativa;
- * 			; Fazer pesistência das intâncias dos objetos no google maps;
- * 			; Operações (CRUD) nas intâncias por meio de ajax com informações trocadas por meio de json;
+ * 			; Validar se a aventura esta ativa;
+ * 			; Fazer persistencia das intancias dos objetos no google maps;
+ * 			; Operacoes (CRUD) nas instancias por meio de ajax com informacoes trocadas por meio de json;
  * 
  * @author: Roberto Guimaraes Morati Junior
  */		
@@ -742,6 +742,15 @@ function placeInstancesGoogleMaps(location,icon, id_instancia, name_objeto){
 		  zIndex: 5,
 	  });
 	  
+	  //<TESTE>
+	  /**var circle = new google.maps.Circle({
+		  map: $map,
+		  radius: 20,    // 10 miles in metres
+		  fillColor: '#AA0000'
+		});
+	  
+	  circle.bindTo('center', marker, 'position');
+	  **/
 	  iconTime = "" + '<i class=" icon-download-alt"></i>';
 	  
 	  //getting of following link:
@@ -788,13 +797,13 @@ function placeInstancesGoogleMaps(location,icon, id_instancia, name_objeto){
 	    	  				if(responseText.response == "delete"){
 	    	  					info.close();//fecha infowindow
 	    	  					rmMaker.setMap(null);//remove marcador
-	    	  					flagloadBackupInstances = false;//set flag to upadte instances
+	    	  					flagloadBackupInstances = false;//set flag to update instances
 	    	  					loadInstancias();//update isntances
 	    	  					
 	    	  				}else if (ct.indexOf('json') > -1) {
 	    	  					info.close();//após atualizar fecha a infowindow
 	    	  					
-	    	  					info.setContent(data);//atualiza conteúdo;
+	    	  					info.setContent(data);//atualiza conteúdo
 	    	  				}else{
 	    	  					//alert("Dados?" + responseText.response + " " + ct);
 	    	  				}
@@ -847,19 +856,19 @@ function placeInstancesGoogleMaps(location,icon, id_instancia, name_objeto){
 			
 	   }//fim do if
 	
-	 //Quando o marcador/instância é arrastado, é feito o update da sua POS
+	 //Quando uma instância de objeto é arrastada, sua posiçào geográfica é atualizada
      google.maps.event.addListener(marker, 'dragend', function() {
      
     	 var curLatLng = marker.getPosition();
     	
-        //json contendo nova pos
+        //json para atualização da pos
   		json_pos = '[{"latitude":"' + curLatLng.lat() + '"' + ',"longitude":"' + curLatLng.lng() + '"' + ',"altitude":"' + '0.0' + '"}]';
   	
   		updatePosMarker(json_pos,marker);
   		
-     });// fim da  google.maps.event.addListener
+     });//fim da  google.maps.event.addListener
 
-}//fim da função
+}//end function
 
 
 /**

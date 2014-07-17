@@ -1,13 +1,12 @@
 
 <!-- {% load bootstrap_toolkit %} -->
-{% block content %} 
-
-	  <form id="condicao_objeto_update_view" class="form-actions" method="post" tabindex="-1"  action="{% url condicao_objeto_update_view object.pk %}">
+{% block content %}  
+	  <form id="condicao_jogador_objeto_create_view" class="form-actions" method="post" action="{% url condicao_jogador_objeto_create_view %}">
 		  <div class="modal-header">
 		    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" action="">×</button>
-		    <h3 id="myModalLabel">Update Conditions between Instances</h3>
+		    <h3 id="myModalLabel">Create Conditions between Avatars and Objects</h3>
 		  </div>
-		  <div class="modal-body">  
+		  <div class="modal-body">
 			  {% if messages %}
 						<div class="alert alert-error" width="30">
 							<button type="button" class="close" data-dismiss="alert">
@@ -34,11 +33,11 @@
 					 			{{ form.prefixo|as_bootstrap }}
 						 		{{ form.ligacao|as_bootstrap}}
 						 		{{ form.sufixo|as_bootstrap }}
+						 		{{ form.quantidade|as_bootstrap }}
 						 		{{ form.operador|as_bootstrap }}
 						 	</div>
 						</div>
 				  </div>
-				</select>
 		  </div>
 		  <div class="modal-footer">
 		    <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
@@ -47,30 +46,27 @@
 	  </form>
 
 
-	<script type="text/javascript">
-		var options = {
-				
-			target : '#condicoes',
-			success : showResponse
-		};
-	
-		// post-submit callback 
-		function showResponse(responseText, statusText, xhr, $form) {
-			var ct = xhr.getResponseHeader("content-type") || "";
-			// se a resposta for um json, significa que o objeto foi criado com sucesso
-			
-			if (ct.indexOf('json') > -1) {
-				// fecha o modal
-			
-				$('#condicoes').modal('hide');
-				refreshDiv('{% url condicao_objeto_list_view %}','content');
-			}else{
-				openModal('{% url condicao_objeto_update_view object.pk %}','condicoes');
-			}
-		}
+		<script type="text/javascript">
+			var options = {
+				target : '#condicoes',
+				success : showResponse
+			};
 		
-		$('#condicao_objeto_update_view').ajaxForm(options);
-	</script>
+			// post-submit callback 
+			function showResponse(responseText, statusText, xhr, $form) {
+				var ct = xhr.getResponseHeader("content-type") || "";
+				
+				if (ct.indexOf('json') > -1) {
+					// fecha o modal
+					$('#condicoes').modal('hide');
+					refreshDiv('{% url condicao_jogador_list_view %}','content');
+				}else{
+					//openModal('{% url missao_create_view %}','missao');
+				}
+			}
+		
+			$('#condicao_jogador_objeto_create_view').ajaxForm(options);
+		</script>
 {% endblock %}
 
 

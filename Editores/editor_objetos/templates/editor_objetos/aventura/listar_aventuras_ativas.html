@@ -1,0 +1,45 @@
+{% block content %}
+
+<div class="form-actions">
+		<h3><strong>Active Adventures</strong></h3>
+	<table class="table table-bordered">
+		<tr>
+			<th>Instance</th>
+			<th>Public</th>
+			<th>Access Key</th>
+		</tr>
+		<tbody>
+			{% for object in object_list %}
+			<tr class="success">
+				<td><a data-toggle="modal"
+					onClick="openModal('{% url  aventura_ativa_update_view object.pk %}','aventura')"
+					href="#aventura">{{ object.instancia }}</a></td>
+				<td>{{ object.publica }}</td>
+				<td>{{ object.chave_acesso }}</td>
+				    {% csrf_token %} 
+				<td>
+					<a class="btn btn-block btn-small btn-danger" data-toggle="modal" 
+					onClick="openModal('{% url  aventura_ativa_delete_view object.pk %}','aventura')" 
+					href="#aventura">Delete</a>
+				</td>
+			</tr>
+			{% empty %}
+			<tr>
+				<td colspan="4"><i style="margin-right: 10px;"
+					class="icon-warning-sign"></i><strong>Attention!</strong>There are no adventures.
+				</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+	<a role="button"
+		onClick="openModal('{% url ativar_aventura_create_view %}','aventura')"
+		class="btn btn-small btn-primary" data-toggle="modal" href="#aventura">Activate Adventure</a> 
+
+
+	<!-- Div para guardar a modal -->
+	<div id="aventura" class="modal hide fade"></div>
+
+</div>
+
+{% endblock %}

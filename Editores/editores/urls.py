@@ -12,7 +12,7 @@ from django.views.generic import RedirectView
 from rest_framework import routers
 
 #Teste com o framework rest
-from core_services.views import MyRESTView,AventuraView,InstanciasObjetoView
+from core_services.views import AventuraView,InstanciasObjetoView
 
 admin.autodiscover()
 
@@ -28,12 +28,12 @@ urlpatterns = patterns('',
 
      # this URL passes resource_id in **kw to MyRESTView
      #url(r'^api/v1.0/resource/(?P<resource_id>\d+)[/]?$', login_required(MyRESTView.as_view()), name='my_rest_view'),
-     url(r'^api/v1.0/resource[/]?$', login_required(MyRESTView.as_view()), name='my_rest_view'),
+     #url(r'^api/v1.0/resource[/]?$', login_required(MyRESTView.as_view()), name='my_rest_view'),
      
      #url(r'^api/aventuras[/]?$', login_required(AventuraViewSet.as_view()), name='aventuras-resource'),
      url(r'^api/aventuras/(?P<autor_id>\d+)[/]?$', login_required(AventuraView.as_view()), name='aventuras-resource'),
      url(r'^api/instancias_objetos/(?P<aventura_id>\d+)[/]?$', login_required(InstanciasObjetoView.as_view()), name='instancias-resource'),
-     
+     #url(r'^api/register_player/$',JogadorLoginCreateView.as_view(), name='jogador-resource'),
      
     # this URL passes resource_id in **kw to MyRESTView
     #url(r'^api/v1.0/resource/(?P<resource_id>\d+)[/]?$', MyRESTView.as_view(), name='my_rest_view'),
