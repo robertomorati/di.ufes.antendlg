@@ -3,7 +3,7 @@
 import os
 
 
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
