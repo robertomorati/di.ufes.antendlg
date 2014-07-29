@@ -2,6 +2,7 @@
 # Django settings for Editores project.
 import os
 
+
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
