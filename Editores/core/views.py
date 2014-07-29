@@ -42,6 +42,8 @@ from forms import CondicaoInstanciaObjetoForm, CondicaoDialogoInstanciaForm,Cond
 from forms import AgenteWithoutFieldsForm,AgressivoCreateForm,PassivoCreateForm, ColaborativoCreateForm, InstancesComportamentoAddForm, CompetitivoCreateForm
 from forms import EnredoFileForm, EnredoInstanciaForm, EnredoMensagemForm, CondicaoJogadorObjetoForm,AventuraAtivaWithoutFieldsForm
 
+
+
 from itertools import chain
 
 import string, random
@@ -760,6 +762,16 @@ class AtivarAventuraView(CreateView):
     def get_success_url(self):
         return reverse('aventuras_ativas_list_view')
     
+    
+    def get_initial(self):
+        initial = super(AtivarAventuraView, self).get_initial()
+        initial['request'] = self.request
+        if self.request.session[SESSION_AVENTURA] != '-1':
+            initial['aventura_id'] = self.request.session[SESSION_AVENTURA].id
+        else:
+            initial['aventura_id'] = self.request.session[SESSION_AVENTURA]
+        return initial
+    
     #Override no form. 
     def form_valid(self, form):
         
@@ -870,9 +882,8 @@ class AtivarAventuraView(CreateView):
             
             json_condicoes = json_condicoes + ']}'           
             
-            
-        return HttpResponse(json.dumps({'PosInstanciaAtiva' : json_instancias,'AvatarAtivo':json_avatares, 'MissaoAtiva' : json_missoes, 'CondicaoAtiva': json_condicoes}), content_type="application/json")
-
+            return HttpResponse(json.dumps({'PosInstanciaAtiva' : json_instancias,'AvatarAtivo':json_avatares, 'MissaoAtiva' : json_missoes, 'CondicaoAtiva': json_condicoes}), content_type="application/json")            
+        
 #ativação da aventura para ser jogada
 class AventuraAtivaUpdateView(UpdateView):
     template_name = 'editor_objetos/aventura/update_aventura_ativa.html' 
@@ -882,6 +893,14 @@ class AventuraAtivaUpdateView(UpdateView):
     def get_success_url(self):
         return reverse('aventuras_ativas_list_view')
     
+    def get_initial(self):
+        initial = super(AventuraAtivaUpdateView, self).get_initial()
+        initial['request'] = self.request
+        if self.request.session[SESSION_AVENTURA] != '-1':
+            initial['aventura_id'] = self.request.session[SESSION_AVENTURA].id
+        else:
+            initial['aventura_id'] = self.request.session[SESSION_AVENTURA]
+        return initial
     #Override no form. 
     def form_valid(self, form):
         
@@ -890,7 +909,7 @@ class AventuraAtivaUpdateView(UpdateView):
             #verifica se o atributo publico foi alterado    
             if form.instance.publica == True:
                 form.instance.chave_acesso = ""
-            elif  form.instance.publica == False: 
+            elif  form.instance.publica == False and form.instance.chave_acesso == "": 
                 form.instance.chave_acesso = id_generator() 
             form.instance.aventura_id = self.request.session[SESSION_AVENTURA].id
             
@@ -2346,8 +2365,14 @@ class AgenteCreateView(CreateView):
     
     def get_initial(self):
         initial = super(AgenteCreateView, self).get_initial()
-        initial['aventura_id'] = self.request.session[SESSION_AVENTURA].id
+        if self.request.session[SESSION_AVENTURA] != '-1':
+            initial['aventura_id'] = self.request.session[SESSION_AVENTURA].id
+        else:
+            initial['aventura_id'] = self.request.session[SESSION_AVENTURA]
+            ValidationError
+            messages.error(self.request, "".join("Please. Activate an adventure for authoring!"))
         return initial
+    
     
     def form_valid(self, form):
         
@@ -2356,7 +2381,7 @@ class AgenteCreateView(CreateView):
             self.object = form.save()
         else:
             ValidationError
-            messages.error(self.request, "".join("Please. Activate an adventure for authoring!"))
+            messages.error(self.request, "".join("Please. Activate an adventure for authoring to create an agent!"))
             return HttpResponse(json.dumps({'response': 'no adventure activate'}), content_type="text")
         
         

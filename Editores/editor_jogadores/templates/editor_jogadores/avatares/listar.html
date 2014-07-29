@@ -13,7 +13,7 @@
 			<tr class="success">
 				<td>
 					<!-- Modal para atualização de objetos   --> <a data-toggle="modal"
-					onClick="openModal('{% url  avatar_update_view object.pk %}','avatares')"
+					onClick="openModal('{% url  'avatar_update_view' object.pk %}','avatares')"
 					href="#avatares">{{ object.nome }}</a> 
 				</td>
 				<td><img  class="avatar" src="{{ object.avatar.url }}" alt="avatar"/></td>
@@ -28,7 +28,7 @@
 						{% csrf_token %}
 						<!--<input type="submit" class="btn btn-block btn-small btn-danger " value="Deletar">-->
 						<a class="btn btn-block btn-small btn-danger" data-toggle="modal"
-							onClick="openModal('{% url  avatar_delete_view object.pk %}','avatares')"
+							onClick="openModal('{% url  'avatar_delete_view' object.pk %}','avatares')"
 							href="#avatares">Delete</a>
 				</td>
 			</tr>
@@ -41,7 +41,7 @@
 		</tbody>
 	</table>
 
-	<a role="button" onClick="openModal('{% url avatar_create_view %}','avatares')" class="btn btn-small btn-primary" data-toggle="modal" href="#avatares">Criar Avatar</a>
+	<a role="button" onClick="openModal('{% url 'avatar_create_view' %}','avatares')" class="btn btn-small btn-primary" data-toggle="modal" href="#avatares">Criar Avatar</a>
 
 	<div id="avatares" class="modal hide fade"></div>
 </div>

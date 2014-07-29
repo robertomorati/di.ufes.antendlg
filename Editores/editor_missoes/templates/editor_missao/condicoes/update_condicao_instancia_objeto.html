@@ -2,7 +2,7 @@
 <!-- {% load bootstrap_toolkit %} -->
 {% block content %} 
 
-	  <form id="condicao_objeto_update_view" class="form-actions" method="post" tabindex="-1"  action="{% url condicao_objeto_update_view object.pk %}">
+	  <form id="condicao_objeto_update_view" class="form-actions" method="post" tabindex="-1"  action="{% url 'condicao_objeto_update_view' object.pk %}">
 		  <div class="modal-header">
 		    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" action="">×</button>
 		    <h3 id="myModalLabel">Update Conditions between Object's Instances</h3>
@@ -63,9 +63,9 @@
 				// fecha o modal
 			
 				$('#condicoes').modal('hide');
-				refreshDiv('{% url condicao_objeto_list_view %}','content');
+				refreshDiv("{% url 'condicao_objeto_list_view' %}",'content');
 			}else{
-				openModal('{% url condicao_objeto_update_view object.pk %}','condicoes');
+				openModal("{% url 'condicao_jogador_objeto_list_view' object.pk %}",'condicoes');
 			}
 		}
 		

@@ -30,7 +30,7 @@
 		<title>{% if title %}{{ title }}{% else %}AntEnDLG - Authoring Environment for Location Decision Games{% endif %}</title>
 	</head>
 	{% csrf_token %}
-	<body id="body" onload="refreshDiv('{% url gmaps_view %}','content'); addTabs('{% url tipo_objeto_get_view %}'); getAvatar({{ user.id }});">	
+	<body id="body" onload="refreshDiv('{% url 'gmaps_view' %}','content'); addTabs('{% url 'tipo_objeto_get_view' %}'); getAvatar({{ user.id }});">	
 		<div class="well well-small">
 			<div class="container-fluid">
 				<div class="row-fluid">
@@ -52,7 +52,7 @@
 											   	
 											   </aventura_ativa>
 										   </strong>
-										   	<a class="btn btn-link"  href="{% url logout %}" style="color: black; float: right;">
+										   	<a class="btn btn-link"  href="{% url 'logout' %}" style="color: black; float: right;">
 										   		<i class="icon-off"></i>Logout
 										   	</a>
 									   	</p>
@@ -80,9 +80,9 @@
 											style="height: 0px;">
 											<div class="accordion-inner">
 												<ul id="ulNoMaker">
-													<li><i class="icon-edit"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url aventura_list_view user.id %}">Adventure Edit</a></li>
-													<li><i class="icon-map-marker"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url gmaps_view %}">Map Adventure Edit</a></li>
-													<li><i class="icon-edit"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url avtentura_ativas_list_view %}">Activate Adventure Edit</a></li>
+													<li><i class="icon-edit"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url 'aventura_list_view' user.id %}">Adventure Edit</a></li>
+													<li><i class="icon-map-marker"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url 'gmaps_view' %}">Map Adventure Edit</a></li>
+													<li><i class="icon-edit"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url 'avtentura_ativas_list_view' %}">Activate Adventure Edit</a></li>
 												</ul>
 											</div>
 										</div>
@@ -98,11 +98,11 @@
 											style="height: 0px;">
 											<div class="accordion-inner">
 												<ul id="ulNoMaker">
-													<li><i class="icon-edit"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url tipo_objeto_list_view %}">Object Type Edit</a></li>
-													<li><i class="icon-edit"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url objeto_list_view %}">Objects Edit </a></li>
-													<li><i class="icon-edit"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url icone_list_view %}">Icon Edit</a></li>
-													<li><i class="icon-road"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url sugestao_list_view %}">Suggestion Edit</a></li>
-													<li><i class="icon-picture"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url tipo_imagem_list_view %}">Images Edit</a></li>
+													<li><i class="icon-edit"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url 'tipo_objeto_list_view' %}">Object Type Edit</a></li>
+													<li><i class="icon-edit"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url 'objeto_list_view' %}">Objects Edit </a></li>
+													<li><i class="icon-edit"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url 'icone_list_view' %}">Icon Edit</a></li>
+													<li><i class="icon-road"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url 'sugestao_list_view' %}">Suggestion Edit</a></li>
+													<li><i class="icon-picture"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url 'tipo_imagem_list_view' %}">Images Edit</a></li>
 												</ul>
 											</div>
 										</div>
@@ -118,11 +118,11 @@
 											style="height: 0px;">
 											<div class="accordion-inner">
 												<ul id="ulNoMaker">
-													<li><i class="icon-edit"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url missao_list_view %}">Mission Edit</a></li>
-													<li><i class="icon-list-alt"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url condicao_objeto_list_view %}">Conditions with Instances Edit</a></li>
-													<li><i class="icon-list-alt"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url condicao_jogador_instancia_list_view %}">Conditions with Avatars Edit</a></li>
-													<li><i class="icon-list-alt"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url condicao_jogador_objeto_list_view %}">Conditions withObjects Edit</a></li>
-													<li><i class="icon-list-alt"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url condicao_dialogo_list_view %}">Conditions with Dialogues Edit</a></li>					
+													<li><i class="icon-edit"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url 'missao_list_view' %}">Mission Edit</a></li>
+													<li><i class="icon-list-alt"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url 'condicao_objeto_list_view' %}">Conditions with Instances Edit</a></li>
+													<li><i class="icon-list-alt"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url 'condicao_jogador_instancia_list_view' %}">Conditions with Avatars Edit</a></li>
+													<li><i class="icon-list-alt"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url 'condicao_jogador_objeto_list_view' %}">Conditions withObjects Edit</a></li>
+													<li><i class="icon-list-alt"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url 'condicao_dialogo_list_view' %}">Conditions with Dialogues Edit</a></li>					
 												</ul>
 											</div>
 										</div>
@@ -138,8 +138,8 @@
 											style="height: 0px;">
 											<div class="accordion-inner">
 												<ul id="ulNoMaker">
-													<li><i class="icon-edit"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url avatar_list_view %}">Avatars Edit</a></li>
-													<li><i class="icon-edit"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url avatar_list_instances_view %}">Avatars' Roles Edit </a></li>					
+													<li><i class="icon-edit"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url 'avatar_list_view' %}">Avatars Edit</a></li>
+													<li><i class="icon-edit"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url 'avatar_list_instances_view' %}">Avatars' Roles Edit </a></li>					
 												</ul>
 											</div>
 										</div>
@@ -155,7 +155,7 @@
 											style="height: 0px;">
 											<div class="accordion-inner">
 												<ul id="ulNoMaker">	
-													<li><i class="icon-edit"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url agente_list_view %}">Agents Edit</a></li>
+													<li><i class="icon-edit"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url 'agente_list_view' %}">Agents Edit</a></li>
 												</ul>
 											</div>
 										</div>
@@ -171,9 +171,9 @@
 											style="height: 0px;">
 											<div class="accordion-inner">
 												<ul id="ulNoMaker">
-													<li><i class="icon-edit"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url enredo_file_list_view	 %}">Story File Edit</a></li>
-													<li><i class="icon-edit"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url enredo_instancia_list_view	 %}">Story Instance Edit</a></li>
-													<li><i class="icon-edit"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url enredo_mensagem_list_view	 %}">Story Message Edit</a></li>
+													<li><i class="icon-edit"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url 'enredo_file_list_view'	 %}">Story File Edit</a></li>
+													<li><i class="icon-edit"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url 'enredo_instancia_list_view'	 %}">Story Instance Edit</a></li>
+													<li><i class="icon-edit"></i><a class="menu-item  btn btn-link" data-toggle="collapse" href="{% url 'enredo_mensagem_list_view'	 %}">Story Message Edit</a></li>
 												</ul>
 											</div>
 										</div>

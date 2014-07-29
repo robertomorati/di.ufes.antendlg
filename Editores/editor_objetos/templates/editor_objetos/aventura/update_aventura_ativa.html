@@ -1,5 +1,5 @@
 <!-- {% load bootstrap_toolkit %} -->
-	  <form id="aventura_ativa_update_view" class="form-actions" method="post" action="{% url aventura_ativa_update_view object.pk %}">
+	  <form id="aventura_ativa_update_view" class="form-actions" method="post" action="{% url 'aventura_ativa_update_view' object.pk %}">
 		  <div class="modal-header">
 		    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" action="">×</button>
 		    <h3 id="myModalLabel">Update Active Adventure
@@ -29,7 +29,7 @@
 				if (ct.indexOf('json') > -1) {
 					// fecha o modal
 					$('#aventura').modal('hide');
-					refreshDiv('{% url avtentura_ativas_list_view %}','content');
+					refreshDiv("{% url 'avtentura_ativas_list_view' %}",'content');
 								
 				}
 			}

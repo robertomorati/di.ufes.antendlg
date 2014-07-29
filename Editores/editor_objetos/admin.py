@@ -7,18 +7,26 @@ Created on 18/09/2013
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
 from django.contrib.auth.models import User
-from editor_objetos.models import TipoObjeto,Autor
+from editor_objetos.models import TipoObjeto,Autor,Jogador
 
 
 class AutorInline(admin.TabularInline):
     model = Autor
+    
+class JogadorInline(admin.TabularInline):
+    model = Jogador
 
 class UserAdmin(DjangoUserAdmin):
-    inlines = (AutorInline,)
+    inlines = (AutorInline,JogadorInline,)
+
+
 
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
+
 ''''
+Código não utilizado
+
 class Calc(DjangoUserAdmin):
     inlines = (AutorInline,)
 
@@ -26,12 +34,18 @@ admin.site.unregister(CalcClass)
 admin.site.register(CalcClass, Calc)
 '''
 
+'''
 class TipoObjetoAdmin(admin.ModelAdmin):
     pass
 
 admin.site.register(TipoObjeto, TipoObjetoAdmin)
 
 
+class JogadorAdmin(admin.ModelAdmin):
+    pass
+
+admin.site.register(Jogador, JogadorAdmin)
+'''
 
 '''
 Código Antigo

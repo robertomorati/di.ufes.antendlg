@@ -12,14 +12,14 @@
 			{% for object in object_list %}
 			<tr class="success">
 				<td><a data-toggle="modal"
-					onClick="openModal('{% url  aventura_ativa_update_view object.pk %}','aventura')"
+					onClick="openModal('{% url  'aventura_ativa_update_view' object.pk %}','aventura')"
 					href="#aventura">{{ object.instancia }}</a></td>
 				<td>{{ object.publica }}</td>
 				<td>{{ object.chave_acesso }}</td>
 				    {% csrf_token %} 
 				<td>
 					<a class="btn btn-block btn-small btn-danger" data-toggle="modal" 
-					onClick="openModal('{% url  aventura_ativa_delete_view object.pk %}','aventura')" 
+					onClick="openModal('{% url  'aventura_ativa_delete_view' object.pk %}','aventura')" 
 					href="#aventura">Delete</a>
 				</td>
 			</tr>
@@ -33,7 +33,7 @@
 		</tbody>
 	</table>
 	<a role="button"
-		onClick="openModal('{% url ativar_aventura_create_view %}','aventura')"
+		onClick="openModal('{% url 'ativar_aventura_create_view' %}','aventura')"
 		class="btn btn-small btn-primary" data-toggle="modal" href="#aventura">Activate Adventure</a> 
 
 

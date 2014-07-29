@@ -2,7 +2,7 @@
 <!-- {% load bootstrap_toolkit %} -->
 {% block content %} 
 
-	  <form id="aventura_desativar_edicao_view" class="form-actions" method="post" tabindex="-1"  action="{% url aventura_desativar_edicao_view object.pk %}">
+	  <form id="aventura_desativar_edicao_view" class="form-actions" method="post" tabindex="-1"  action="{% url 'aventura_desativar_edicao_view' object.pk %}">
 		  <div class="modal-header">
 		    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" action=""></button>
 		    <h3 id="myModalLabel">Desativação da Aventura para Autoria</h3>
@@ -52,14 +52,12 @@
 				$('body').find('aventura_ativa').empty().append("");
 				$('body').find('aventura_ativa').append('<aventura_ativa_id id="-1" ></aventura_ativa_id>');
 				
-
-				//refreshDiv('{% url aventura_list_view user.id %}','content');
 				 intancias_objetos_json = "";//limpa persistencia de instancias
 				 flagloadBackupInstances = true;
 				 flagLoadBackupInstancesMoreOfPos  = true;
 			}else if (ct == 'text'){
 				$('body').find('aventura_ativa').empty();
-				openModal('{% url aventura_desativar_edicao_view object.pk %}','aventura');
+				openModal("{% url 'aventura_desativar_edicao_view' object.pk %}",'aventura');
 			}
 		}
 		

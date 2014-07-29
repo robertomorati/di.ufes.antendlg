@@ -1,5 +1,5 @@
 <!-- {% load bootstrap_toolkit %} -->
-	  <form id="tipo_objeto_create_view" class="form-actions" method="post" action="{% url tipo_objeto_create_view %}">
+	  <form id="tipo_objeto_create_view" class="form-actions" method="post" action="{% url 'tipo_objeto_create_view' %}">
 		  <div class="modal-header">
 		    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" action="">×</button>
 		    <h3 id="myModalLabel">Create Object Type</h3>
@@ -32,8 +32,8 @@
 					$('#objeto').modal('hide');
 					$('#objetoTab').html('');
 			    	$('#pageTabContent').html('');
-			    	addTabs('{% url tipo_objeto_get_view %}');
-					refreshDiv('{% url tipo_objeto_list_view %}','content');
+			    	addTabs("{% url 'tipo_objeto_get_view' %}");
+					refreshDiv("{% url 'tipo_objeto_list_view' %}",'content');
 				}
 			}
 		

@@ -26,7 +26,7 @@
 							<td>
 								<!-- moda atualizacao condicoes--> 
 								<a data-toggle="modal"
-								onClick="openModal('{% url  condicao_objeto_update_view condicao.pk %}','condicoes')"
+								onClick="openModal('{% url  'condicao_objeto_update_view' condicao.pk %}','condicoes')"
 								href="#condicoes">{{ condicao.nome }}</a> 
 							</td>
 							<td>{{ condicao.prefixo }}</td>
@@ -39,7 +39,7 @@
 									{% csrf_token %}
 									<!--<input type="submit" class="btn btn-block btn-small btn-danger " value="Deletar">-->
 									<a class="btn btn-block btn-small btn-danger" data-toggle="modal"
-										onClick="openModal('{% url  condicao_delete_view condicao.pk %}','condicoes')"
+										onClick="openModal('{% url  'condicao_delete_view' condicao.pk %}','condicoes')"
 										href="#condicoes">Delete</a>
 							</td>
 						</tr>
@@ -58,7 +58,7 @@
 	</div>
 	
 	<!-- Modal para criação de objetos -->
-	<a role="button" onClick="openModal('{% url condicao_objeto_create_view %}','condicoes')" class="btn btn-small btn-primary" data-toggle="modal" href="#condicoes">Create Condition</a>
+	<a role="button" onClick="openModal('{% url 'condicao_objeto_create_view' %}','condicoes')" class="btn btn-small btn-primary" data-toggle="modal" href="#condicoes">Create Condition</a>
 	<div id="condicoes" class="modal hide fade"></div>
 </div>
 

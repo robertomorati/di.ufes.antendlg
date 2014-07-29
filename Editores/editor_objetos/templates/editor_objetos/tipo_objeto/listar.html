@@ -13,15 +13,14 @@
 			{% for object in object_list %}
 			<tr class="success">
 				<td><a data-toggle="modal"
-					onClick="openModal('{% url  tipo_objeto_update_view object.pk %}','objeto')"
+					onClick="openModal('{% url  'tipo_objeto_update_view' object.pk %}','objeto')"
 					href="#objeto">{{ object.tipo }}</a></td>
 					 <!-- <script>addTabs("");</script> -->
 				<td>{{ object.descricao }}</td>
 				<td>{{ object.posicoes_geograficas }}</td>
 				<td>
 				{% csrf_token %} 
-				<!--<input type="submit" class="btn btn-block btn-small btn-danger " value="Deletar">-->
-					<a class="btn btn-block btn-small btn-danger" data-toggle="modal" onClick="openModal('{% url  tipo_objeto_delete_view object.pk %}','objeto')" href="#objeto">Deletar</a>
+					<a class="btn btn-block btn-small btn-danger" data-toggle="modal" onClick="openModal('{% url  'tipo_objeto_delete_view' object.pk %}','objeto')" href="#objeto">Deletar</a>
 				</td>
 			</tr>
 			{% empty %}
@@ -35,7 +34,7 @@
 	</table>
 	<!-- Modal para criação de objetos -->
 	<a role="button"
-		onClick="openModal('{% url  tipo_objeto_create_view %}','objeto')"
+		onClick="openModal('{% url  'tipo_objeto_create_view' %}','objeto')"
 		class="btn btn-small btn-primary" data-toggle="modal" href="#objeto">Create Object Type</a>
 
 	<!-- Div para guardar a modal -->

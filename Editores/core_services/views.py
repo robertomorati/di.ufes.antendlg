@@ -5,6 +5,7 @@ Created on 17/06/2014
 @author: Roberto Guimaraes Morati Junior
 '''
 from rest_framework.views import APIView
+from rest_framework.generics import ListCreateAPIView
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework import status
@@ -15,40 +16,40 @@ from editor_objetos.models import Aventura
 from editor_objetos.models import Objeto, Icone, TipoObjeto, InstanciaObjeto, PosicaoGeografica, Jogador
 
 from rest_framework import permissions
+from django.db import transaction
 
+from core_services.forms import JogadorSerializer
+from django.contrib.auth.decorators import permission_required
 
 
 """
 Views para Jogador
-
-class JogadorLoginCreateView(generics.ListCreateAPIView):
+"""
+class JogadorLoginCreateView(ListCreateAPIView):
     model = Jogador
-    #serializer_class = UserSerializer
+    serializer_class = JogadorSerializer
 
+    #qualquer um pode acessar o Post para create
+    permission_classes = (permissions.AllowAny,)
+    #def post(self, request, *args, **kwargs):
     def create(self, request, *args, **kwargs):
-        data = request.DATA
 
-        # note: transaction.atomic was introduced in Django 1.6
-        with transaction.atomic():
-            user = User(
-                profit_and_loss=data['component_comments'],
-                name=data['name']
-            )
-            user.clean()
-            user.save()
-
-            UserProfile.objects.create(
-                user=user,
-                name=data['profile']['name']
-            )
-
-        serializer = UserSerializer(user)
-        headers = self.get_success_headers(serializer.data)
-
-        return Response(serializer.data, status=status.HTTP_201_CREATED,
-                        headers=headers)
-"""    
-
+        serializer = self.get_serializer(data=request.DATA)
+        if serializer.is_valid():
+            with transaction.atomic():
+                self.pre_save(serializer.object)
+                self.object = serializer.save()
+                self.post_save(self.object, created=True)
+                headers = self.get_success_headers(serializer.data)
+                return Response(serializer.data, status=status.HTTP_201_CREATED,
+                                headers=headers)
+        else:
+            return Response(serializer._errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    permission_required = (permissions.IsAuthenticatedOrReadOnly,)
+    def get(self,request, *args, **kw):
+        #do nothing
+        return Response("{'status':'get deactivated'}", status=status.HTTP_200_OK)
     
 """
 Retorna lista de aventuras por autor

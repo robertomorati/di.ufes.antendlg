@@ -30,6 +30,8 @@ admin.autodiscover()
 #router = routers.DefaultRouter()
 #router.register(r'aventuras', AventuraViewSet)
 
+from django.contrib.auth.decorators import login_required
+
 
 
 urlpatterns = patterns('',        
@@ -39,14 +41,14 @@ urlpatterns = patterns('',
     #url(r'^api-auth/aventuras/$', AventuraViewSet.as_view(), name='aventuras-resource'),  
     
     #urls para tipo de objeto
-    url(r'^tipo_objeto/$', TipoObjetoListView.as_view(), name='tipo_objeto_list_view'),
+    url(r'^tipo_objeto/$', login_required(TipoObjetoListView.as_view()), name='tipo_objeto_list_view'),
     url(r'^tipo_objeto/criar_tipo_objeto/$', TipoObjetoCreateView.as_view(), name='tipo_objeto_create_view'),
     url(r'^tipo_objeto/(?P<pk>\w+)/$', TipoObjetoUpdateView.as_view(), name='tipo_objeto_update_view',),
     url(r'^tipo_objeto/delete_tipo_objeto/(?P<pk>\w+)/$', TipoObjetoDeleteView.as_view(), name='tipo_objeto_delete_view',),
     url(r'^get_lista_tipo_objeto/$', TipoObjetoGetJsonView.as_view(), name='tipo_objeto_get_view'),
     
     #urls para objeto
-    url(r'^objeto/$', ObjetoListView.as_view(), name='objeto_list_view'),
+    url(r'^objeto/$',login_required(ObjetoListView.as_view()), name='objeto_list_view'),
     url(r'^objeto/criar_objeto/$', ObjetoCreateView.as_view(), name='objeto_create_view'),
     #url(r'^objeto/update_objeto/$', ObjetoUpdateView.as_view(), name='objeto_update_view',),
     url(r'^objeto/update_objeto/(?P<pk>\w+)/$', ObjetoUpdateView.as_view(), name='objeto_update_view',),

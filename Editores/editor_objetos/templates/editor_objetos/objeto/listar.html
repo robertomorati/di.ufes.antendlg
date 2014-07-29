@@ -16,9 +16,9 @@
 			{% for object in object_list %}
 			<tr class="success">
 				<td>
-					<!-- Modal para atualização de objetos   --> <a data-toggle="modal"
-					onClick="openModal('{% url  objeto_update_view object.pk %}','objeto')"
-					href="#objeto">{{ object.nome }}</a> <!-- <a class="update" data-toggle="modal" title="{% url  objeto_update_view object.pk %}" href="#objeto">{{ object.nome }}</a>-->
+				<a data-toggle="modal"
+					onClick="openModal('{% url  'objeto_update_view' object.pk %}','objeto')"
+					href="#objeto">{{ object.nome }}</a>
 				</td>
 				<td>{{ object.descricao }}</td>
 				<td>{{ object.quantidade }}</td>
@@ -43,9 +43,8 @@
 				
 				<td>
 						{% csrf_token %}
-						<!--<input type="submit" class="btn btn-block btn-small btn-danger " value="Deletar">-->
 						<a class="btn btn-block btn-small btn-danger" data-toggle="modal"
-							onClick="openModal('{% url  objeto_delete_view object.pk %}','objeto')"
+							onClick="openModal('{% url  'objeto_delete_view' object.pk %}','objeto')"
 							href="#objeto">Delete</a>
 				</td>
 			</tr>
@@ -57,29 +56,7 @@
 			{% endfor %}
 		</tbody>
 	</table>
-	<!-- Modal para criação de objetos -->
-	<a role="button" onClick="openModal('{% url  objeto_create_view %}','objeto')" class="btn btn-small btn-primary" data-toggle="modal" href="#objeto">Create Object</a>
-	<!-- Modal para criação de ícones 
-		<a role="button" onClick="openModal('{% url  objeto_create_view %}','objeto')" class="btn btn-small btn-primary" data-toggle="modal" href="#objeto">Criar Ícone</a>
-	-->
-
-	<!-- <a class="create" role="button" class="btn btn-small btn-primary create" data-toggle="modal" title="{% url objeto_create_view %}"  href="#objeto">Criar Objeto</a>   -->
+	<a role="button" onClick="openModal('{% url  'objeto_create_view' %}','objeto')" class="btn btn-small btn-primary" data-toggle="modal" href="#objeto">Create Object</a>
+	
 	<div id="objeto" class="modal hide fade"></div>
 </div>
-
-<!--Código antigo, pode servir para algo em outras páginas. Não deletar.  
-	<script type="text/javascript">
-		$('#create').click(function() {
-			$.get("{% url objeto_create_view %}", function(data) {
-				$("#criarObjeto").html(data);
-
-			});
-		});
-
-		$('#update').click(function(url) {
-			$.get(url, function(data) {
-				$("#atualizarObjeto").html(data);
-			});
-		});
-	</script>
--->

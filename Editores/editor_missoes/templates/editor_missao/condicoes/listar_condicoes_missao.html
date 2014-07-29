@@ -1,11 +1,12 @@
 
 {% block content %} 
-		 
-	  <form id="condicoes_missao_list_view" class="form-actions" method="post" action="{% url condicoes_missao_list_view 2 %}">
+		
+	  <form id="condicoes_missao_list_view" class="form-actions" method="post" action="{% url 'condicoes_missao_list_view' 0 %}">
 		  <div class="modal-header">
 		    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" action="">×</button>
 		    <h3 id="myModalLabel">Conditions of the Mission</h3>
 		  </div>
+		   
 		  <div class="modal-body">
 				<table class="table table-bordered">
 				<tr>
@@ -17,6 +18,7 @@
 					<th>Operator</th>
 					<th>Quantity</th>
 				</tr>
+				{% csrf_token %} 
 					<tbody>
 					{% for object in object_list %}
 						<tr class="success">
@@ -60,9 +62,8 @@
 				if (ct.indexOf('json') > -1) {
 					// fecha o modal
 					$('#condicoes_missao').modal('hide');
-					openModal('{% url condicoes_missao_list_view 2 %}','condicoes_missao');
+					openModal("{% url 'condicoes_missao_list_view' 0 %}",'condicoes_missao');
 				}else if (ct == 'text'){
-					//openModal('{% url instance_list_view %}','agente');
 				}
 			}
 

@@ -1,7 +1,7 @@
 
 <!-- {% load bootstrap_toolkit %} -->
 {% block content %}  
-	  <form id="condicao_dialogo_create_view" class="form-actions" method="post" action="{% url condicao_dialogo_create_view %}">
+	  <form id="condicao_dialogo_create_view" class="form-actions" method="post" action="{% url 'condicao_dialogo_create_view' %}">
 		  <div class="modal-header">
 		    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" action="">×</button>
 		    <h3 id="myModalLabel">Create Conditions with Dialogues of the Instances</h3>
@@ -59,9 +59,9 @@
 				if (ct.indexOf('json') > -1) {
 					// fecha o modal
 					$('#condicoes').modal('hide');
-					refreshDiv('{% url condicao_dialogo_list_view %}','content');
+					refreshDiv("{% url 'condicao_dialogo_list_view' %}",'content');
 				}else{
-					//openModal('{% url missao_create_view %}','missao');
+				
 				}
 			}
 		

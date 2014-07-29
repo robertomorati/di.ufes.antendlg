@@ -1,7 +1,7 @@
 
 <!-- {% load bootstrap_toolkit %} -->
 {% block content %}  
-	  <form id="instance_list_view" class="form-actions" method="post" action="{% url instance_list_view %}">
+	  <form id="instance_list_view" class="form-actions" method="post" action="{% url 'instance_list_view' %}">
 		  <div class="modal-header">
 		    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" action="">×</button>
 		    <h3 id="myModalLabel">Instances of Behavior</h3>
@@ -17,7 +17,7 @@
 							<tr class="success">
 								<td>
 									<!-- Modal para atualização de objetos   --> <a data-toggle="modal"
-									onClick="updateInstanceBehavior('{% url instance_comportamento_update_view object.pk %}','agente_instance')"
+									onClick="updateInstanceBehavior('{% url 'instance_comportamento_update_view' object.pk %}','agente_instance')"
 									href="#agente_instance">{{ object.instancia_objeto }}</a> 
 								</td>
 								<td>{{ object.mensagem }}</td>
@@ -43,9 +43,9 @@
 				if (ct.indexOf('json') > -1) {
 					// fecha o modal
 					$('#agente').modal('hide');
-					openModal('{% url instance_list_view %}','agente');
+					openModal('{% url 'instance_list_view' %}','agente');
 				}else if (ct == 'text'){
-					//openModal('{% url instance_list_view %}','agente');
+					
 				}
 			}
 		

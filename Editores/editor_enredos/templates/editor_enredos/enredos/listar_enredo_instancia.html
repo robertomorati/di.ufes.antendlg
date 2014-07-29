@@ -13,7 +13,7 @@
 			<tr class="success">
 				<td>
 					<!-- Modal para atualização de objetos   --> <a data-toggle="modal"
-					onClick="openModal('{% url  enredo_instancia_update_view object.pk %}','enredo')"
+					onClick="openModal('{% url  'enredo_instancia_update_view' object.pk %}','enredo')"
 					href="#enredo">{{ object.nome }}</a> 
 				</td>
 				<td>				
@@ -24,7 +24,7 @@
 						{% csrf_token %}
 						<!--<input type="submit" class="btn btn-block btn-small btn-danger " value="Deletar">-->
 						<a class="btn btn-block btn-small btn-danger" data-toggle="modal"
-							onClick="openModal('{% url  enredo_delete_view object.pk %}','enredo')"
+							onClick="openModal('{% url  'enredo_delete_view' object.pk %}','enredo')"
 							href="#enredo">Delete</a>
 				</td>
 			</tr>
@@ -37,29 +37,6 @@
 		</tbody>
 	</table>
 	<!-- Modal para criaÃ§Ã£o de objetos -->
-	<a role="button" onClick="openModal('{% url enredo_instancia_create_view %}','enredo')" class="btn btn-small btn-primary" data-toggle="modal" href="#enredo">Create Story</a>
-	
-	<!-- Modal para criaÃ§Ã£o de Ã­cones 
-		<a role="button" onClick="openModal('{% url  objeto_create_view %}','objeto')" class="btn btn-small btn-primary" data-toggle="modal" href="#objeto">Criar Ã�cone</a>
-	-->
-
-	<!-- <a class="create" role="button" class="btn btn-small btn-primary create" data-toggle="modal" title="{% url objeto_create_view %}"  href="#objeto">Criar Objeto</a>   -->
+	<a role="button" onClick="openModal('{% url 'enredo_instancia_create_view' %}','enredo')" class="btn btn-small btn-primary" data-toggle="modal" href="#enredo">Create Story</a>
 	<div id="enredo" class="modal hide fade"></div>
 </div>
-
-<!--CÃ³digo antigo, pode servir para algo em outras pÃ¡ginas. NÃ£o deletar.  
-	<script type="text/javascript">
-		$('#create').click(function() {
-			$.get("{% url objeto_create_view %}", function(data) {
-				$("#criarObjeto").html(data);
-
-			});
-		});
-
-		$('#update').click(function(url) {
-			$.get(url, function(data) {
-				$("#atualizarObjeto").html(data);
-			});
-		});
-	</script>
--->

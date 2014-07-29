@@ -13,6 +13,8 @@ from editor_objetos.models import Enredo, EnredoFile, EnredoInstancia, EnredoMen
 from django.forms.extras.widgets import SelectDateWidget 
 from django.forms.models import ModelChoiceField
 from datetime import date
+from django.core.exceptions import ValidationError
+from django.contrib import messages
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -337,7 +339,7 @@ Form  para criação de Autor
 class AutorForm(forms.ModelForm):
     password = forms.CharField(label=_("Senha"), widget=forms.PasswordInput(render_value=False))
     
-    # criptografia senha autor
+    #criptografia da senha do autor e salva
     def save(self, commit=True):
         user = super(AutorForm, self).save(commit=False)
         user.set_password(self.cleaned_data["password"])
@@ -707,10 +709,19 @@ class CondicaoJogadorObjetoForm(forms.ModelForm):
 Form utilizado para AventuraAtiva
 '''
 class AventuraAtivaWithoutFieldsForm(forms.ModelForm):
+    
+    def __init__(self, *args, **kwargs):
+        super(AventuraAtivaWithoutFieldsForm, self).__init__(*args, **kwargs)
+
+        req = kwargs['initial']['request']
+        if kwargs['initial']['aventura_id'] == '-1':
+            ValidationError
+            messages.error(req, "".join("It's necessary activate an adventure for authoring mode."))  
+        
     class Meta:
         model = AventuraAtiva
-        exclude = ['aventura','joadores_aventura_ativa', 'instancia', 'chave_acesso', ]    
-        
+        exclude = ['aventura','joadores_aventura_ativa', 'instancia', 'chave_acesso', ]  
+            
         
 '''
 ########################################################

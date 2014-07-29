@@ -2,7 +2,7 @@
 <!-- {% load bootstrap_toolkit %} -->
 {% block content %} 
 
-	  <form id="enredo_mensagem_update_view" class="form-actions" method="post" tabindex="-1"  action="{% url enredo_mensagem_update_view object.pk %}">
+	  <form id="enredo_mensagem_update_view" class="form-actions" method="post" tabindex="-1"  action="{% url 'enredo_mensagem_update_view' object.pk %}">
 		  <div class="modal-header">
 		    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" action="">×</button>
 		    <h3 id="myModalLabel">Updated Story</h3>
@@ -47,9 +47,9 @@
 				// fecha o modal
 			
 				$('#enredo').modal('hide');
-				refreshDiv('{% url enredo_mensagem_list_view %}','content');
+				refreshDiv("{% url enredo_mensagem_list_view %}",'content');
 			}else{
-				openModal('{% url enredo_mensagem_update_view object.pk %}','enredo');
+				openModal("{% url 'enredo_mensagem_update_view' object.pk %}",'enredo');
 			}
 		}
 		

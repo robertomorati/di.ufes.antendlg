@@ -1,5 +1,5 @@
 <!-- {% load bootstrap_toolkit %} -->
-	  <form id="aventura_create_view" class="form-actions" method="post" action="{% url aventura_create_view user.id %}">
+	  <form id="aventura_create_view" class="form-actions" method="post" action="{% url 'aventura_create_view' user.id %}">
 		  <div class="modal-header">
 		    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" action="">×</button>
 		    <h3 id="myModalLabel">Create Adventure
@@ -29,7 +29,7 @@
 				if (ct.indexOf('json') > -1) {
 					// fecha o modal
 					$('#aventura').modal('hide');
-					refreshDiv('{% url aventura_list_view user.id %}','content');
+					refreshDiv('{% url 'aventura_list_view' user.id %}','content');
 				}
 			}
 		

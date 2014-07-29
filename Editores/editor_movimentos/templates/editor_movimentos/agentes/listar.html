@@ -14,7 +14,7 @@
 				<tr class="success">
 					<td>
 						<!-- Modal para atualização de objetos   --> <a data-toggle="modal"
-						onClick="openModal('{% url  agente_update_view object.pk %}','agente')"
+						onClick="openModal('{% url  'agente_update_view' object.pk %}','agente')"
 						href="#agente">{{ object.nome }}</a> 
 					</td>
 					<td>{{ object.comportamento }}</td>
@@ -52,7 +52,7 @@
 							{% csrf_token %}
 							<!--<input type="submit" class="btn btn-block btn-small btn-danger " value="Deletar">-->
 							<a class="btn btn-block btn-small btn-danger" data-toggle="modal"
-								onClick="openModal('{% url agente_delete_view object.pk %}','agente')"
+								onClick="openModal('{% url 'agente_delete_view' object.pk %}','agente')"
 								href="#agente">Delete Agent</a>
 					</td>
 				</tr>
@@ -68,7 +68,7 @@
 	<strong>If you change a behavior of the agent, the old behavior will be deleted. Thus, will be necessary to configure the new behavior.</strong>
 	</p>
 	<!-- Modal para criação de agentes -->
-	<a role="button" onClick="openModal('{% url agente_create_view %}','agente')" class="btn btn-small btn-primary" data-toggle="modal" href="#agente">Create Agent</a>
+	<a role="button" onClick="openModal('{% url 'agente_create_view' %}','agente')" class="btn btn-small btn-primary" data-toggle="modal" href="#agente">Create Agent</a>
 	<div id="agente" class="modal hide fade"></div>
 	<div id="agente_instance" class="modal hide fade"></div>
 </div>

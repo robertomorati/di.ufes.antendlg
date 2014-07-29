@@ -14,7 +14,7 @@
 			{% for object in object_list %}
 			<tr class="success">
 				<td><a data-toggle="modal"
-					onClick="openModal('{% url  aventura_update_view object.pk %}','aventura')"
+					onClick="openModal('{% url  'aventura_update_view' object.pk %}','aventura')"
 					href="#aventura">{{ object.nome }}</a></td>
 				<td>{{ object.descricao }}</td>
 				<td>{{ object.inicio }}</td>
@@ -25,20 +25,18 @@
 				    {% csrf_token %} 
 				
 				<td>
-				 <!-- botao editar - id da aventura é inserido na seçção -->
 				 	<a class="btn btn-block btn-small btn-primary" data-toggle="modal"
-				 	onClick="openModal('{% url aventura_ativar_edicao_view object.pk %}','aventura')" 
+				 	onClick="openModal('{% url 'aventura_ativar_edicao_view' object.pk %}','aventura')" 
 				 	href="#aventura">Activate Authoring</a>		 
 				</td>
 				<td>
-				 <!-- botao editar - id da aventura é inserido na seçção -->
 				 	<a class="btn btn-block btn-small" data-toggle="modal"
-				 	onClick="openModal('{% url aventura_desativar_edicao_view object.pk %}','aventura')" 
+				 	onClick="openModal('{% url 'aventura_desativar_edicao_view' object.pk %}','aventura')" 
 				 	href="#aventura">Deactivate Authoring</a>		 
 				</td>
 				<td>
 					<a class="btn btn-block btn-small btn-danger" data-toggle="modal" 
-					onClick="openModal('{% url  aventura_delete_view object.pk %}','aventura')" 
+					onClick="openModal('{% url  'aventura_delete_view' object.pk %}','aventura')" 
 					href="#aventura">Delete</a>
 				</td>
 			</tr>
@@ -51,9 +49,9 @@
 			{% endfor %}
 		</tbody>
 	</table>
-	<!--  Modal para criação de aventuras - a criação de aventura se dará somente no inicio, por enquanto -->
+	<!--  Modal para criacao de aventuras - a criacao de aventura se dara somente no inicio, por enquanto -->
 	<a role="button"
-		onClick="openModal('{% url aventura_create_view user.id %}','aventura')"
+		onClick="openModal('{% url 'aventura_create_view' user.id %}','aventura')"
 		class="btn btn-small btn-primary" data-toggle="modal" href="#aventura">Create Adventure</a> 
 
 

@@ -1,4 +1,4 @@
-	  <form id="aventura_delete_view" class="form-actions" method="post" action="{% url aventura_delete_view object.pk %}">
+	  <form id="aventura_delete_view" class="form-actions" method="post" action="{% url 'aventura_delete_view' object.pk %}">
 		  <div class="modal-header">
 		    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" action="">×</button>
 		    <h3 id="myModalLabel">Delete Adventure</h3>
@@ -46,15 +46,10 @@
 					// fecha o modal
 					$('#aventura').modal('hide');
 					// atualiza a div content
-					refreshDiv('{% url aventura_list_view user.id %}','content');
-
-				
-					//$('body').find('aventura_editada').empty().append('<i class="icon-map-marker"></i>Editando Aventura:' + responseText.response);
-
+					refreshDiv("{% url 'aventura_list_view' user.id %}",'content');
 					
-				// Em caso de exceção, será retornado um text e a modal será atualizada para o usuário.
 				}else if (ct == 'text'){
-						openModal('{% url aventura_delete_view object.pk %}','aventura');
+						openModal("{% url 'aventura_delete_view' object.pk %}",'aventura');
 				}
 			}
 		

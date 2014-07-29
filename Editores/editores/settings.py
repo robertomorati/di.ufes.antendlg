@@ -4,11 +4,17 @@ import os
 
 DEBUG = True
 
+ALLOWED_HOSTS = ['*']
+
 #SESSION_COOKIE_SECURE = True
 #CSRF_COOKIE_SECURE = True
 
 
+LOGIN_URL='/autendlg/login/'
+LOGIN_REDIRECT_URL='/autendlg/'
+
 TEMPLATE_DEBUG = DEBUG
+
 PROJECT_DIR = os.path.dirname(__file__)
 #STATICFILES_DIRS = ( os.path.join(PROJECT_DIR,'static/'),)
 #ICONES_URL = '../media/imagens/icones/'
@@ -23,14 +29,27 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': os.path.join(PROJECT_DIR, "../editores.db"),                      # Or path to database file if using sqlite3.
-        'USER': '',                      # Not used with sqlite3.
-        'PASSWORD': '',                  # Not used with sqlite3.
-        'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+        'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+        'NAME': 'autenvldg', #os.path.join(PROJECT_DIR, "../editores.db"),                      # Or path to database file if using sqlite3.
+        'USER': 'autenvldg',                      # Not used with sqlite3.
+        'PASSWORD': 'autenvldg07062014',                  # Not used with sqlite3.
+        'HOST': '192.241.218.138',                      # Set to empty string for localhost. Not used with sqlite3.
+        'PORT': '3306',                      # Set to empty string for default. Not used with sqlite3.
     }
 }
+
+
+
+'''
+    'default': {
+        'ENGINE': 'django.db.backends.oracle', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+        #'NAME': '',#os.path.join(PROJECT_DIR, "../editores.db"),                      # Or path to database file if using sqlite3.
+        'USER': 'robertomorati',                      # Not used with sqlite3.
+        'PASSWORD': 'zey1987',                  # Not used with sqlite3.
+        'HOST': 'localhost',                      # Set to empty string for localhost. Not used with sqlite3.
+        'PORT': '1521',                      # Set to empty string for default. Not used with sqlite3.
+    }
+'''
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -81,7 +100,7 @@ STATIC_ROOT = os.path.join(PROJECT_DIR, '/static/')
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
-STATIC_URL = '/static'
+STATIC_URL = '/static/'
 
 # URL of the login page.
 LOGIN_URL = '/login/'
@@ -119,11 +138,13 @@ TEMPLATE_LOADERS = (
 #)
 
 MIDDLEWARE_CLASSES = (
-    'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
    
     #'django.contrib.contenttypes',
     #'django.contrib.messages.middleware.MessageMiddleware',
@@ -131,6 +152,23 @@ MIDDLEWARE_CLASSES = (
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
+
+TEMPLATE_CONTEXT_PROCESSORS = (
+    'django.contrib.auth.context_processors.auth',
+    'django.core.context_processors.debug',
+    'django.core.context_processors.i18n',
+    'django.core.context_processors.media',
+    'django.core.context_processors.static',
+    'django.core.context_processors.tz',
+    'django.contrib.messages.context_processors.messages',   
+)
+
+MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
+
+#Fix Json django 1.4 to django 1.6
+SESSION_SERIALIZER = (
+    'django.contrib.sessions.serializers.PickleSerializer')
+
 
 CODEMIRROR_PATH = r"javascript/codemirror"
 
@@ -163,7 +201,7 @@ INSTALLED_APPS = (
     'bootstrap_toolkit',
     'PIL',
     'imagekit',
-    'south',
+    #'south',
     'rest_framework',
     'editor_enredos',
     'editor_missoes',
@@ -177,6 +215,8 @@ INSTALLED_APPS = (
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
 )
+
+
 
 PASSWORD_HASHERS = (
     'django.contrib.auth.hashers.PBKDF2PasswordHasher',
@@ -200,7 +240,7 @@ PASSWORD_HASHERS = (
 # more details on how to customize your logging configuration.
 LOGGING = {
     'version': 1,
-    'disable_existing_loggers': False,
+    'disable_existing_loggers': True,
     'filters': {
         'require_debug_false': {
             '()': 'django.utils.log.RequireDebugFalse'

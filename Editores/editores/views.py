@@ -63,20 +63,13 @@ class LoginView(FormView):
             return self.get(request, *args, **kwargs)
         user = authenticate(username=form.cleaned_data["username"],
                             password=form.cleaned_data["password"])
+        #melhorar
         if not user or not user.is_active:
-        #return self.get(request, *args, **kwargs)
-        #return HttpResponse(json.dumps({'response': 'erro login'}), content_type="text")
             ValidationError
             messages.error(request, "".join("Usuário ou senha incorretos!"))
             return self.get(request, *args, **kwargs)
-        #else: 
-            #request.session['user'] = form.cleaned_data["username"]
-            #print request.session['user']
-            #print request.session['user']
-            
-        
+      
         # Persist user
-        #
         #login(request, user)
         #override login auth
         def login(request, user):
@@ -127,7 +120,7 @@ class LoginCreateView(CreateView):
        
         self.object = form.save()
           
-        #json.dumps() transforma objeto em string JSON e, json.loads() transforma string JSON em objeto    
+
         return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")
 
 

@@ -30,12 +30,12 @@ urlpatterns = patterns('',
     url(r'^condicoes_objeto/criar_condicao/$', CondicaoInstanciaObjetoCreateView.as_view(), name='condicao_objeto_create_view'),
     url(r'^condicoes_objeto/update_condicao/(?P<pk>\w+)/$', CondicaoInstanciaObjetoUpdateView.as_view(), name='condicao_objeto_update_view'),
     
-    #urls para condições entre objetos
+    #urls para condições com instancias
     url(r'^condicoes_jogador_instancia/$', CondicaoJogadorInstanciaListView.as_view(), name='condicao_jogador_instancia_list_view'),
     url(r'^condicoes_jogador_instancia/criar_condicao/$', CondicaoJogadorInstanciaCreateView.as_view(), name='condicao_jogador_create_view'),
     url(r'^condicoes_jogador_instancia/update_condicao/(?P<pk>\w+)/$', CondicaoJogadorInstanciaUpdateView.as_view(), name='condicao_jogador_update_view'),
     
-    #urls para condições entre objetos
+    #urls para condições com objetos
     url(r'^condicoes_jogador_objeto/$', CondicaoJogadorObjetoListView.as_view(), name='condicao_jogador_objeto_list_view'),
     url(r'^condicoes_jogador_objeto/criar_condicao/$', CondicaoJogadorObjetoCreateView.as_view(), name='condicao_jogador_objeto_create_view'),
     url(r'^condicoes_jogador_objeto/update_condicao/(?P<pk>\w+)/$', CondicaoJogadorObjetoUpdateView.as_view(), name='condicao_jogador_objeto_update_view'),

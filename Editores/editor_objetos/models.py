@@ -19,6 +19,17 @@ from django.utils.translation import gettext as _
 #from imagekit.models import ImageSpecField
 
 
+class MySQLBooleanField(models.BooleanField):
+    __metaclass__ = models.SubfieldBase
+
+    def to_python(self, value):
+        if isinstance(value, bool):
+            return value
+        return bytearray(value)[0]
+
+    def get_db_prep_value(self, value):
+        return '\x01' if value else '\x00'
+
 '''
 Class TipoObjeto 
 
@@ -36,7 +47,7 @@ class TipoObjeto(models.Model):
     tipo = models.CharField(max_length=30)
     descricao = models.CharField(max_length=100)
     posicoes_geograficas = models.IntegerField(max_length=3,default=1, help_text=u"Delimita a quantidade de posições geográficas da instância do objeto.")
-    publico = models.BooleanField(default='True')
+    publico = models.BooleanField(default=True) 
     
     #return o tipo
     def __unicode__(self):
@@ -112,10 +123,10 @@ class Sugestao(models.Model):
         (AUDIO, 'Áudio'),
         (IMAGEM, 'Imagem'),)
     nome = models.CharField(max_length=30,default="", )
-    publico = models.BooleanField(default='True')
     tipo = models.CharField(max_length=10, choices=TIPO_SUGESTAO ,default=TEXTO)
     sugestao = models.FileField(upload_to ='sugestao/', help_text="Sugestão para tomada de decisão.",default="", )
     proximidade = models.IntegerField(max_length=3,default=1)
+    publico = models.BooleanField(default=True,)
     
     def __unicode__(self):
         return u'%s' % (self.nome) 
@@ -264,10 +275,10 @@ class TipoImagem(models.Model):
     TIPO_IMAGEMS = (
         (IMG_MAP, 'Imagem Google Maps'),
         (IMG_CAM, 'Imagem Câmera'),)
-    nome_img = models.CharField(max_length=30, verbose_name="Nome da Imagem",default="",)
-    tipo = models.CharField(max_length=10, choices=TIPO_IMAGEMS ,default=IMG_MAP)
-    img_play = models.FileField(_("Imagem"), upload_to ='imagens/img_play/',null=True, blank=True)
-    descricao = models.CharField(max_length=100, default="")
+    nome_img = models.CharField(max_length=30,  verbose_name="Nome da Imagem",default="",)
+    tipo = models.CharField( max_length=10, choices=TIPO_IMAGEMS ,default=IMG_MAP)
+    img_play = models.FileField(_("Imagem"),  upload_to ='imagens/img_play/',null=True, blank=True)
+    descricao = models.CharField( max_length=100, default="", )
     
     def __unicode__(self):
         return u'%s' % (self.nome_img)
@@ -331,8 +342,8 @@ class InstanciaObjeto(models.Model):
     sugestao_objeto = models.ForeignKey(Sugestao, related_name="sugestoes", blank=True, default="", null=True, )
     aventura = models.ForeignKey(Aventura, related_name="aventura_inst_obj", blank=True, default="", null=True,)
     dialogo = models.TextField('dialogo', blank=True)
-    imagem_mapa = models.ForeignKey(TipoImagem,related_name="imagem_mapa", blank=True, default="", null=True, )
-    imagem_camera = models.ForeignKey(TipoImagem,related_name="imagem_camera", blank=True, default="", null=True, )
+    imagem_mapa = models.ForeignKey(TipoImagem,related_name="tipo_imagem_mapa", blank=True, default="", null=True, )
+    imagem_camera = models.ForeignKey(TipoImagem,related_name="tipo_imagem_camera", blank=True, default="", null=True, )
     
     #dialogo = models.ForeignKey(Dialogo, related_name="dialogo",blank=True,)
     #posicao_geografica_ = models.ManyToManyField(PosicaoGeografica, related_name="pos_geo_inst_objeto",) 
@@ -738,7 +749,7 @@ NivelAutor: na aventura um autor pode ser o principal, com direito de excluir a 
 @param nivel: nivel de autorização do autor para a aventura  
 
 Pedencia: Classe não utilizada no momento. 
-'''
+
 class NivelAutor(models.Model):
     PRINCIPAL = 'Principal'
     SECUNDARIO = 'Secundário'
@@ -748,7 +759,7 @@ class NivelAutor(models.Model):
     autor = models.ForeignKey(Autor, related_name="autor", blank=True, default="", null=True, )
     aventura_autor =  models.ForeignKey(Aventura, related_name="aventura_autor", blank=True, default="", null=True, )
     nivel = models.CharField(max_length=1, choices=NIVEL_AUTOR ,default=PRINCIPAL)
-
+'''
     
 '''
 Agente - classe responsavem por conter o nome do agente e o tipo de comportamento.

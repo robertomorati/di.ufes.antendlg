@@ -13,7 +13,7 @@
 			<tr class="success">
 				<td>
 					<!-- Modal para atualização de objetos   --> <a data-toggle="modal"
-					onClick="openModal('{% url  avatar_update_roles__view object.pk %}','avatares')"
+					onClick="openModal('{% url  'avatar_update_roles__view' object.pk %}','avatares')"
 					href="#avatares">{{ object.nome }}</a> 
 				</td>
 				<td><img  class="avatar" src="{{ object.avatar.url }}" alt="avatar"/></td>		

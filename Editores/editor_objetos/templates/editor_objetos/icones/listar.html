@@ -18,8 +18,7 @@
 				{% for object in object_list %}
 				<tr class="success">
 					<td>
-						<!-- Modal para atualização de icones   --> 
-						<a data-toggle="modal" onClick="openModal('{% url  icone_update_view object.pk %}','icone')" href="#icone">{{ object.nome }}</a> 
+						<a data-toggle="modal" onClick="openModal('{% url  'icone_update_view' object.pk %}','icone')" href="#icone">{{ object.nome }}</a> 
 					</td>
 					<td>
 						<img  class="avatar" src="{{ object.icone.url }}" alt="avatar"/>
@@ -27,7 +26,7 @@
 					<td>
 					
 						{% csrf_token %}
-						<a class="btn btn-block btn-small btn-danger" data-toggle="modal" onClick="openModal('{% url  icone_delete_view object.pk %}','icone')" href="#icone">Deletar</a>
+						<a class="btn btn-block btn-small btn-danger" data-toggle="modal" onClick="openModal('{% url  'icone_delete_view' object.pk %}','icone')" href="#icone">Deletar</a>
 					</td>
 				</tr>
 				{% empty %}
@@ -39,8 +38,8 @@
 			</tbody>
 		</table>
 		<!-- Modal para criação de ícones -->
-		<a role="button" onClick="openModal('{% url  icone_create_view %}','icone')" class="btn btn-small btn-primary" data-toggle="modal" href="#icone">Create Icon</a>
-		<!-- div para modal de criação; atualização e deleção -->
+		<a role="button" onClick="openModal('{% url  'icone_create_view' %}','icone')" class="btn btn-small btn-primary" data-toggle="modal" href="#icone">Create Icon</a>
+
 		<div id="icone" class="modal hide fade"></div>
 	</div>
 

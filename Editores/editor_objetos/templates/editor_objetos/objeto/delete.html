@@ -9,7 +9,7 @@
 	    </form>
 	{% endblock %}
 {% endcomment%}
-		  <form id="objeto_delete_view" class="form-actions" method="post" action="{% url objeto_delete_view object.pk %}">
+		  <form id="objeto_delete_view" class="form-actions" method="post" action="{% url 'objeto_delete_view' object.pk %}">
 		  <div class="modal-header">
 		    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" action="">×</button>
 		    <h3 id="myModalLabel"></h3>
@@ -57,9 +57,9 @@
 				if (ct == 'application/json') {
 					// fecha o modal
 					$('#objeto').modal('hide');
-					refreshDiv('{% url objeto_list_view %}','content');
+					refreshDiv("{% url 'objeto_list_view' %}",'content');
 				}else if (ct == 'text'){
-						openModal('{% url objeto_delete_view object.pk %}','objeto');
+						openModal("{% url 'objeto_delete_view' object.pk %}",'objeto');
 				}
 			}
 		

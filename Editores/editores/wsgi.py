@@ -21,7 +21,12 @@ import os
 # setting points here.
 from django.core.wsgi import get_wsgi_application
 application = get_wsgi_application()
-from django.http import absolute_http_url_re, urljoin, iri_to_uri
+
+#update 1.4 to 1.6 django
+try:#django 1.6
+    from django.http.request import absolute_http_url_re, urljoin, iri_to_uri
+except ImportError:#django 1.4
+    from django.http import absolute_http_url_re, urljoin, iri_to_uri
 
 # Apply WSGI middleware here.
 # from helloworld.wsgi import HelloWorldApplication

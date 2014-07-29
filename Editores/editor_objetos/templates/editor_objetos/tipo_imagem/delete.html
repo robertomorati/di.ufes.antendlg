@@ -1,6 +1,6 @@
 
 
-		  <form id="tipo_imagem_delete_view" class="form-actions" method="post" action="{% url tipo_imagem_delete_view object.pk %}">
+		  <form id="tipo_imagem_delete_view" class="form-actions" method="post" action="{% url 'tipo_imagem_delete_view' object.pk %}">
 		  <div class="modal-header">
 		    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" action="">×</button>
 		    <h3 id="myModalLabel"></h3>
@@ -48,9 +48,9 @@
 				if (ct == 'application/json') {
 					// fecha o modal
 					$('#tipo_imagem').modal('hide');
-					refreshDiv('{% url tipo_imagem_list_view %}','content');
+					refreshDiv("{% url 'tipo_imagem_list_view' %}",'content');
 				}else if (ct == 'text'){
-					openModal('{% url tipo_imagem_delete_view object.pk %}','tipo_imagem');
+					openModal("{% url 'tipo_imagem_delete_view' object.pk %}",'tipo_imagem');
 				}
 			}
 		
