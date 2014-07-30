@@ -7,6 +7,7 @@
 		  </div>
 		  <div class="modal-body"> 
 				 {% csrf_token %}
+				 {{form|as_bootstrap}}
 				 {{form.username|as_bootstrap}}
 				 {{form.nickname|as_bootstrap}}
 				 {{form.first_name|as_bootstrap}}
