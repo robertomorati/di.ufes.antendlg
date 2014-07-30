@@ -2,6 +2,11 @@
 # Django settings for Editores project.
 import os
 
+STATSD_HOST = '192.241.218.138'
+STATSD_PORT = 8125
+STATSD_PREFIX = None
+STATSD_MAXUDPSIZE = 512
+
 
 DEBUG = False
 
