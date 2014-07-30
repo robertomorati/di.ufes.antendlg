@@ -64,11 +64,19 @@ class LoginView(FormView):
         user = authenticate(username=form.cleaned_data["username"],
                             password=form.cleaned_data["password"])
         #melhorar
+        
+         
         if not user or not user.is_active:
             ValidationError
-            messages.error(request, "".join("Usuário ou senha incorretos!"))
+            messages.error(request, "".join("Invalid username or incorrect password !"))
             return self.get(request, *args, **kwargs)
       
+        else:
+            if not Autor.objects.all().filter(user_ptr_id = user.pk):
+                ValidationError
+                messages.error(request, "".join("It's a player account!"))
+                return self.get(request, *args, **kwargs)
+            
         # Persist user
         #login(request, user)
         #override login auth

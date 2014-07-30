@@ -11,8 +11,8 @@ ALLOWED_HOSTS = ['*']
 #CSRF_COOKIE_SECURE = True
 
 
-LOGIN_URL='/autendlg/login/'
-LOGIN_REDIRECT_URL='/autendlg/'
+#LOGIN_URL='/autendlg/login/'
+#LOGIN_REDIRECT_URL='/autendlg/'
 
 TEMPLATE_DEBUG = DEBUG
 
@@ -39,18 +39,6 @@ DATABASES = {
     }
 }
 
-
-
-'''
-    'default': {
-        'ENGINE': 'django.db.backends.oracle', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        #'NAME': '',#os.path.join(PROJECT_DIR, "../editores.db"),                      # Or path to database file if using sqlite3.
-        'USER': 'robertomorati',                      # Not used with sqlite3.
-        'PASSWORD': 'zey1987',                  # Not used with sqlite3.
-        'HOST': 'localhost',                      # Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '1521',                      # Set to empty string for default. Not used with sqlite3.
-    }
-'''
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -97,7 +85,7 @@ MEDIA_URL = '/media/'
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/home/media/media.lawrence.com/static/"
-STATIC_ROOT = os.path.join(PROJECT_DIR, '/static/')
+STATIC_ROOT = os.path.join(PROJECT_DIR, '/editores/static/')
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
@@ -111,6 +99,7 @@ STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
+    os.path.join(PROJECT_DIR, '/editores/static/'),
 )
 
 # List of finder classes that know how to find static files in
