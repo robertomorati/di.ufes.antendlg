@@ -10,7 +10,7 @@ from rest_framework import serializers
 
 
 class JogadorSerializer(serializers.ModelSerializer):
-    #password = forms.CharField(widget=forms.PasswordInput(render_value=False))
+    password = forms.CharField(widget=forms.PasswordInput(render_value=False))
     
     # criptografia senha autor
     def save(self, commit=True):

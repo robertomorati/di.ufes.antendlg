@@ -2885,7 +2885,6 @@ class CondicaoAtivaCreateView(AjaxableResponseMixin, CreateView):
             poscondicaoativa.estado_condicao = False
             missaoativa = MissaoAtiva.objects.all().filter(missao_id =ins['missao_id'],aventura_ativa_missao_id =pos['aventura_ativa_id'] )
             for m in missaoativa:
-                print m.pk
                 poscondicaoativa.missao_ativa_id = m.pk
             poscondicaoativa.aventura_ativa_condicao_id = pos['aventura_ativa_id'] 
             poscondicaoativa.condicao_id = ins['condicao_id'] 
