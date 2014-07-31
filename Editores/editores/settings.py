@@ -2,8 +2,10 @@
 # Django settings for Editores project.
 import os
 
-DEBUG = True
+#monitoring apps
+from statsd import StatsClient
 
+DEBUG = True
 
 
 ALLOWED_HOSTS = ['*']
@@ -107,10 +109,19 @@ DATADOG_APP_NAME = 'editor_jogadores'
 DATADOG_APP_NAME = 'editor_movimentos'
 
 
-STATSD_HOST = '192.241.218.138'
-STATSD_PORT = 8125
-STATSD_PREFIX = None
-STATSD_MAXUDPSIZE = 512
+#STATSD_HOST = '192.241.218.138'
+#STATSD_PORT = 8125
+#STATSD_PREFIX = None
+#STATSD_MAXUDPSIZE = 512
+
+statsd = StatsClient(host='localhost',
+                     port=8125,
+                     prefix=None,
+                     maxudpsize=512)
+
+statsd.incr('editores')
+statsd.incr('editor_enredos')
+
 
 
 # Additional locations of static files

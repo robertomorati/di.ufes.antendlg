@@ -56,6 +56,7 @@ register = template.Library()
 import os
 import json
 
+
 SESSION_AVENTURA = '_user_aventura_id'
 
 #assumindo que a criação de aventuras não seja colaborativa
