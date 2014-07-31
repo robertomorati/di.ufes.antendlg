@@ -19,6 +19,9 @@ from  django.contrib.auth import *
 import json
 SESSION_AVENTURA = '_user_aventura_id'
 
+from django.core.context_processors import csrf
+from django.shortcuts import render_to_response
+
 '''
 Página inicial
 '''
@@ -110,7 +113,9 @@ class LoginView(FormView):
         #return HttpResponseRedirect(self.get_success_url())
         #data = {}
         return HttpResponseRedirect(self.get_success_url())
-        #return render_to_response('index.html', data, context_instance=RequestContext(request)) 
+        #args = {}
+        #args.update(csrf(request))
+        #return render_to_response("/autendlg/", args) 
         
 '''
 LoginCreateView - criação de usuário

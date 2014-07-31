@@ -30,6 +30,7 @@ urlpatterns = patterns('',
     # Admin django
     url(r'^admin/', include(admin.site.urls)),
     
+    
     #rest_framework
     url(r'^', include(router.urls)),
     url(r'^autenvldg_services/', include('rest_framework.urls', namespace='rest_framework')),
@@ -84,3 +85,5 @@ urlpatterns = patterns('',
     
 
 )
+
+#urlpatterns += patterns('/i18n/', include('django.conf.urls.i18n'))

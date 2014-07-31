@@ -39,21 +39,22 @@ urlpatterns = patterns('',
     #url(r'^', include(router.urls)),
     #url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),     
     #url(r'^api-auth/aventuras/$', AventuraViewSet.as_view(), name='aventuras-resource'),  
+ 
     
     #urls para tipo de objeto
     url(r'^tipo_objeto/$', login_required(TipoObjetoListView.as_view()), name='tipo_objeto_list_view'),
-    url(r'^tipo_objeto/criar_tipo_objeto/$', TipoObjetoCreateView.as_view(), name='tipo_objeto_create_view'),
-    url(r'^tipo_objeto/(?P<pk>\w+)/$', TipoObjetoUpdateView.as_view(), name='tipo_objeto_update_view',),
-    url(r'^tipo_objeto/delete_tipo_objeto/(?P<pk>\w+)/$', TipoObjetoDeleteView.as_view(), name='tipo_objeto_delete_view',),
-    url(r'^get_lista_tipo_objeto/$', TipoObjetoGetJsonView.as_view(), name='tipo_objeto_get_view'),
+    url(r'^tipo_objeto/criar_tipo_objeto/$', login_required(TipoObjetoCreateView.as_view()), name='tipo_objeto_create_view'),
+    url(r'^tipo_objeto/(?P<pk>\w+)/$', login_required(TipoObjetoUpdateView.as_view()), name='tipo_objeto_update_view',),
+    url(r'^tipo_objeto/delete_tipo_objeto/(?P<pk>\w+)/$', login_required(TipoObjetoDeleteView.as_view()), name='tipo_objeto_delete_view',),
+    url(r'^get_lista_tipo_objeto/$', login_required(TipoObjetoGetJsonView.as_view()), name='tipo_objeto_get_view'),
     
     #urls para objeto
     url(r'^objeto/$',login_required(ObjetoListView.as_view()), name='objeto_list_view'),
-    url(r'^objeto/criar_objeto/$', ObjetoCreateView.as_view(), name='objeto_create_view'),
+    url(r'^objeto/criar_objeto/$', login_required(ObjetoCreateView.as_view()), name='objeto_create_view'),
     #url(r'^objeto/update_objeto/$', ObjetoUpdateView.as_view(), name='objeto_update_view',),
-    url(r'^objeto/update_objeto/(?P<pk>\w+)/$', ObjetoUpdateView.as_view(), name='objeto_update_view',),
-    url(r'^objeto/delete_objeto/(?P<pk>\w+)/$', ObjetoDeleteView.as_view(), name='objeto_delete_view',),
-    url(r'^objeto/get_lista_objetos/(?P<pk>\w+)/$', ObjetoGetJsonView.as_view(), name='objeto_get_json_view'),
+    url(r'^objeto/update_objeto/(?P<pk>\w+)/$', login_required(ObjetoUpdateView.as_view()), name='objeto_update_view',),
+    url(r'^objeto/delete_objeto/(?P<pk>\w+)/$', login_required(ObjetoDeleteView.as_view()), name='objeto_delete_view',),
+    url(r'^objeto/get_lista_objetos/(?P<pk>\w+)/$', login_required(ObjetoGetJsonView.as_view()), name='objeto_get_json_view'),
     
     #urls para icones do objeto
     url(r'^icones/$', IconeListView.as_view(), name='icone_list_view'),
@@ -115,5 +116,7 @@ urlpatterns = patterns('',
     url(r'^estado_aventura/create_instances_activates/$', PosInstanciaAtivaCreateView.as_view(), name='instances_activates_view'),
     url(r'^estado_aventura/create_avatars_activates/$', AvatarAtivoCreateView.as_view(), name='avatars_activates_view'),
     url(r'^estado_aventura/create_missions_activates/$', MissaoAtivaCreateView.as_view(), name='missions_activates_view'),
-     url(r'^estado_aventura/create_conditions_activates/$', CondicaoAtivaCreateView.as_view(), name='conditions_activates_view')
+    url(r'^estado_aventura/create_conditions_activates/$', CondicaoAtivaCreateView.as_view(), name='conditions_activates_view')
+    
+    
 )

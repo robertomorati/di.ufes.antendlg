@@ -1,8 +1,9 @@
 <!-- {% load bootstrap_toolkit %} -->
+	  {% load i18n %}
 	  <form id="ativar_aventura_create_view" class="form-actions" method="post" action="{% url 'ativar_aventura_create_view' %}">
 		  <div class="modal-header">
 		    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" action="">×</button>
-		    <h3 id="myModalLabel">Activate Adventure
+		    <h3 id="myModalLabel"> {% trans "Activate Adventure" %} 
 		  </div>
 		  	  <div class="modal-body">  
 			  {% if messages %}
@@ -16,8 +17,8 @@
 						</ul>
 					</div>
 			<div class="modal-footer">
-				<button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
-				<button class="btn btn-primary disabled">Activate</button>
+				<button class="btn" data-dismiss="modal" aria-hidden="true">{% trans "Cancel" %}</button>
+				<button class="btn btn-primary disabled">{% trans "Activate" %}</button>
 			</div>
 		  </div>
 		  {% else %}	

@@ -2,22 +2,23 @@
 # Django settings for Editores project.
 import os
 
-STATSD_HOST = '192.241.218.138'
-STATSD_PORT = 8125
-STATSD_PREFIX = None
-STATSD_MAXUDPSIZE = 512
+#STATSD_HOST = '192.241.218.138'
+#STATSD_PORT = 8125
+#STATSD_PREFIX = None
+#STATSD_MAXUDPSIZE = 512
 
 
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
-#SESSION_COOKIE_SECURE = True
-#CSRF_COOKIE_SECURE = True
+#APPEND_SLASH=False
+
+SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = False
 
 
 #LOGIN_URL='/autendlg/login/'
-#LOGIN_REDIRECT_URL='/autendlg/'
 
 TEMPLATE_DEBUG = DEBUG
 
@@ -58,17 +59,17 @@ TIME_ZONE = 'America/Chicago'
 # http://www.i18nguy.com/unicode/language-identifiers.html
 LANGUAGE_CODE = 'pt-BR'
 
-SITE_ID = 1
+SITE_ID  = True
 
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.
 USE_I18N = True
 
 LANGUAGES = (
-    ('pt_BR', ('Portugues brasileiro')),
-    ('en_US', ('English')),
+    ('pt_BR', ('pt_br')),
+    ('en_US', ('en_us')),
 )
-
+DEFAULT_LANGUAGE = 1
 
 # If you set this to False, Django will not format dates, numbers and
 # calendars according to the current locale.
@@ -97,8 +98,19 @@ STATIC_ROOT = os.path.join(PROJECT_DIR, '../staticfiles/')
 STATIC_URL = '/static/'
 
 # URL of the login page.
-LOGIN_URL = '/login/'
+LOGIN_URL = '/autendlg/login/'
 
+
+#datalog config
+DATADOG_API_KEY = 'YOUR_API_KEY'
+DATADOG_APP_KEY = 'YOUR_APP_KEY'
+DATADOG_APP_NAME = 'editores'
+DATADOG_APP_NAME = 'editor_enredos'
+DATADOG_APP_NAME = 'editor_missoes'
+DATADOG_APP_NAME = 'editor_jogadores'
+DATADOG_APP_NAME = 'editor_movimentos'
+
+    
 # Additional locations of static files
 STATICFILES_DIRS = (
     os.path.join(PROJECT_DIR, "static"),
@@ -139,7 +151,8 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    
+    'django.middleware.locale.LocaleMiddleware',
+    'datadog.middleware.DatadogMiddleware',
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
@@ -198,7 +211,8 @@ INSTALLED_APPS = (
     'editor_missoes',
     'editor_jogadores',
     'editor_movimentos',
-    'bootstrap3',  
+    'bootstrap3', 
+    'datadog',
     #'rest_framework',
     #'django_cleanup', # remove old files
     # Uncomment the next line to enable the admin:

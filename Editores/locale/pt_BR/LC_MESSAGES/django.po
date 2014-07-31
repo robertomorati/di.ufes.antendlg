@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-01-13 10:41-0200\n"
+"POT-Creation-Date: 2014-07-30 20:35-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,42 +18,58 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1)\n"
 
-#: .\core\forms.py:234
-msgid "Username"
+#: .\core\forms.py:331
+msgid "Usuário"
 msgstr ""
 
-#: .\core\forms.py:236 .\editor_objetos\models.py:320
-msgid "Password"
-msgstr ""
-
-#: .\core\forms.py:243
+#: .\core\forms.py:333
 msgid "Senha"
 msgstr ""
 
-#: .\core\forms.py:287
+#: .\core\forms.py:340
+msgid "Senha"
+msgstr ""
+
+#: .\core\forms.py:384
 msgid "Nome"
 msgstr ""
 
-#: .\core\forms.py:288
+#: .\core\forms.py:385
 msgid "Proximidade"
 msgstr ""
 
-#: .\core\forms.py:289
+#: .\core\forms.py:386
 msgid "Diálogo"
 msgstr ""
 
-#: .\editor_objetos\models.py:194
+#: .\editor_objetos\models.py:252
 msgid "Data Inicio"
 msgstr ""
 
-#: .\editor_objetos\models.py:195
+#: .\editor_objetos\models.py:253
 msgid "Data Fim"
 msgstr ""
 
-#: .\editor_objetos\models.py:220
+#: .\editor_objetos\models.py:280
 msgid "Imagem"
 msgstr ""
 
-#: .\editor_objetos\models.py:441
+#: .\editor_objetos\models.py:607
 msgid "Tempo para Missão"
+msgstr ""
+
+#: .\editor_objetos\templates\editor_objetos\aventura\ativar_aventura.html:6
+msgid "Ativar Aventura"
+msgstr ""
+
+#: .\editor_objetos\templates\editor_objetos\aventura\ativar_aventura.html:20
+msgid "Cancelar"
+msgstr ""
+
+#: .\editor_objetos\templates\editor_objetos\aventura\ativar_aventura.html:21
+msgid "Ativar"
+msgstr ""
+
+#: .\editores\templates\registration\login.html:17
+msgid "AntEnDLG - Ambiente de Autoria de Jogos Locativos de Decisão"
 msgstr ""
