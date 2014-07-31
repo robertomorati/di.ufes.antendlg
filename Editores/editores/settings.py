@@ -2,12 +2,6 @@
 # Django settings for Editores project.
 import os
 
-#STATSD_HOST = '192.241.218.138'
-#STATSD_PORT = 8125
-#STATSD_PREFIX = None
-#STATSD_MAXUDPSIZE = 512
-
-
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
@@ -110,7 +104,13 @@ DATADOG_APP_NAME = 'editor_missoes'
 DATADOG_APP_NAME = 'editor_jogadores'
 DATADOG_APP_NAME = 'editor_movimentos'
 
-    
+
+#STATSD_HOST = '192.241.218.138'
+#STATSD_PORT = 8125
+#STATSD_PREFIX = None
+#STATSD_MAXUDPSIZE = 512
+
+
 # Additional locations of static files
 STATICFILES_DIRS = (
     os.path.join(PROJECT_DIR, "static"),
