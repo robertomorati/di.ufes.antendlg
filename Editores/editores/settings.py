@@ -102,11 +102,11 @@ LOGIN_URL = '/autendlg/login/'
 #datalog config
 DATADOG_API_KEY = '429b85a4274f59adfeb8a438e3478d59'
 DATADOG_APP_KEY = '429b85a4274f59adfeb8a438e3478d59'
-DATADOG_APP_NAME = 'editores'
-DATADOG_APP_NAME = 'editor_enredos'
-DATADOG_APP_NAME = 'editor_missoes'
-DATADOG_APP_NAME = 'editor_jogadores'
-DATADOG_APP_NAME = 'editor_movimentos'
+DATADOG_APP_NAME = 'page.views'
+#DATADOG_APP_NAME = 'editor_enredos'
+#DATADOG_APP_NAME = 'editor_missoes'
+#DATADOG_APP_NAME = 'editor_jogadores'
+#DATADOG_APP_NAME = 'editor_movimentos'
 
 
 #STATSD_HOST = '192.241.218.138'
@@ -119,8 +119,7 @@ statsd = StatsClient(host='localhost',
                      prefix=None,
                      maxudpsize=512)
 
-statsd.incr('editores')
-statsd.incr('editor_enredos')
+statsd.incr('page.views')
 
 
 
