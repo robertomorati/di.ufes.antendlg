@@ -102,8 +102,8 @@ LOGIN_URL = '/autendlg/login/'
 
 
 #datalog config
-DATADOG_API_KEY = 'YOUR_API_KEY'
-DATADOG_APP_KEY = 'YOUR_APP_KEY'
+DATADOG_API_KEY = '429b85a4274f59adfeb8a438e3478d59'
+DATADOG_APP_KEY = '429b85a4274f59adfeb8a438e3478d59'
 DATADOG_APP_NAME = 'editores'
 DATADOG_APP_NAME = 'editor_enredos'
 DATADOG_APP_NAME = 'editor_missoes'
