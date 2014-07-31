@@ -109,18 +109,15 @@ DATADOG_APP_NAME = 'page.views'
 #DATADOG_APP_NAME = 'editor_movimentos'
 
 
-#STATSD_HOST = '192.241.218.138'
-#STATSD_PORT = 8125
-#STATSD_PREFIX = None
-#STATSD_MAXUDPSIZE = 512
+STATSD_HOST = 'localhost'
+STATSD_PORT = 8125
+STATSD_PREFIX = None
+STATSD_MAXUDPSIZE = 512
+from statsd.defaults.django import statsd
 
-statsd = StatsClient(host='localhost',
-                     port=8125,
-                     prefix=None,
-                     maxudpsize=512)
+#statsd.incr('page.views')
 
-statsd.incr('page.views')
-
+statsd.increment('page.views')
 
 
 # Additional locations of static files
