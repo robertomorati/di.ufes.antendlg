@@ -4,6 +4,8 @@ import os
 
 DEBUG = True
 
+
+
 ALLOWED_HOSTS = ['*']
 
 #APPEND_SLASH=False
@@ -105,10 +107,10 @@ DATADOG_APP_NAME = 'editor_jogadores'
 DATADOG_APP_NAME = 'editor_movimentos'
 
 
-#STATSD_HOST = '192.241.218.138'
-#STATSD_PORT = 8125
-#STATSD_PREFIX = None
-#STATSD_MAXUDPSIZE = 512
+STATSD_HOST = '192.241.218.138'
+STATSD_PORT = 8125
+STATSD_PREFIX = None
+STATSD_MAXUDPSIZE = 512
 
 
 # Additional locations of static files
@@ -212,6 +214,7 @@ INSTALLED_APPS = (
     'editor_jogadores',
     'editor_movimentos',
     'bootstrap3', 
+    'statsd',
     'datadog',
     #'rest_framework',
     #'django_cleanup', # remove old files
