@@ -588,7 +588,6 @@ class AventuraListView(ListView):
     def get_queryset(self):
         #print self.request.session[SESSION_AVENTURA]
         object_list = Aventura.objects.all().filter(autor=self.kwargs['pk'])
-        #self.model.objects.filter(pk = self.kwargs['pk'])
         return object_list
 
 #Criação das aventuras
