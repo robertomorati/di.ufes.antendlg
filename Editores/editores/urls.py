@@ -36,15 +36,15 @@ urlpatterns = patterns('',
 
     
     # Login / logout.
-    url(r"^autendlg/login/$",LoginView.as_view(), name="login",),
-    url(r"^autendlg/registrar/$",LoginCreateView.as_view(), name="registrar_create_view",),
-    url(r'^autendlg/logout/$', logout_page, name="logout",),
+    url(r"^autenvldg/login/$",LoginView.as_view(), name="login",),
+    url(r"^autenvldg/registrar/$",LoginCreateView.as_view(), name="registrar_create_view",),
+    url(r'^autenvldg/logout/$', logout_page, name="logout",),
     
     #Dados Autor
     url(r'^autor/get_url_icone/(?P<pk>\w+)/$', AutorGetJsonView.as_view(), name='avatar_autor_get_json_url_view'),
     
     #Pages project
-    url(r'^autendlg/', login_required(IndexView.as_view()), name="index"),
+    url(r'^autenvldg/', login_required(IndexView.as_view()), name="index"),
     url(r'^editor_objetos/', include('editor_objetos.urls')),
     url(r'^editor_enredos/', include('editor_enredos.urls')),
     url(r'^editor_missoes/', include('editor_missoes.urls')),
