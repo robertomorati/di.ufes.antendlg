@@ -583,7 +583,7 @@ class MsgShowView(TemplateView):
 #Listagem da aventura
 class AventuraListView(ListView):
     model = Aventura
-    template_name = 'editor_objetos/aventura/listar.html' 
+    template_name = 'editor_aventuras/aventura/listar.html' 
         
     def get_queryset(self):
         #print self.request.session[SESSION_AVENTURA]
@@ -593,7 +593,7 @@ class AventuraListView(ListView):
 
 #Criação das aventuras
 class AventuraCreateView(CreateView):
-    template_name = 'editor_objetos/aventura/create.html'
+    template_name = 'editor_aventuras/aventura/create.html'
     model = Aventura
     form_class = AventuraForm
     
@@ -628,7 +628,7 @@ class AventuraUpdateView(UpdateView):
 
 #ativar aventura para autoria
 class AventuraAtivarView(UpdateView):
-    template_name = 'editor_objetos/aventura/message.html'
+    template_name = 'editor_aventuras/aventura/message.html'
     model = Aventura
     form_class = AventuraWithoutFieldsForm
     
@@ -647,7 +647,7 @@ class AventuraAtivarView(UpdateView):
         return HttpResponse(json.dumps({'response': nome ,'id' : id_av }), content_type="application/json")
 
 class AventuraDesativarView(UpdateView):
-    template_name = 'editor_objetos/aventura/messageDesativar.html'
+    template_name = 'editor_aventuras/aventura/messageDesativar.html'
     model = Aventura
     form_class = AventuraWithoutFieldsForm
     
@@ -666,7 +666,7 @@ class AventuraDesativarView(UpdateView):
 
 #Atualizar posição aventura
 class AventuraUpdatePositionView(AjaxableResponseMixin, UpdateView):
-    #template_name = 'editor_objetos/aventura/message.html'
+    #template_name = 'editor_aventuras/aventura/message.html'
     model = Aventura
     form_class = AventuraWithoutFieldsForm
     
@@ -697,7 +697,7 @@ class AventuraUpdatePositionView(AjaxableResponseMixin, UpdateView):
 
 #Deleção da aventura
 class AventuraDeleteView(DeleteView):
-    template_name = 'editor_objetos/aventura/delete.html'
+    template_name = 'editor_aventuras/aventura/delete.html'
     model = Aventura
     
     def delete(self, request, *args, **kwargs):
@@ -741,7 +741,7 @@ class AventuraGetJsonView(ListView):
 #view que lista as aventuras ativas
 class AventuraAtivaListView(ListView):
     model = AventuraAtiva
-    template_name = 'editor_objetos/aventura/listar_aventuras_ativas.html'
+    template_name = 'editor_aventuras/aventura/listar_aventuras_ativas.html'
     
     def get_queryset(self):
         if self.request.session[SESSION_AVENTURA] != '-1':
@@ -756,7 +756,7 @@ def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
     
 #ativação da aventura para ser jogada
 class AtivarAventuraView(CreateView):
-    template_name = 'editor_objetos/aventura/ativar_aventura.html' 
+    template_name = 'editor_aventuras/aventura/ativar_aventura.html' 
     model = AventuraAtiva
     form_class = AventuraAtivaWithoutFieldsForm
     
@@ -887,7 +887,7 @@ class AtivarAventuraView(CreateView):
         
 #ativação da aventura para ser jogada
 class AventuraAtivaUpdateView(UpdateView):
-    template_name = 'editor_objetos/aventura/update_aventura_ativa.html' 
+    template_name = 'editor_aventuras/aventura/update_aventura_ativa.html' 
     model = AventuraAtiva
     form_class = AventuraAtivaWithoutFieldsForm
     
@@ -920,7 +920,7 @@ class AventuraAtivaUpdateView(UpdateView):
         return HttpResponse(json.dumps({'response' : 'ok'}), content_type="application/json")
 
 class AventuraAtivaDeleteView(DeleteView):
-    template_name = 'editor_objetos/aventura/delete_aventura_ativa.html' 
+    template_name = 'editor_aventuras/aventura/delete_aventura_ativa.html' 
     model = AventuraAtiva
     form_class = AventuraAtivaWithoutFieldsForm
     

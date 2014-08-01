@@ -2,7 +2,9 @@
 # Django settings for Editores project.
 import os
 
-DEBUG = False
+DEBUG = True
+
+from statsd import statsd
 
 ALLOWED_HOSTS = ['*']
 
@@ -96,7 +98,7 @@ LOGIN_URL = '/autendlg/login/'
 #datalog config
 DATADOG_API_KEY = '429b85a4274f59adfeb8a438e3478d59'
 DATADOG_APP_KEY = '429b85a4274f59adfeb8a438e3478d59'
-#DATADOG_APP_NAME = 'page.views'
+DATADOG_APP_NAME = 'page.views'
 #DATADOG_APP_NAME = 'editores'
 #DATADOG_APP_NAME = 'editor_enredos'
 #DATADOG_APP_NAME = 'editor_missoes'
@@ -226,6 +228,7 @@ INSTALLED_APPS = (
     'editor_missoes',
     'editor_jogadores',
     'editor_movimentos',
+    'editor_aventuras',
     'bootstrap3', 
     'statsd',
     'datadog',

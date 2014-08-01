@@ -32,7 +32,7 @@ function carregaPos (){
 	var id = aventuraAtiva();
 	if(id != '-1'){
 		 
-		 var urlView = '/editor_objetos/get_json_aventura/' + id +'/';
+		 var urlView = '/editor_aventuras/get_json_aventura/' + id +'/';
 		 $.ajax({
 		        type: 'GET',
 		        url: urlView,
@@ -157,7 +157,7 @@ function initialize() {
 		       id_aventura = $('body').find('aventura_ativa_id').attr('id');
 		       
 		      //create url "to" update aventura
-		       var urlView = '/editor_objetos/set_json_aventura/';
+		       var urlView = '/editor_aventuras/set_json_aventura/';
 		       urlView += id_aventura + '/'; 
 		       
 		       //atualiza a localização da aventura

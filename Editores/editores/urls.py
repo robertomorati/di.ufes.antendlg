@@ -13,7 +13,7 @@ from rest_framework import routers
 from core_services.views import AventuraView,InstanciasObjetoView,JogadorLoginCreateView
 
 #monitoring apps
-from statsd import statsd
+#from statsd import statsd
 
 admin.autodiscover()
 
@@ -50,6 +50,7 @@ urlpatterns = patterns('',
     url(r'^editor_missoes/', include('editor_missoes.urls')),
     url(r'^editor_movimentos/', include('editor_movimentos.urls')),
     url(r'^editor_jogadores/', include('editor_jogadores.urls')),
+    url(r'^editor_aventuras/', include('editor_aventuras.urls')),
 
 
     # Serve static content.
