@@ -2,7 +2,7 @@
 # Django settings for Editores project.
 import os
 
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -10,7 +10,7 @@ ALLOWED_HOSTS = ['*']
 SESSION_COOKIE_SECURE = False
 CSRF_COOKIE_SECURE = False
 
-LOGIN_URL='/autendlg/login/'
+LOGIN_URL='/autenvldg/login/'
 
 TEMPLATE_DEBUG = DEBUG
 
