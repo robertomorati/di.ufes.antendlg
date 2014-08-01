@@ -2,8 +2,7 @@
 # Django settings for Editores project.
 import os
 
-#monitoring apps
-from statsd import statsd
+
 
 
 DEBUG = True
@@ -126,7 +125,7 @@ DATADOG_APP_NAME = 'editor_jogadores'
 #statsd.connect('localhost', 8125)
 
 # Increment a counter.
-statsd.increment('page.views')
+#statsd.increment('page.views')
 
 # Record a gauge 50% of the time.
 #statsd.gauge('users.online', 123, sample_rate=0.5)

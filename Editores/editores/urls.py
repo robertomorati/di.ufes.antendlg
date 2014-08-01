@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
 from editores.views import IndexView, logout_page
@@ -7,15 +6,14 @@ from editores.settings import MEDIA_ROOT
 from django.contrib.auth.decorators import login_required
 from editores.views import LoginView, LoginCreateView, AutorGetJsonView
 
-from editor_objetos.models import Jogador 
-from django.views.generic import RedirectView
-from django.contrib.auth.models import User 
 
 from rest_framework import routers
 
 #Teste com o framework rest
 from core_services.views import AventuraView,InstanciasObjetoView,JogadorLoginCreateView
 
+#monitoring apps
+from statsd import statsd
 
 admin.autodiscover()
 
