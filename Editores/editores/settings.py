@@ -4,7 +4,7 @@ import os
 
 DEBUG = True
 
-from statsd import statsd
+#from statsd import statsd
 
 ALLOWED_HOSTS = ['*']
 
@@ -99,11 +99,12 @@ LOGIN_URL = '/autendlg/login/'
 DATADOG_API_KEY = '429b85a4274f59adfeb8a438e3478d59'
 DATADOG_APP_KEY = '429b85a4274f59adfeb8a438e3478d59'
 DATADOG_APP_NAME = 'page.views'
-#DATADOG_APP_NAME = 'editores'
-#DATADOG_APP_NAME = 'editor_enredos'
-#DATADOG_APP_NAME = 'editor_missoes'
+DATADOG_APP_NAME = 'editores'
+DATADOG_APP_NAME = 'editor_enredos'
+DATADOG_APP_NAME = 'editor_missoes'
 DATADOG_APP_NAME = 'editor_jogadores'
-#DATADOG_APP_NAME = 'editor_movimentos'
+DATADOG_APP_NAME = 'editor_movimentos'
+DATADOG_APP_NAME = 'editor_aventuras'
 
 
 #STATSD_HOST = 'localhost'
