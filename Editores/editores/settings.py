@@ -3,7 +3,8 @@
 import os
 
 #monitoring apps
-from statsd import StatsClient
+from statsd import statsd
+
 
 DEBUG = True
 
@@ -100,24 +101,35 @@ LOGIN_URL = '/autendlg/login/'
 
 
 #datalog config
-DATADOG_API_KEY = '429b85a4274f59adfeb8a438e3478d59'
-DATADOG_APP_KEY = '429b85a4274f59adfeb8a438e3478d59'
-DATADOG_APP_NAME = 'page.views'
+#DATADOG_API_KEY = '429b85a4274f59adfeb8a438e3478d59'
+#DATADOG_APP_KEY = '429b85a4274f59adfeb8a438e3478d59'
+#DATADOG_APP_NAME = 'page.views'
 #DATADOG_APP_NAME = 'editor_enredos'
 #DATADOG_APP_NAME = 'editor_missoes'
 #DATADOG_APP_NAME = 'editor_jogadores'
 #DATADOG_APP_NAME = 'editor_movimentos'
 
 
-STATSD_HOST = 'localhost'
-STATSD_PORT = 8125
-STATSD_PREFIX = None
-STATSD_MAXUDPSIZE = 512
-from statsd.defaults.django import statsd
+#STATSD_HOST = 'localhost'
+#STATSD_PORT = 8125
+#STATSD_PREFIX = None
+#STATSD_MAXUDPSIZE = 512
+
 
 #statsd.incr('page.views')
 
+
+
+# Optionally, configure the host and port if you're running Statsd on a
+# non-standard port.
+#statsd.connect('localhost', 8125)
+
+# Increment a counter.
 statsd.increment('page.views')
+
+# Record a gauge 50% of the time.
+#statsd.gauge('users.online', 123, sample_rate=0.5)
+
 
 
 # Additional locations of static files
