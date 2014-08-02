@@ -607,7 +607,7 @@ class AventuraCreateView(CreateView):
 
 #Atualização de uma aventura
 class AventuraUpdateView(UpdateView):
-    template_name = 'editor_objetos/aventura/update.html'
+    template_name = 'editor_aventuras/aventura/update.html'
     model = Aventura
     form_class = AventuraForm
     
