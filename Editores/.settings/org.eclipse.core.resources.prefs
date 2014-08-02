@@ -11,10 +11,10 @@ encoding//editor_missoes/templates/editor_missao/condicoes/listar_condicoes.html
 encoding//editor_missoes/urls.py=utf-8
 encoding//editor_movimentos/urls.py=utf-8
 encoding//editor_objetos/admin.py=utf-8
-encoding//editor_objetos/models.py=utf-8
 encoding//editor_objetos/templates/editor_objetos/objeto/listar.html=UTF-8
 encoding//editor_objetos/thumbs.py=utf-8
 encoding//editor_objetos/urls.py=utf-8
+encoding//editores/models.py=utf-8
 encoding//editores/settings.py=utf-8
 encoding//editores/static/js/gmaputil.js=UTF-8
 encoding//editores/templates/registration/registration.html=UTF-8

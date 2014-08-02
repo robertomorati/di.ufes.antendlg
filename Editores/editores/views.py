@@ -8,7 +8,7 @@ from django.views.generic.base import TemplateView
 from django.http import HttpResponseRedirect
 from django.contrib.auth import login, logout, authenticate
 from django.views.generic import FormView, CreateView, ListView
-from editor_objetos.models import Autor
+from editores.models import Autor
 from django.http import HttpResponse
 from django.core.exceptions import ValidationError
 from django.contrib import messages

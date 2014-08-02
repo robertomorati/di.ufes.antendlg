@@ -5,7 +5,7 @@ Created on Jul 22, 2014
 '''
 
 from django import forms 
-from editor_objetos.models import Jogador
+from editores.models import Jogador
 from rest_framework import serializers
 
 

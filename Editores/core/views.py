@@ -21,18 +21,18 @@ from core.ajax import AjaxableResponseMixin
 
 #imports para objeto, tipos de objetos, icones utilizados no momento de autoria, instancias dos objetos.
 #Also, imports para posições geográficas que as instâncias possuem, bem como a sugestão e o tipo de imagem
-from editor_objetos.models import Objeto, TipoObjeto, Icone, Aventura, InstanciaObjeto, PosicaoGeografica, Sugestao, TipoImagem,\
+from editores.models import Objeto, TipoObjeto, Icone, Aventura, InstanciaObjeto, PosicaoGeografica, Sugestao, TipoImagem,\
     Jogador
 
 #impost para Enredo, criação de missões e tipos de condições que compoõem missões
-from editor_objetos.models import Missao, Condicao,CondicaoDialogoInstancia,CondicaoJogadorInstancia,CondicaoJogadorObjeto, CondicaoInstanciaObjeto
+from editores.models import Missao, Condicao,CondicaoDialogoInstancia,CondicaoJogadorInstancia,CondicaoJogadorObjeto, CondicaoInstanciaObjeto
 
-from editor_objetos.models import Enredo, EnredoFile, EnredoInstancia, EnredoMensagem
+from editores.models import Enredo, EnredoFile, EnredoInstancia, EnredoMensagem
 
 #imports para avatar e criação de agentes com seus tipos de comportamentps
-from editor_objetos.models import Avatar, Agente, Agressivo, Comportamento, Passivo, Colaborativo, Mensagem, Competitivo
+from editores.models import Avatar, Agente, Agressivo, Comportamento, Passivo, Colaborativo, Mensagem, Competitivo
 
-from editor_objetos.models import AventuraAtiva,CondicaoAtiva,MissaoAtiva,PosInstanciaAtiva,AvatarAtivo
+from editores.models import AventuraAtiva,CondicaoAtiva,MissaoAtiva,PosInstanciaAtiva,AvatarAtivo
 
 from forms import PosInstanciaAtivaCreateForm,AvatarAtivoCreateForm, MissaoAtivaCreateForm,CondicaoAtivaCreateForm
 

@@ -12,8 +12,8 @@ from rest_framework import status
 from django.core import serializers
 
 
-from editor_objetos.models import Aventura
-from editor_objetos.models import Objeto, Icone, TipoObjeto, InstanciaObjeto, PosicaoGeografica, Jogador
+from editores.models import Aventura
+from editores.models import Objeto, Icone, TipoObjeto, InstanciaObjeto, PosicaoGeografica, Jogador
 
 from rest_framework import permissions
 from django.db import transaction

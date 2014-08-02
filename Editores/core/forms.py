@@ -5,11 +5,11 @@ Created on 23/10/2013
 @author: Roberto Gumarães  Morati Junior
 '''
 from django import forms 
-from editor_objetos.models import Aventura, Autor, PosicaoGeografica, InstanciaObjeto, Objeto, TipoImagem, Icone, Missao, Avatar,\
+from editores.models import Aventura, Autor, PosicaoGeografica, InstanciaObjeto, Objeto, TipoImagem, Icone, Missao, Avatar,\
     PosInstanciaAtiva, AvatarAtivo, MissaoAtiva, CondicaoAtiva
-from editor_objetos.models import CondicaoInstanciaObjeto, CondicaoDialogoInstancia, CondicaoJogadorInstancia, CondicaoJogadorObjeto, Agente
-from editor_objetos.models import Agressivo, Passivo, Colaborativo, Mensagem, Competitivo, AventuraAtiva
-from editor_objetos.models import Enredo, EnredoFile, EnredoInstancia, EnredoMensagem
+from editores.models import CondicaoInstanciaObjeto, CondicaoDialogoInstancia, CondicaoJogadorInstancia, CondicaoJogadorObjeto, Agente
+from editores.models import Agressivo, Passivo, Colaborativo, Mensagem, Competitivo, AventuraAtiva
+from editores.models import Enredo, EnredoFile, EnredoInstancia, EnredoMensagem
 from django.forms.extras.widgets import SelectDateWidget 
 from django.forms.models import ModelChoiceField
 from datetime import date
