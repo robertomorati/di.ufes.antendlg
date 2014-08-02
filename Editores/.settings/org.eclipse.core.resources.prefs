@@ -1,4 +1,5 @@
 eclipse.preferences.version=1
+encoding//core/choices_models.py=utf-8
 encoding//core/forms.py=utf-8
 encoding//core/views.py=utf-8
 encoding//core_services/views.py=utf-8

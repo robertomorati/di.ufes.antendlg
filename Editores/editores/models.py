@@ -16,6 +16,7 @@ from django.core.exceptions import ValidationError
 from datetime import date
 from django.contrib.auth.models import User 
 from django.utils.translation import gettext as _
+from core.choices_models import TIPO_SUGESTAO
 #from imagekit.models import ImageSpecField
 
 
@@ -115,15 +116,15 @@ Por exemplo, a proximidade com o Cascumpus pode ser indicada por um áudio de ru
 Pendências nessa classe: Identificar tipos de arquivos e atualizar a forma de criar sugestões.
 '''
 class Sugestao(models.Model):
-    TEXTO = 'STX'
-    AUDIO = 'SAU'
-    IMAGEM = 'SIMG' 
-    TIPO_SUGESTAO = (
-        (TEXTO, 'Texto'),
-        (AUDIO, 'Áudio'),
-        (IMAGEM, 'Imagem'),)
+    #TEXTO = 'STX'
+    #AUDIO = 'SAU'
+    #IMAGEM = 'SIMG' 
+    #TIPO_SUGESTAO = (
+    #    (TEXTO, 'Texto'),
+    #    (AUDIO, 'Áudio'),
+    #    (IMAGEM, 'Imagem'),)
     nome = models.CharField(max_length=30,default="", )
-    tipo = models.CharField(max_length=10, choices=TIPO_SUGESTAO ,default=TEXTO)
+    tipo = models.CharField(max_length=10, choices=TIPO_SUGESTAO, default=u'STX', )
     sugestao = models.FileField(upload_to ='sugestao/', help_text="Sugestão para tomada de decisão.",default="", )
     proximidade = models.IntegerField(max_length=3,default=1)
     publico = models.BooleanField(default=True,)

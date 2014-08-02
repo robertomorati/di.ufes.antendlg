@@ -7,7 +7,7 @@ Created on 18/09/2013
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
 from django.contrib.auth.models import User
-from editor_objetos.models import TipoObjeto,Autor,Jogador
+from editores.models import TipoObjeto,Autor,Jogador
 
 
 class AutorInline(admin.TabularInline):
