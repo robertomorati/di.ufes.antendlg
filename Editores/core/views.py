@@ -768,6 +768,7 @@ class AtivarAventuraView(CreateView):
         initial['request'] = self.request
         if self.request.session[SESSION_AVENTURA] != '-1':
             initial['aventura_id'] = self.request.session[SESSION_AVENTURA].id
+            initial['autoria_estado'] = self.request.session[SESSION_AVENTURA].autoria_estado
         else:
             initial['aventura_id'] = self.request.session[SESSION_AVENTURA]
         return initial
@@ -778,117 +779,111 @@ class AtivarAventuraView(CreateView):
         
         #Aventura só pode ser ativada se estiver em modo de autoria
         if self.request.session[SESSION_AVENTURA] != '-1':
+            if self.request.session[SESSION_AVENTURA].autoria_estado == 'AC':
             
-            #aventura precisa estar concluida para ser ativada
-            if self.request.session[SESSION_AVENTURA].autoria_estado == 'AI':
-                ValidationError
-                messages.error(request, "".join("Aventura não pode ser ativada! Autoria incompleta!"))
-                return HttpResponse(json.dumps({'response': 'exception delete'}), content_type="text")
-            
-            
-            #verificando quantidade de aventuras ativas
-            flag = 1
-            object_list= AventuraAtiva.objects.all().filter(aventura_id = self.request.session[SESSION_AVENTURA].id)
-            for obj in object_list:
-                flag = flag + 1
-                
-            #gerando chave de acesso
-            if form.instance.publica == False:
-                form.instance.chave_acesso = id_generator()
-                
-            form.instance.aventura_id = self.request.session[SESSION_AVENTURA].id
-            
-            form.instance.instancia = flag
-           
-            #ativando aventura
-            self.object = form.save()  
-            #recuperando id da aventura ativada
-            aventura_ativa_id = self.object.pk
-           
-           
-            #recuperando dados da aventura que está sendo ativa
-            instancias = InstanciaObjeto.objects.all().filter(aventura_id = self.request.session[SESSION_AVENTURA].id)
-            
-            posicoes_instancias = ''
-            flag = 0
-            for obj in instancias:
-                if flag == 0:
-                    posicoes_instancias = PosicaoGeografica.objects.all().filter(instancia_objeto_id = obj.id)
-                    flag = 1
-                elif flag == 1:
-                    posicoes_instancias = posicoes_instancias | PosicaoGeografica.objects.all().filter(instancia_objeto_id = obj.id)
+                #verificando quantidade de aventuras ativas
+                flag = 1
+                object_list= AventuraAtiva.objects.all().filter(aventura_id = self.request.session[SESSION_AVENTURA].id)
+                for obj in object_list:
+                    flag = flag + 1
                     
-            avatares = Avatar.objects.all().filter(aventura_avatar_id = self.request.session[SESSION_AVENTURA].id)
-            
-            missoes = Missao.objects.all().filter(aventuras_id = self.request.session[SESSION_AVENTURA].id)
-            
-            
-            
-            flag = 0
-            condicoes = ''
-            for obj in missoes:
-                if flag == 0:
-                    condicoes = Condicao.objects.all().filter(missao_id = obj.id)
-                    flag = 1
-                elif flag ==1:
-                    condicoes = condicoes | Condicao.objects.all().filter(missao_id = obj.id)
-          
-
-            json_instancias = '{"aventura_ativa_id":"'+str(aventura_ativa_id)+'","PosInstanciaAtiva":['
-            
-            flag = 0
-            for obj in posicoes_instancias:
-                if flag == 0:
-                    json_instancias = json_instancias + ' {"instancia_id":' + '"' + str(obj.instancia_objeto_id) + '",'
-                    json_instancias = json_instancias + ' "lat":' + '"' + str(obj.latitude) + '",'
-                    json_instancias = json_instancias + ' "log":' + '"' + str(obj.longitude) + '",'
-                    json_instancias = json_instancias + ' "alt":' + '"' + str(obj.altitude) + '"}'
-                    flag = 1
-                elif flag == 1:
-                    json_instancias = json_instancias + ',{"instancia_id":' + '"' + str(obj.instancia_objeto_id) + '",'
-                    json_instancias = json_instancias + ' "lat":' + '"' + str(obj.latitude) + '",'
-                    json_instancias = json_instancias + ' "log":' + '"' + str(obj.longitude) + '",'
-                    json_instancias = json_instancias + ' "alt":' + '"' + str(obj.altitude) + '"}'
+                #gerando chave de acesso
+                if form.instance.publica == False:
+                    form.instance.chave_acesso = id_generator()
                     
-            json_instancias = json_instancias + ']}'
-            
-            json_avatares = '{"aventura_ativa_id":"'+str(aventura_ativa_id)+'","AvatarAtivo":['
-            flag = 0
-            for obj in avatares:
-                if flag == 0:
-                    json_avatares = json_avatares + ' {"avatar_id":' + '"' + str(obj.id) + '"}'
-                    flag = 1
-                elif flag == 1:
-                    json_avatares = json_avatares + ',{"avatar_id":' + '"' + str(obj.id) + '"}'
-            
-            json_avatares = json_avatares + ']}'
-            
-            
-            json_missoes = '{"aventura_ativa_id":"'+str(aventura_ativa_id)+'","MissaoAtiva":['
-            flag = 0
-            for obj in missoes:
-                if flag == 0:
-                    json_missoes = json_missoes + ' {"missao_id":' + '"' + str(obj.id) + '"}'
-                    flag = 1
-                elif flag == 1:
-                    json_missoes = json_missoes + ',{"missao_id":' + '"' + str(obj.id) + '"}'
-            
-            json_missoes = json_missoes + ']}'
-            
-            
-            json_condicoes = '{"aventura_ativa_id":"'+str(aventura_ativa_id)+'","CondicaoAtiva":['
-            flag = 0
-            if condicoes:
-                for obj in condicoes:
+                form.instance.aventura_id = self.request.session[SESSION_AVENTURA].id
+                
+                form.instance.instancia = flag
+               
+                #ativando aventura
+                self.object = form.save()  
+                #recuperando id da aventura ativada
+                aventura_ativa_id = self.object.pk
+               
+               
+                #recuperando dados da aventura que está sendo ativa
+                instancias = InstanciaObjeto.objects.all().filter(aventura_id = self.request.session[SESSION_AVENTURA].id)
+                
+                posicoes_instancias = ''
+                flag = 0
+                for obj in instancias:
                     if flag == 0:
-                        json_condicoes = json_condicoes + ' {"condicao_id":' + '"' + str(obj.id) + '",'
-                        json_condicoes = json_condicoes + ' "missao_id":' + '"' + str(obj.missao_id) + '"}'
+                        posicoes_instancias = PosicaoGeografica.objects.all().filter(instancia_objeto_id = obj.id)
                         flag = 1
                     elif flag == 1:
-                        json_condicoes = json_condicoes + ',{"condicao_id":' + '"' + str(obj.id) + '",'
-                        json_condicoes = json_condicoes + ' "missao_id":' + '"' + str(obj.missao_id) + '"}'
-            
-            json_condicoes = json_condicoes + ']}'           
+                        posicoes_instancias = posicoes_instancias | PosicaoGeografica.objects.all().filter(instancia_objeto_id = obj.id)
+                        
+                avatares = Avatar.objects.all().filter(aventura_avatar_id = self.request.session[SESSION_AVENTURA].id)
+                
+                missoes = Missao.objects.all().filter(aventuras_id = self.request.session[SESSION_AVENTURA].id)
+                
+                
+                
+                flag = 0
+                condicoes = ''
+                for obj in missoes:
+                    if flag == 0:
+                        condicoes = Condicao.objects.all().filter(missao_id = obj.id)
+                        flag = 1
+                    elif flag ==1:
+                        condicoes = condicoes | Condicao.objects.all().filter(missao_id = obj.id)
+              
+    
+                json_instancias = '{"aventura_ativa_id":"'+str(aventura_ativa_id)+'","PosInstanciaAtiva":['
+                
+                flag = 0
+                for obj in posicoes_instancias:
+                    if flag == 0:
+                        json_instancias = json_instancias + ' {"instancia_id":' + '"' + str(obj.instancia_objeto_id) + '",'
+                        json_instancias = json_instancias + ' "lat":' + '"' + str(obj.latitude) + '",'
+                        json_instancias = json_instancias + ' "log":' + '"' + str(obj.longitude) + '",'
+                        json_instancias = json_instancias + ' "alt":' + '"' + str(obj.altitude) + '"}'
+                        flag = 1
+                    elif flag == 1:
+                        json_instancias = json_instancias + ',{"instancia_id":' + '"' + str(obj.instancia_objeto_id) + '",'
+                        json_instancias = json_instancias + ' "lat":' + '"' + str(obj.latitude) + '",'
+                        json_instancias = json_instancias + ' "log":' + '"' + str(obj.longitude) + '",'
+                        json_instancias = json_instancias + ' "alt":' + '"' + str(obj.altitude) + '"}'
+                        
+                json_instancias = json_instancias + ']}'
+                
+                json_avatares = '{"aventura_ativa_id":"'+str(aventura_ativa_id)+'","AvatarAtivo":['
+                flag = 0
+                for obj in avatares:
+                    if flag == 0:
+                        json_avatares = json_avatares + ' {"avatar_id":' + '"' + str(obj.id) + '"}'
+                        flag = 1
+                    elif flag == 1:
+                        json_avatares = json_avatares + ',{"avatar_id":' + '"' + str(obj.id) + '"}'
+                
+                json_avatares = json_avatares + ']}'
+                
+                
+                json_missoes = '{"aventura_ativa_id":"'+str(aventura_ativa_id)+'","MissaoAtiva":['
+                flag = 0
+                for obj in missoes:
+                    if flag == 0:
+                        json_missoes = json_missoes + ' {"missao_id":' + '"' + str(obj.id) + '"}'
+                        flag = 1
+                    elif flag == 1:
+                        json_missoes = json_missoes + ',{"missao_id":' + '"' + str(obj.id) + '"}'
+                
+                json_missoes = json_missoes + ']}'
+                
+                
+                json_condicoes = '{"aventura_ativa_id":"'+str(aventura_ativa_id)+'","CondicaoAtiva":['
+                flag = 0
+                if condicoes:
+                    for obj in condicoes:
+                        if flag == 0:
+                            json_condicoes = json_condicoes + ' {"condicao_id":' + '"' + str(obj.id) + '",'
+                            json_condicoes = json_condicoes + ' "missao_id":' + '"' + str(obj.missao_id) + '"}'
+                            flag = 1
+                        elif flag == 1:
+                            json_condicoes = json_condicoes + ',{"condicao_id":' + '"' + str(obj.id) + '",'
+                            json_condicoes = json_condicoes + ' "missao_id":' + '"' + str(obj.missao_id) + '"}'
+                
+                json_condicoes = json_condicoes + ']}'           
             
             return HttpResponse(json.dumps({'PosInstanciaAtiva' : json_instancias,'AvatarAtivo':json_avatares, 'MissaoAtiva' : json_missoes, 'CondicaoAtiva': json_condicoes}), content_type="application/json")            
         

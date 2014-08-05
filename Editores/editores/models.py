@@ -380,13 +380,12 @@ Jogador - representar um jogador cadastrado com seu dispositivo movel
 class Jogador(User, models.Model):
     dica_senha = models.CharField(max_length=200, verbose_name="Dica de Senha",default="",blank=True,)
     nickname = models.CharField(max_length=100, verbose_name="Nickname",default="",blank=True,)
-
+    distancia = models.IntegerField(max_length=10,default=500,)
     #icone_jogador = models.ImageField(upload_to ='avatar_jogador/', help_text="Avatar do jogador.", default="", blank=True,)
     
-
     def __unicode__(self):
         return u'%s' % (self.nickname)
-
+        
 
 '''
 class AventuraAtiva - representa um aventura que está ativa, ou seja, uma aventura que poderá ser jogada.
@@ -400,7 +399,7 @@ class AventuraAtiva(models.Model):
     instancia = models.IntegerField(max_length=2,default=1,)
     aventura = models.ForeignKey(Aventura, related_name="aventura", blank=True, default="", null=True, )
     publica = models.BooleanField(default=True, help_text=u"Informa se a aventura ativa é de livre acesso.")
-    joadores_aventura_ativa =  models.ManyToManyField(Jogador, related_name="joadores_aventura_ativa", blank=True, default="", null=True, )
+    joadores_aventura_ativa =  models.ManyToManyField(Jogador, related_name="jogadores_aventura_ativa", blank=True, default="", null=True, )
     chave_acesso = models.CharField(max_length=10,default="",blank=True,)#XPTO2014
 
     #inicio = models.DateField(_("Data Inicio"), default=date.today)

@@ -22,4 +22,4 @@ class JogadorSerializer(serializers.ModelSerializer):
     class Meta: 
         model = Jogador
         # remove parametros desnecessarios
-        exclude = ['is_staff', 'is_active', 'is_superuser', 'last_login', 'date_joined', 'groups', 'user_permissions', 'id_password1', 'id_password2', ]
+        exclude = ['is_staff', 'is_active', 'is_superuser', 'last_login', 'date_joined', 'groups', 'user_permissions', 'id_password1', 'id_password2','distancia' ]

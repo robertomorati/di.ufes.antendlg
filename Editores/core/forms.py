@@ -718,6 +718,10 @@ class AventuraAtivaWithoutFieldsForm(forms.ModelForm):
             ValidationError
             messages.error(req, "".join("It's necessary activate an adventure for authoring mode."))  
         
+        #aventura precisa estar concluida para ser ativada
+        if kwargs['initial']['autoria_estado']  == 'AI':
+            ValidationError
+            messages.error(req, "".join("Aventura não pode ser ativada! Autoria incompleta!")) 
     class Meta:
         model = AventuraAtiva
         exclude = ['aventura','joadores_aventura_ativa', 'instancia', 'chave_acesso', ]  
