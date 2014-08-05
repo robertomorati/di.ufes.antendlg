@@ -301,7 +301,7 @@ Form para Aventura
 class AventuraForm(forms.ModelForm):
     class Meta:
         model = Aventura
-        exclude = ['latitude', 'longitude', 'autor', ]
+        exclude = ['latitude', 'longitude', 'autor','autoria_estado',]
         fim = forms.DateField(widget=SelectDateWidget(years=range(date.today().year, 2099)),)
         # autor = forms.IntegerField(widget=forms.IntegerField())
         # def __init__(self, *args, **kwargs):

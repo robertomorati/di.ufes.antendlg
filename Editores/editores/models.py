@@ -16,7 +16,7 @@ from django.core.exceptions import ValidationError
 from datetime import date
 from django.contrib.auth.models import User 
 from django.utils.translation import gettext as _
-from core.choices_models import TIPO_SUGESTAO
+from core.choices_models import TIPO_SUGESTAO,AVENTURA_CONSTRUCAO
 #from imagekit.models import ImageSpecField
 
 
@@ -116,13 +116,6 @@ Por exemplo, a proximidade com o Cascumpus pode ser indicada por um áudio de ru
 Pendências nessa classe: Identificar tipos de arquivos e atualizar a forma de criar sugestões.
 '''
 class Sugestao(models.Model):
-    #TEXTO = 'STX'
-    #AUDIO = 'SAU'
-    #IMAGEM = 'SIMG' 
-    #TIPO_SUGESTAO = (
-    #    (TEXTO, 'Texto'),
-    #    (AUDIO, 'Áudio'),
-    #    (IMAGEM, 'Imagem'),)
     nome = models.CharField(max_length=30,default="", )
     tipo = models.CharField(max_length=10, choices=TIPO_SUGESTAO, default=u'STX', )
     sugestao = models.FileField(upload_to ='sugestao/', help_text="Sugestão para tomada de decisão.",default="", )
@@ -255,6 +248,7 @@ class Aventura(models.Model):
     latitude = models.FloatField(blank=True,default=0.0)
     longitude = models.FloatField(blank=True,default=0.0)
     autor = models.ForeignKey(User, related_name="Autor",default="", blank=True,)
+    autoria_estado = models.CharField(max_length=10, choices=AVENTURA_CONSTRUCAO, default=u'AI', )
     #autores = models.ManyToManyField(Autor, related_name="autores_aventura",)
     
     def __unicode__(self):

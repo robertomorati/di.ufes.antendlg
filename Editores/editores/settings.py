@@ -222,7 +222,7 @@ INSTALLED_APPS = (
     'bootstrap_toolkit',
     'PIL',
     'imagekit',
-    #'south',
+    'south',
     'rest_framework',
     'editor_enredos',
     'editor_missoes',

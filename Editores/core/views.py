@@ -775,28 +775,27 @@ class AtivarAventuraView(CreateView):
     #Override no form. 
     def form_valid(self, form):
         
-        #uma aventura só pode ser ativa se estiver em modo de autoria
+        #Aventura só pode ser ativada se estiver em modo de autoria
         if self.request.session[SESSION_AVENTURA] != '-1':
             
-            flag = 1
-            #verificando quantidade de aventuras ativas
-            object_list= AventuraAtiva.objects.all().filter(aventura_id = self.request.session[SESSION_AVENTURA].id)
             
+            #verificando quantidade de aventuras ativas
+            flag = 1
+            object_list= AventuraAtiva.objects.all().filter(aventura_id = self.request.session[SESSION_AVENTURA].id)
             for obj in object_list:
                 flag = flag + 1
                 
-            
+            #gerando chave de acesso
             if form.instance.publica == False:
                 form.instance.chave_acesso = id_generator()
                 
             form.instance.aventura_id = self.request.session[SESSION_AVENTURA].id
             
             form.instance.instancia = flag
-            
            
-            #ativa aventura
+            #ativando aventura
             self.object = form.save()  
-            #recuperando id da aventura ativa
+            #recuperando id da aventura ativada
             aventura_ativa_id = self.object.pk
            
            
@@ -872,7 +871,7 @@ class AtivarAventuraView(CreateView):
             
             json_condicoes = '{"aventura_ativa_id":"'+str(aventura_ativa_id)+'","CondicaoAtiva":['
             flag = 0
-            if condicoes != '':
+            if condicoes:
                 for obj in condicoes:
                     if flag == 0:
                         json_condicoes = json_condicoes + ' {"condicao_id":' + '"' + str(obj.id) + '",'
@@ -933,7 +932,7 @@ class AventuraAtivaDeleteView(DeleteView):
         
         if self.request.session[SESSION_AVENTURA] != '-1':
             
-            
+            object_list = ''
             avatares_ativos = AvatarAtivo.objects.all().filter(aventura_ativa_avatar_id = self.kwargs['pk'],)
             
             flag =0
@@ -945,11 +944,14 @@ class AventuraAtivaDeleteView(DeleteView):
                     object_list = object_list | Avatar.objects.all().filter(pk = obj.avatar_id, )
             
             flag = 0
-            for obj in object_list:
-                
-                if str(obj.aventureiro_id) == "None":
-                    flag = flag + 1      
-                    
+            if object_list:
+                for obj in object_list:
+                    if str(obj.aventureiro_id) == "None":
+                        flag = flag + 1
+            else:#deleção de aventura ativada para testes
+                self.object = self.get_object() 
+                return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")  
+                        
             self.object = self.get_object()
 
             if flag > 0:   

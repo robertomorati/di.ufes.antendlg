@@ -50,7 +50,7 @@
 					$('#aventura').modal('hide');
 					refreshDiv("{% url 'avtentura_ativas_list_view' %}",'content');
 					
-					//dados da aventura ativa sendo enviados para salvar
+					//salvar dados da aventura ativa
 					createPosInstanciaAtiva(responseText.PosInstanciaAtiva);
 					createAvatarAtivo(responseText.AvatarAtivo);
 					createMissaoAtiva(responseText.MissaoAtiva);
