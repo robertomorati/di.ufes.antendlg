@@ -871,14 +871,15 @@ class AtivarAventuraView(CreateView):
             
             json_condicoes = '{"aventura_ativa_id":"'+str(aventura_ativa_id)+'","CondicaoAtiva":['
             flag = 0
-            for obj in condicoes:
-                if flag == 0:
-                    json_condicoes = json_condicoes + ' {"condicao_id":' + '"' + str(obj.id) + '",'
-                    json_condicoes = json_condicoes + ' "missao_id":' + '"' + str(obj.missao_id) + '"}'
-                    flag = 1
-                elif flag == 1:
-                    json_condicoes = json_condicoes + ',{"condicao_id":' + '"' + str(obj.id) + '",'
-                    json_condicoes = json_condicoes + ' "missao_id":' + '"' + str(obj.missao_id) + '"}'
+            if condicoes:
+                for obj in condicoes:
+                    if flag == 0:
+                        json_condicoes = json_condicoes + ' {"condicao_id":' + '"' + str(obj.id) + '",'
+                        json_condicoes = json_condicoes + ' "missao_id":' + '"' + str(obj.missao_id) + '"}'
+                        flag = 1
+                    elif flag == 1:
+                        json_condicoes = json_condicoes + ',{"condicao_id":' + '"' + str(obj.id) + '",'
+                        json_condicoes = json_condicoes + ' "missao_id":' + '"' + str(obj.missao_id) + '"}'
             
             json_condicoes = json_condicoes + ']}'           
             
