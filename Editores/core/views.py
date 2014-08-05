@@ -819,6 +819,7 @@ class AtivarAventuraView(CreateView):
             
             
             flag = 0
+            condicoes = ''
             for obj in missoes:
                 if flag == 0:
                     condicoes = Condicao.objects.all().filter(missao_id = obj.id)
