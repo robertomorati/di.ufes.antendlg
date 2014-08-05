@@ -1,0 +1,7 @@
+Django==1.6.5
+django-bootstrap-toolkit
+PIL
+imagekit
+rest_framework
+bootstrap3
+south
