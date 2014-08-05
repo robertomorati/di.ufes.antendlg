@@ -775,8 +775,15 @@ class AtivarAventuraView(CreateView):
     #Override no form. 
     def form_valid(self, form):
         
+        
         #Aventura só pode ser ativada se estiver em modo de autoria
         if self.request.session[SESSION_AVENTURA] != '-1':
+            
+            #aventura precisa estar concluida para ser ativada
+            if self.request.session[SESSION_AVENTURA].autoria_estado == 'AI':
+                ValidationError
+                messages.error(request, "".join("Aventura não pode ser ativada! Autoria incompleta!"))
+                return HttpResponse(json.dumps({'response': 'exception delete'}), content_type="text")
             
             
             #verificando quantidade de aventuras ativas
