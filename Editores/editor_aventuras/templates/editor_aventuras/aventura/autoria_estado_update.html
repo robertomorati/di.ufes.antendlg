@@ -1,0 +1,66 @@
+
+<!-- {% load bootstrap_toolkit %} -->
+{% block content %} 
+
+	  <form id="autoria_estado_update_view" class="form-actions" method="post" tabindex="-1"  action="{% url 'autoria_estado_update_view' object.pk %}">
+		  <div class="modal-header">
+		    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" action=""></button>
+		    <h3 id="myModalLabel">Atualizar Estado da Autoria</h3>
+		  </div>
+		  <div class="modal-body">
+		  		 {% if messages %}
+					<div class="alert alert-error" width="30">
+						<button type="button" class="close" data-dismiss="alert">
+							<span class="badge badge-important">x</span>
+						</button>
+						<ul class="messages">
+							{% for message in messages %}
+								<p><strong><li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li> </strong></p>
+							{% endfor %}
+						</ul>
+					</div>
+				 {% endif %}    
+				 {% csrf_token %}
+			     {{ form|as_bootstrap }}
+		  </div>
+		  <div class="modal-footer">
+		    <button type="submit" class="btn btn-primary">Atualizar</button>
+		  </div>
+	  </form>
+
+
+	<script type="text/javascript">
+		
+		var options = {
+				
+			target : '#aventura',
+			success : showResponse
+		};
+		
+		// post-submit callback 
+		function showResponse(responseText, statusText, xhr, $form) {
+		
+			var ct = xhr.getResponseHeader("content-type") || "";
+			 if (ct == 'application/json') {
+				
+				// fecha o modal
+				$('#aventura').modal('hide');
+				
+				//add nome da aventura que esta em autoria
+				$('body').find('aventura_ativa').empty().append('<i class="icon-map-marker"></i> Aventura: ' + responseText.nome + ' Autoria: ' + responseText.autoria_estado);
+				$('body').find('aventura_ativa').append('<aventura_ativa_id id="' + responseText.id + '" ></aventura_ativa_id>');
+				 //intancias_objetos_json = "";
+				 //flagloadBackupInstances = false;
+				 //loadInstancias();//carrega objetos para a aventura....
+			}//else if (ct == 'text'){
+				//$('body').find('aventura_ativa').empty();
+				//openModal("{% url 'aventura_ativar_edicao_view' object.pk %}",'aventura');
+			//}
+		}
+		
+		$('#autoria_estado_update_view').ajaxForm(options);
+	</script>
+{% endblock %}
+
+
+
