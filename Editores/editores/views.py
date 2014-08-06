@@ -45,7 +45,7 @@ def logout_page(request):
     Log users out and re-direct them to the main page.
     """
     logout(request)
-    return HttpResponseRedirect('/autendlg/login/')
+    return HttpResponseRedirect('/autenvldg/login/')
 
 '''
 LoginView - autenticação do usuário
@@ -54,7 +54,7 @@ class LoginView(FormView):
   
     template_name = "registration/login.html"
     form_class = LoginForm
-    success_url = "/autendlg/"
+    success_url = "/autenvldg/"
     
     def get(self, request, *args, **kwargs):
         form = self.get_form(self.form_class)

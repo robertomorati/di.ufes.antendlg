@@ -593,11 +593,11 @@ class AventuraAutoriaEstadoUpdateView(UpdateView):
     # Override no form. 
     def form_valid(self, form):
         # form.instance.autor_id = self.kwargs['pk']
-        
-        print form
-        
+
         self.object = form.save()    
         
+        #atualiza objeto na session
+        self.request.session[SESSION_AVENTURA].autoria_estado =  self.object.autoria_estado
         #copia dados da aventura
         nome = self.request.session[SESSION_AVENTURA].nome
         id_av = self.request.session[SESSION_AVENTURA].id
