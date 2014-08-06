@@ -9,7 +9,7 @@ from django.conf.urls import patterns, url
 from core.views import AventuraListView, AventuraCreateView, AventuraUpdateView
 from core.views import AventuraDesativarView, AventuraDeleteView, AventuraGetJsonView, AventuraAtivarView, AventuraUpdatePositionView
 
-from core.views import PosInstanciaAtivaCreateView, AvatarAtivoCreateView, MissaoAtivaCreateView
+from core.views import PosInstanciaAtivaCreateView, AvatarAtivoCreateView, MissaoAtivaCreateView, AventuraAutoriaEstadoUpdateView
 
 from core.views import AventuraAtivaListView, AtivarAventuraView, AventuraAtivaUpdateView,AventuraAtivaDeleteView,CondicaoAtivaCreateView
 from django.contrib import admin
@@ -19,6 +19,8 @@ urlpatterns = patterns('',
   
     #urls para aventura
     #lista aventuras ativas
+    
+    url(r'^aventura/update_estado_autoria/(?P<pk>\d+)/$', AventuraAutoriaEstadoUpdateView.as_view(), name='autoria_estado_update_view',),
     url(r'^aventura/(?P<pk>\d+)/$', AventuraListView.as_view(), name='aventura_list_view'),
     url(r'^aventura/ativar_aventura/(?P<pk>\w+)/$', AventuraAtivarView.as_view(), name='aventura_ativar_edicao_view',),#editar remete a criação da aventura
     url(r'^aventura/desativar_aventura/(?P<pk>\w+)/$', AventuraDesativarView.as_view(), name='aventura_desativar_edicao_view',),#editar remete a criação da aventura

@@ -34,7 +34,7 @@
 			if (ct.indexOf('json') > -1) {
 				// fecha o modal
 				$('#aventura').modal('hide');
-				$('body').find('aventura_ativa').empty().append('<i class="icon-map-marker"></i>Editando Aventura: ' + responseText.response);
+				$('body').find('aventura_ativa').empty().append('<i class="icon-map-marker"></i> Aventura: ' + responseText.response + ' Autoria: ' + responseText.autoria_estado);
 				$('body').find('aventura_ativa').append('<aventura_ativa_id id="' + responseText.id + '" ></aventura_ativa_id>');
 				refreshDiv("{% url 'aventura_list_view' user.id %}",'content');
 			}

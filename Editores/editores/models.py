@@ -425,8 +425,6 @@ class PosInstanciaAtiva(models.Model):
      
 '''
 Avatar - representa os persongens criados para uma determinada aventura.
-
-
 '''  
 class Avatar(models.Model):
     nome = models.CharField(max_length=30)

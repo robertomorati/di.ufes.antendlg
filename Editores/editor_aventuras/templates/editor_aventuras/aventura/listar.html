@@ -11,6 +11,7 @@
 			<th>Location</th>
 		</tr>
 		<tbody>
+			{% csrf_token %}
 			{% for object in object_list %}
 			<tr class="success">
 				<td><a data-toggle="modal"
@@ -22,8 +23,6 @@
 				<td>{{ object.latitude }} 
 				    {{ object.longitude }}
 				</td>
-				    {% csrf_token %} 
-				
 				<td>
 				 	<a class="btn btn-block btn-small btn-primary" data-toggle="modal"
 				 	onClick="openModal('{% url 'aventura_ativar_edicao_view' object.pk %}','aventura')" 
@@ -33,6 +32,11 @@
 				 	<a class="btn btn-block btn-small" data-toggle="modal"
 				 	onClick="openModal('{% url 'aventura_desativar_edicao_view' object.pk %}','aventura')" 
 				 	href="#aventura">Deactivate Authoring</a>		 
+				</td>
+				<td>
+				 	<a class="btn btn-block btn-small btn-primary" data-toggle="modal"
+				 	onClick="openModal('{% url 'autoria_estado_update_view' object.pk %}','aventura')" 
+				 	href="#aventura">Update State Authoring</a>		 
 				</td>
 				<td>
 					<a class="btn btn-block btn-small btn-danger" data-toggle="modal" 
