@@ -601,7 +601,11 @@ class AventuraAutoriaEstadoUpdateView(UpdateView):
         #copia dados da aventura
         nome = self.request.session[SESSION_AVENTURA].nome
         id_av = self.request.session[SESSION_AVENTURA].id
-        autoria_estado = self.request.session[SESSION_AVENTURA].autoria_estado
+       
+        if self.request.session[SESSION_AVENTURA].autoria_estado == 'AC':
+            autoria_estado = "Autoria Completa"
+        else:
+            autoria_estado = "Autoria Incompleta"
         return HttpResponse(json.dumps({'nome': nome , 'id' : id_av, 'autoria_estado': autoria_estado }), content_type="application/json")
     
 # Listagem da aventura
@@ -646,7 +650,10 @@ class AventuraUpdateView(UpdateView):
         
         nome = self.request.session[SESSION_AVENTURA].nome
         id_av = self.request.session[SESSION_AVENTURA].id
-        autoria_estado = self.request.session[SESSION_AVENTURA].autoria_estado
+        if self.request.session[SESSION_AVENTURA].autoria_estado == 'AC':
+            autoria_estado = "Autoria Completa"
+        else:
+            autoria_estado = "Autoria Incompleta"
         return HttpResponse(json.dumps({'response': nome , 'id' : id_av, 'autoria_estado':autoria_estado }), content_type="application/json")
 
 # ativar aventura para autoria
@@ -663,7 +670,10 @@ class AventuraAtivarView(UpdateView):
         self.request.session[SESSION_AVENTURA] = self.object
         nome = self.request.session[SESSION_AVENTURA].nome
         id_av = self.request.session[SESSION_AVENTURA].id
-        autoria_estado = self.request.session[SESSION_AVENTURA].autoria_estado
+        if self.request.session[SESSION_AVENTURA].autoria_estado == 'AC':
+            autoria_estado = "Autoria Completa"
+        else:
+            autoria_estado = "Autoria Incompleta"
         if self.request.session[SESSION_AVENTURA] == '-1':
             ValidationError
             messages.error(request, "".join("Ocorreu um problema ao ativar a aventura! Tente novamente!"))
