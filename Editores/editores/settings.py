@@ -2,7 +2,7 @@
 # Django settings for Editores project.
 import os
 
-DEBUG = True
+DEBUG = False
 
 #from statsd import statsd
 
