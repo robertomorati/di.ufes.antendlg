@@ -48,12 +48,17 @@
 				// fecha o modal
 				$('#aventura').modal('hide');
 				
+				
+				 refreshDiv('{% url 'aventura_list_view' user.id %}','content');
+				 
 				//add nome da aventura que esta em autoria
 				$('body').find('aventura_ativa').empty().append('<i class="icon-map-marker"></i> Aventura: ' + responseText.response + ' Autoria: ' + responseText.autoria_estado);
 				$('body').find('aventura_ativa').append('<aventura_ativa_id id="' + responseText.id + '" ></aventura_ativa_id>');
 				 intancias_objetos_json = "";
 				 flagloadBackupInstances = false;
 				 loadInstancias();//carrega objetos para a aventura....
+				 
+					 
 			}else if (ct == 'text'){
 				$('body').find('aventura_ativa').empty();
 				openModal("{% url 'aventura_ativar_edicao_view' object.pk %}",'aventura');

@@ -63,6 +63,8 @@ SESSION_AVENTURA = '_user_aventura_id'
 SESSION_INSTANCIA = '_instancia_aventura'
 SESSION_AGENTE = '_instancia_agente'
 SESSION_TYPE_BEHAVIOR = '_type_behavior'
+SESSION_AVENTURA_AUTORIA = '_aventura_autoria'
+
 
 '''
 ===================================================================
@@ -613,10 +615,17 @@ class AventuraListView(ListView):
     model = Aventura
     template_name = 'editor_aventuras/aventura/listar.html' 
         
-    def get_queryset(self):
+    def get_context_data(self, **kwargs):
+        context = super(AventuraListView, self).get_context_data(**kwargs)
+        if self.request.session[SESSION_AVENTURA] != '-1':
+            context['aventura_autoria'] = self.request.session[SESSION_AVENTURA].id
+        else:
+            context['aventura_autoria'] = '-1'
+        
+        context['object_list'] = Aventura.objects.all().filter(autor=self.kwargs['pk'])
+       
         # print self.request.session[SESSION_AVENTURA]
-        object_list = Aventura.objects.all().filter(autor=self.kwargs['pk'])
-        return object_list
+        return context
 
 # Criação das aventuras
 class AventuraCreateView(CreateView):

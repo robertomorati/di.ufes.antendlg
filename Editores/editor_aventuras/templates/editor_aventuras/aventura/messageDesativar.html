@@ -55,6 +55,9 @@
 				 intancias_objetos_json = "";//limpa persistencia de instancias
 				 flagloadBackupInstances = true;
 				 flagLoadBackupInstancesMoreOfPos  = true;
+				 
+				 refreshDiv('{% url 'aventura_list_view' user.id %}','content');
+				 
 			}else if (ct == 'text'){
 				$('body').find('aventura_ativa').empty();
 				openModal("{% url 'aventura_desativar_edicao_view' object.pk %}",'aventura');

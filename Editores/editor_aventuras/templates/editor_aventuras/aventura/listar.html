@@ -23,26 +23,44 @@
 				<td>{{ object.latitude }} 
 				    {{ object.longitude }}
 				</td>
-				<td>
-				 	<a class="btn btn-block btn-small btn-primary" data-toggle="modal"
-				 	onClick="openModal('{% url 'aventura_ativar_edicao_view' object.pk %}','aventura')" 
-				 	href="#aventura">Activate Authoring</a>		 
-				</td>
-				<td>
-				 	<a class="btn btn-block btn-small" data-toggle="modal"
-				 	onClick="openModal('{% url 'aventura_desativar_edicao_view' object.pk %}','aventura')" 
-				 	href="#aventura">Deactivate Authoring</a>		 
-				</td>
-				<td>
-				 	<a class="btn btn-block btn-small btn-primary" data-toggle="modal"
-				 	onClick="openModal('{% url 'autoria_estado_update_view' object.pk %}','aventura')" 
-				 	href="#aventura">Update State Authoring</a>		 
-				</td>
+				{% if aventura_autoria == '-1' %}
+						<td>
+						 	<a class="btn btn-block btn-small btn-primary" data-toggle="modal"
+						 	onClick="openModal('{% url 'aventura_ativar_edicao_view' object.pk %}','aventura')" 
+						 	href="#aventura">Activate Authoring</a>		 
+						</td>
+				{% else %}
+						<td>
+						 	<button class="btn btn-block btn-small btn-primary disabled">Activate Authoring</button>	 
+						</td>
+				{% endif %}
+				
+				
+				{% if aventura_autoria == object.pk %}
+					<td>
+					 	<a class="btn btn-block btn-small" data-toggle="modal"
+					 	onClick="openModal('{% url 'aventura_desativar_edicao_view' object.pk %}','aventura')" 
+					 	href="#aventura">Deactivate Authoring</a>		 
+					</td>
+					<td>	 
+					 	<button class="btn btn-block btn-small btn-primary disabled">Update State Authoring</button>	 
+					</td>
+				
+				{% else %}
+					<td>
+					 	<button class="btn btn-block btn-small disabled">Deactivate Authoring</button>	 
+					</td>
+					<td>	
+					 	<button class="btn btn-block btn-small btn-primary disabled">Update State Authoring</button> 
+					</td>
+				{% endif %}
+				
 				<td>
 					<a class="btn btn-block btn-small btn-danger" data-toggle="modal" 
 					onClick="openModal('{% url  'aventura_delete_view' object.pk %}','aventura')" 
 					href="#aventura">Delete</a>
 				</td>
+				
 			</tr>
 			{% empty %}
 			<tr>
