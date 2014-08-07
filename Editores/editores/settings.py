@@ -1,8 +1,13 @@
 # -*- coding: utf-8 -*-
 # Django settings for Editores project.
 import os
+import sys
 
-DEBUG = True
+
+if sys.argv[1] == 'runserver':
+    DEBUG = True
+else:
+    DEBUG = False
 
 #from statsd import statsd
 
