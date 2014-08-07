@@ -680,9 +680,9 @@ class AventuraAtivarView(UpdateView):
         nome = self.request.session[SESSION_AVENTURA].nome
         id_av = self.request.session[SESSION_AVENTURA].id
         if self.request.session[SESSION_AVENTURA].autoria_estado == 'AC':
-            autoria_estado = "Autoria Completa"
+            autoria_estado = "Completa"
         else:
-            autoria_estado = "Autoria Incompleta"
+            autoria_estado = "Em construção"
         if self.request.session[SESSION_AVENTURA] == '-1':
             ValidationError
             messages.error(request, "".join("Ocorreu um problema ao ativar a aventura! Tente novamente!"))
