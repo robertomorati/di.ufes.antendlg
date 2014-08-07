@@ -47,7 +47,7 @@
 				$('#aventura').modal('hide');
 				
 				//add nome da aventura que esta em autoria
-				$('body').find('aventura_ativa').empty().append('<i class="icon-map-marker"></i> Aventura: ' + responseText.nome + ' Autoria: ' + responseText.autoria_estado);
+				$('body').find('aventura_ativa').empty().append('<i class="icon-map-marker"></i> Aventura: ' + responseText.nome +  ' <i class="icon-cog"></i> Autoria: ' + responseText.autoria_estado);
 				$('body').find('aventura_ativa').append('<aventura_ativa_id id="' + responseText.id + '" ></aventura_ativa_id>');
 				 //intancias_objetos_json = "";
 				 //flagloadBackupInstances = false;
