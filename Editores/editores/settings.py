@@ -105,7 +105,7 @@ STATIC_ROOT = os.path.join(PROJECT_DIR, '../staticfiles/')
 STATIC_URL = '/static/'
 
 # URL of the login page.
-LOGIN_URL = '/autendlg/login/'
+LOGIN_URL = '/autenvlg/login/'
 
 #datalog config
 DATADOG_API_KEY = '429b85a4274f59adfeb8a438e3478d59'
