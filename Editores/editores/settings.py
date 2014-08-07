@@ -1,8 +1,14 @@
 # -*- coding: utf-8 -*-
 # Django settings for Editores project.
 import os
-
 import sys
+
+
+__author__ = 'Roberto Guimaraes Morati Junior <robertomorati@gmail.com@gmail.com>'
+__copyright__ = 'Copyright (c) 2014 AutEnvLDG/AutoCoop/Nemo'
+__version__ = '1.0.0'
+
+
 
 if 'runserver' in sys.argv:
     DEBUG = True
@@ -14,8 +20,10 @@ else:
 ALLOWED_HOSTS = ['*']
 
 #APPEND_SLASH=False
-SESSION_COOKIE_SECURE = False
+SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = False
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
 
 LOGIN_URL='/autenvldg/login/'
 
