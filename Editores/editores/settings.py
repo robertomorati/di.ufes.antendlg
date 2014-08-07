@@ -20,12 +20,10 @@ else:
 ALLOWED_HOSTS = ['*']
 
 #APPEND_SLASH=False
-SESSION_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = False
 CSRF_COOKIE_SECURE = False
 #SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
-
-LOGIN_URL='/autenvldg/login/'
 
 TEMPLATE_DEBUG = DEBUG
 
@@ -105,7 +103,7 @@ STATIC_ROOT = os.path.join(PROJECT_DIR, '../staticfiles/')
 STATIC_URL = '/static/'
 
 # URL of the login page.
-LOGIN_URL = '/autenvlg/login/'
+#LOGIN_URL='/autenvldg/'
 
 #datalog config
 DATADOG_API_KEY = '429b85a4274f59adfeb8a438e3478d59'
