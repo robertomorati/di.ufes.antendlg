@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 # Django settings for Editores project.
 import os
+
 import sys
 
-
-if sys.argv[1] == 'runserver':
+if 'runserver' in sys.argv:
     DEBUG = True
 else:
     DEBUG = False
