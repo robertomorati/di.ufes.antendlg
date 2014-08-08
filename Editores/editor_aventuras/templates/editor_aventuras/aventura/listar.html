@@ -20,8 +20,12 @@
 				<td>{{ object.descricao }}</td>
 				<td>{{ object.inicio }}</td>
 				<td>{{ object.fim }}</td>
-				<td>{{ object.latitude }} 
-				    {{ object.longitude }}
+				<td>
+				    <div id="locationAdventure"></div>
+					<script type="text/javascript"> 
+				   		getCity("{{ object.latitude }}","{{ object.longitude }}","{{ object.pk }}");
+				    	 
+					</script>
 				</td>
 				{% if aventura_autoria == '-1' %}
 						<td>
