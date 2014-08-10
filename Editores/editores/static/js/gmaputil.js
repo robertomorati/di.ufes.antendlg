@@ -1,37 +1,39 @@
 /**
  * Created on --/10/2013
  * 
- * Arquivo responsavel por:
- * 			; Inicializar o google maps - v3;
- * 			; Validar se a aventura esta ativa;
- * 			; Fazer persistencia das intancias dos objetos no google maps;
- * 			; Operacoes (CRUD) nas instancias por meio de ajax com informacoes trocadas por meio de json;
+ * Arquivo que habilita:
+ * 			1 - A inicialização da API - Google Maps V3;
+ * 			2 - Persistência de dados de uma dada aventura quando ativa;
+ * 			3 - Operações (CRUD) nas instancias por json;
  * 
- * @author: Roberto Guimaraes Morati Junior
+ * @author: Roberto Guimaraes Morati Junior <robertomorati@gmail.com>
  */		
 
 /**
- * Flags criadas para tratar casos especificos relacionados as instâncias.
+ * Flags criadas para tratar casos especificos relacionados com as instâncias.
  **/
 var flagloadInstancias = false; //Flag para evitar a execução do "ajax" que cria a primeira posição geográfica do objeto.
 var flagloadBackupInstances = false;//Flag para controlar o backup de instâncias. Assim, evita requisições desnecessárias.	 
 
 var flagLoadBackupInstancesMoreOfPos = false;//Flag para tratar o backup de instâncias que possuem mais de uma posição geográfica.
 
-var intancias_objetos_json;//armazena instâncias de objetos.
+var intancias_objetos_json;//buffer para armazenar instâncias de objetos.
 var singleClickMouse = false;//Flag para tratar o click simples e duplo em marcadores do Polygon. Uso somente em instâncias com mais de uma POS.
 
 
 
 /**
+ * carregaPos()
+ * 
  * Função que verifica se a aventura está ativa. 
- * Caso a mesma esteja ativa, a posição do mapa é direcionado para a localização da aventura. Caso a aventura tenha uma localização.
+ * Caso a mesma esteja ativa, a posição do mapa é direcionado para a localização da aventura, caso exista.
  */
 var $latlng;//posição do mapa
 function carregaPos (){
+	
 	var id = aventuraAtiva();
+	
 	if(id != '-1'){
-		 
 		 var urlView = '/editor_aventuras/get_json_aventura/' + id +'/';
 		 $.ajax({
 		        type: 'GET',
@@ -53,7 +55,7 @@ function carregaPos (){
 		});	
 	}else{
 		//32,6381461 -16,9332489   -30.068637, -51.120404
-		$latlng = new google.maps.LatLng(32.6381461, -16.9332489);
+		$latlng = new google.maps.LatLng(32.6381461, -16.9332489);//posição padrão caso a aventura não possua.
 		initialize();//inicializa o google maps em uma posição padrão
 	}
 
@@ -61,7 +63,6 @@ function carregaPos (){
 
 /**
  * Função que inicializa o google maps. 
- * API v3 está sendo utilizada, sendo tal em HTML 5.
  * 
  */
 var $map;//google maps
@@ -125,7 +126,7 @@ function initialize() {
             
             //Algumas cidades apresentam problemas ao serem localizadas, retornando mais de uma POS.
             //Desta forma desencadeia uma quantidade absurda de mensagens para o usuário, devido a requisição de salva POS estar dentro do for/loop.
-            //Com o intuito de limitar a mensagem para que parecer somente uma vez, criei a flagCount.
+            //Com o intuito de limitar a mensagem para que parecer somente uma vez, fora criada a flagCount.
             var flagCount = 0;
             var bounds = new google.maps.LatLngBounds();
             for (var i = 0, place; place = places[i]; i++) {
@@ -216,8 +217,8 @@ function initialize() {
  * Cria a instância de um objeto.
  * 
  * @param location - localização da instância
- * @param icon - imagem para add ao marcador
- * @param id - id do objeto a qual a instância pertence
+ * @param icon - imagem para add no marcador
+ * @param id - id do objeto instanciado
  * @param name_objeto  - nome da instância
  * @param quantidade - quandidade permitida de instâncias
  */
@@ -920,22 +921,26 @@ function loadInstancias(){
 	
 	//verifica se a aventura está ativa
 	var aventura_id = aventuraAtiva();
+	
 	if(aventura_id != '-1'){
 		urlView = '/editor_objetos/instancia_objeto/get_instancia/' + aventura_id  + '/';
-    		
+		   
     	if(flagloadBackupInstances == false || flagLoadBackupInstancesMoreOfPos == false){
  
-			//ajax to get all instances by aventura_id
+    		flagloadBackupInstances == false ? flagloadBackupInstances = true
+    		flagLoadBackupInstancesMoreOfPos == false ? flagLoadBackupInstancesMoreOfPos = true
+			
+    		//ajax to get all types of instances by aventura_id
 			$.ajax({
 	   		     type:"GET",
 	   		     url:urlView,
 	   		     success: function(data,status){
 	   		    	 
-	   		    	flagloadBackupInstances = true;//altera flag
+	   		    	
 	   		    	intancias_objetos_json = data;//backup das instâncias atualizado
 	   		     },
 			     error: function(xhr) {
-			        	alert("Erro ao recuperar lista de instâncias de objetios.");
+			        	alert("Erro ao recuperar lista de instâncias de objetos.");
 			     }
 			});
 			
@@ -943,7 +948,6 @@ function loadInstancias(){
 			
 			var instancias = $.parseJSON(intancias_objetos_json);
 			
-
 			for (var i=0;i<instancias.length;i++){
 				if(instancias[i].posicoes_geograficas > 1){
 					placeInstancesPolygonGoogleMaps("", instancias[i].url_icone, instancias[i].id, instancias[i].nome, instancias[i].posicoes_geograficas, instancias[i].pos);

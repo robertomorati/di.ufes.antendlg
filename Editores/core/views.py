@@ -414,7 +414,6 @@ class InstanciaObjetoGetJsonView(ListView):
         
         json_inst_objetos += ']';
         
-        print "Instâncias de Objetos em JSON"
         print json_inst_objetos
         
         return HttpResponse(json_inst_objetos)
