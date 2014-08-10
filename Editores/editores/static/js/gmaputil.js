@@ -1061,7 +1061,6 @@ function getCookie(c_name)
 
 function getCity(lat, lng,id_aventura) {
 
-	alert("Teste");
     var newIdDiv = "locationAdventure"+id_aventura;
     document.getElementById("locationAdventure").setAttribute("id", newIdDiv);
     document.getElementById(newIdDiv).setAttribute("class", newIdDiv);
