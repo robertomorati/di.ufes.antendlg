@@ -927,16 +927,14 @@ function loadInstancias(){
 		   
     	if(flagloadBackupInstances == false || flagLoadBackupInstancesMoreOfPos == false){
  
-    		flagloadBackupInstances == false ? flagloadBackupInstances = true
-    		flagLoadBackupInstancesMoreOfPos == false ? flagLoadBackupInstancesMoreOfPos = true
+    		if(flagloadBackupInstances == false) flagloadBackupInstances = true
+    		if(flagLoadBackupInstancesMoreOfPos == false) flagLoadBackupInstancesMoreOfPos = true
 			
     		//ajax to get all types of instances by aventura_id
 			$.ajax({
 	   		     type:"GET",
 	   		     url:urlView,
 	   		     success: function(data,status){
-	   		    	 
-	   		    	
 	   		    	intancias_objetos_json = data;//backup das instâncias atualizado
 	   		     },
 			     error: function(xhr) {
@@ -1063,6 +1061,7 @@ function getCookie(c_name)
 
 function getCity(lat, lng,id_aventura) {
 
+	alert("Teste");
     var newIdDiv = "locationAdventure"+id_aventura;
     document.getElementById("locationAdventure").setAttribute("id", newIdDiv);
     document.getElementById(newIdDiv).setAttribute("class", newIdDiv);
