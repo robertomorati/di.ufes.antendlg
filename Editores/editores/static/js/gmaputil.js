@@ -1059,6 +1059,13 @@ function getCookie(c_name)
 //http://stackoverflow.com/questions/3394961/google-maps-api-v3-how-to-draw-dynamic-polygons-polylines
 
 
+function getCity(lat, lng,id_aventura) {
+
+	alert("Teste");
+   
+ }
+
+
 /*********************************************************************************************
  *                                  Código Antigo											 *
  ********************************************************************************************/	    
