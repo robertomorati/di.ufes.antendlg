@@ -414,7 +414,7 @@ class InstanciaObjetoGetJsonView(ListView):
         
         json_inst_objetos += ']';
         
-        print json_inst_objetos
+        #print json_inst_objetos
         
         return HttpResponse(json_inst_objetos)
 
@@ -1545,7 +1545,7 @@ class  EnredoFileUpdateView(UpdateView):
                     
             # add id da aventura no enredo
             form.instance.aventura_id = self.request.session[SESSION_AVENTURA].id
-            print form.instance
+            #print form.instance
             self.object = form.save()   
             return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")
         
@@ -1913,7 +1913,7 @@ class CondicoesListView(ListView, template.Node):
             context['condicao_dialogo'] = condicao_dialogo
             
             
-            print condicoes_tipos
+            #print condicoes_tipos
             c1 = condicoes_tipos
             c2 = condicoes_tipos
             for m in missao_list:
@@ -2568,8 +2568,8 @@ class AgressivoCreateView(CreateView):
     
     def get_initial(self):
         initial = super(AgressivoCreateView, self).get_initial()
-        print self.request.session[SESSION_AGENTE]
-        print self.request.session[SESSION_AGENTE].instancia_id
+        #print self.request.session[SESSION_AGENTE]
+        #print self.request.session[SESSION_AGENTE].instancia_id
         initial['instancia_id'] = self.request.session[SESSION_AGENTE].instancia_id
         initial['aventura_id'] = self.request.session[SESSION_AVENTURA].id
         return initial
@@ -2670,7 +2670,7 @@ class ColaborativoCreateView(CreateView):
     
     def form_valid(self, form):
         # form.instance.aventura_agente_id =  self.request.session[SESSION_AVENTURA].id
-        print form 
+        #print form 
         form.instance.agente_id = self.request.session[SESSION_AGENTE].id
         self.object = form.save()
     
@@ -2693,7 +2693,7 @@ class ColaborativoUpdateView(UpdateView):
     
     def form_valid(self, form):
         # form.instance.aventura_agente_id =  self.request.session[SESSION_AVENTURA].id
-        print form 
+        #print form 
         form.instance.agente_id = self.request.session[SESSION_AGENTE].id
         self.object = form.save()
     
@@ -2717,7 +2717,7 @@ class CompetitivoCreateView(CreateView):
     
     def form_valid(self, form):
         # form.instance.aventura_agente_id =  self.request.session[SESSION_AVENTURA].id
-        print form 
+        #print form 
         form.instance.agente_id = self.request.session[SESSION_AGENTE].id
         self.object = form.save()
     
@@ -2740,7 +2740,7 @@ class CompetitivoUpdateView(UpdateView):
     
     def form_valid(self, form):
         # form.instance.aventura_agente_id =  self.request.session[SESSION_AVENTURA].id
-        print form 
+        #print form 
         form.instance.agente_id = self.request.session[SESSION_AGENTE].id
         self.object = form.save()
     
@@ -2791,8 +2791,8 @@ class InstanciasCreateView(CreateView):
         for obj in comportamentos:
             id_comportamento = obj.pk
         
-        print id_comportamento
-        print self.request.session[SESSION_TYPE_BEHAVIOR]
+        #print id_comportamento
+        #print self.request.session[SESSION_TYPE_BEHAVIOR]
         
         if self.request.session[SESSION_TYPE_BEHAVIOR] == "Colaborativo":
             form.instance.colaborativo_id = id_comportamento
@@ -2825,8 +2825,8 @@ class InstanciasUpdateView(UpdateView):
         for obj in comportamentos:
             id_comportamento = obj.pk
         
-        print id_comportamento
-        print self.request.session[SESSION_TYPE_BEHAVIOR]
+        #print id_comportamento
+        #print self.request.session[SESSION_TYPE_BEHAVIOR]
         
         if self.request.session[SESSION_TYPE_BEHAVIOR] == "Colaborativo":
             form.instance.colaborativo_id = id_comportamento
