@@ -2,9 +2,9 @@
  * Created on --/10/2013
  * 
  * Arquivo que habilita:
- * 			1 - A inicialização da API - Google Maps V3;
- * 			2 - Persistência de dados de uma dada aventura quando ativa;
- * 			3 - Operações (CRUD) nas instancias por json;
+ * 			 - A inicialização da API - Google Maps V3;
+ * 			 - Persistência de dados de uma dada aventura quando ativa;
+ * 			 - Operações (CRUD) nas instancias por json;
  * 
  * @author: Roberto Guimaraes Morati Junior <robertomorati@gmail.com>
  */		
@@ -1062,8 +1062,39 @@ function getCookie(c_name)
 function getCity(lat, lng,id_aventura) {
 
 	alert("Teste");
-   
- }
+    var newIdDiv = "locationAdventure"+id_aventura;
+    document.getElementById("locationAdventure").setAttribute("id", newIdDiv);
+    document.getElementById(newIdDiv).setAttribute("class", newIdDiv);
+    
+	var lt = lat.replace(',', '.');
+	var lg = lng.replace(',', '.');
+    var pos = new google.maps.LatLng(lt, lg);
+    var geocoder = new google.maps.Geocoder(); 
+    geocoder.geocode({'latLng': pos}, function(results, status) {
+      if (status == google.maps.GeocoderStatus.OK) {
+        if (results[1]) {
+        //find country name
+         for (var i=0; i<results[0].address_components.length; i++) {
+            for (var b=0;b<results[0].address_components[i].types.length;b++) {
+            	
+            //there are different types that might hold a city admin_area_lvl_1 usually does in come cases looking for sublocality type will be more appropriate
+                if (results[0].address_components[i].types[b] == "neighborhood") {
+                    //this is the object you are looking for
+                    city= results[0].address_components[i];
+                    break;
+                }
+            }
+        }
+        //city data
+         $( "."+newIdDiv ).empty().append( ""+city.short_name );
+        } else {
+        	$( "."+newIdDiv ).empty().append("Sem Localização");
+        }
+      } else {
+    	  $( "."+newIdDiv ).empty().append("Sem Localização");
+      }
+    });
+  }
 
 
 /*********************************************************************************************
