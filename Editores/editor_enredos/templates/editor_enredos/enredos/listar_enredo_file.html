@@ -7,6 +7,7 @@
 			<th>Name</th>
 			<th>Type</th>
 			<th>Story</th>
+			<th>Description</th>
 		</tr>
 		<tbody>
 			{% for object in object_list %}
@@ -26,6 +27,7 @@
 				{% endif %}
 				</td>
 				<td>{{ object.enredo_file }}</td>
+				<td>{{ object.descricao }}</td>
 				<td>
 						{% csrf_token %}
 						<!--<input type="submit" class="btn btn-block btn-small btn-danger " value="Deletar">-->

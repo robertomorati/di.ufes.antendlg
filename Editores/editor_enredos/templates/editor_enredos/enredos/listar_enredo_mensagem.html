@@ -6,6 +6,7 @@
 		<tr>
 			<th>Name</th>
 			<th>Story</th>
+			<th>Description</th>
 		</tr>
 		<tbody>
 			{% for object in object_list %}
@@ -16,6 +17,7 @@
 					href="#enredo">{{ object.nome }}</a> 
 				</td>
 				<td>{{ object.enredo_mensagem }}</td>
+				<td>{{ object.descricao }}</td>
 				<td>
 						{% csrf_token %}
 						<!--<input type="submit" class="btn btn-block btn-small btn-danger " value="Deletar">-->

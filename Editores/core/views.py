@@ -969,7 +969,8 @@ class AventuraAtivaUpdateView(UpdateView):
 class AventuraAtivaDeleteView(DeleteView):
     template_name = 'editor_aventuras/aventura/delete_aventura_ativa.html' 
     model = AventuraAtiva
-    form_class = AventuraAtivaWithoutFieldsForm
+    #form_class = AventuraAtivaWithoutFieldsForm
+    exclude = ['aventura','joadores_aventura_ativa', 'instancia', 'chave_acesso', ] 
     
     def get_success_url(self):
         return reverse('aventuras_ativas_list_view')
@@ -997,6 +998,7 @@ class AventuraAtivaDeleteView(DeleteView):
                         flag = flag + 1
             else:  # deleção de aventura ativada para testes
                 self.object = self.get_object() 
+                self.object.delete()
                 return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")  
                         
             self.object = self.get_object()
@@ -1347,6 +1349,15 @@ class EnredoFileCreateView(CreateView):
     template_name = 'editor_enredos/enredos/create_enredo_file.html'
     model = EnredoFile
     form_class = EnredoFileForm
+
+    def get_initial(self):
+        initial = super(EnredoFileCreateView, self).get_initial()
+        initial['request'] = self.request
+        if self.request.session[SESSION_AVENTURA] != '-1':
+            initial['aventura_id'] = self.request.session[SESSION_AVENTURA].id
+        else:
+            initial['aventura_id'] = '-1'
+        return initial
     
     # Override no form
     def form_valid(self, form):
@@ -1415,7 +1426,11 @@ class EnredoInstanciaCreateView(CreateView):
     
     def get_initial(self):
         initial = super(EnredoInstanciaCreateView, self).get_initial()
-        initial['aventura_id'] = self.request.session[SESSION_AVENTURA].id
+        initial['request'] = self.request
+        if self.request.session[SESSION_AVENTURA] != '-1':
+            initial['aventura_id'] = self.request.session[SESSION_AVENTURA].id
+        else:
+            initial['aventura_id'] = '-1'
         return initial
     # Override no form
     def form_valid(self, form):
@@ -1428,16 +1443,28 @@ class EnredoInstanciaCreateView(CreateView):
             self.object = form.save()   
             return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")
         
-        else:
-            ValidationError
-            msg = "Please. Activate an adventure for authoring!"
-            messages.error(self.request, "".join(msg))
-            return HttpResponse(json.dumps({'response': 'exception created'}), content_type="application/json")
-
+        #else:
+        #    ValidationError
+        #    msg = "Please. Activate an adventure for authoring!"
+        #    messages.error(self.request, "".join(msg))
+        #    return HttpResponse(json.dumps({'response': 'exception created'}), content_type="application/json")
+    def form_invalid(self, form):
+        return CreateView.form_invalid(self, form)
+    
+    
 class EnredoMensagemCreateView(CreateView):
     template_name = 'editor_enredos/enredos/create_enredo_mensagem.html'
     model = EnredoMensagem
     form_class = EnredoMensagemForm
+    
+    def get_initial(self):
+        initial = super(EnredoMensagemCreateView, self).get_initial()
+        initial['request'] = self.request
+        if self.request.session[SESSION_AVENTURA] != '-1':
+            initial['aventura_id'] = self.request.session[SESSION_AVENTURA].id
+        else:
+            initial['aventura_id'] = '-1'
+        return initial
     
     # Override no form
     def form_valid(self, form):
@@ -1449,11 +1476,6 @@ class EnredoMensagemCreateView(CreateView):
             self.object = form.save()   
             return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")
         
-        else:
-            ValidationError
-            msg = "Please. Activate an adventure for authoring!"
-            messages.error(self.request, "".join(msg))
-            return HttpResponse(json.dumps({'response': 'exception created'}), content_type="application/json")   
               
 class  EnredoFileUpdateView(UpdateView):
     template_name = 'editor_enredos/enredos/update_enredo_file.html'
@@ -1462,6 +1484,15 @@ class  EnredoFileUpdateView(UpdateView):
     
     def get_success_url(self):
         return reverse('enredo_file_list_view')
+        
+    def get_initial(self):
+        initial = super(EnredoFileUpdateView, self).get_initial()
+        initial['request'] = self.request
+        if self.request.session[SESSION_AVENTURA] != '-1':
+            initial['aventura_id'] = self.request.session[SESSION_AVENTURA].id
+        else:
+            initial['aventura_id'] = '-1'
+        return initial
     
     # Override no form
     def form_valid(self, form):
@@ -1518,23 +1549,22 @@ class  EnredoFileUpdateView(UpdateView):
             self.object = form.save()   
             return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")
         
-        else:
-            ValidationError
-            msg = "Please. Activate an adventure for authoring!"
-            messages.error(self.request, "".join(msg))
-            return HttpResponse(json.dumps({'response': 'exception created'}), content_type="application/json")
-
 
 class EnredoInstanciaUpdateView(UpdateView):
     template_name = 'editor_enredos/enredos/update_enredo_instancia.html'
     model = EnredoInstancia
     form_class = EnredoInstanciaForm
     
-    
+
     def get_initial(self):
         initial = super(EnredoInstanciaUpdateView, self).get_initial()
-        initial['aventura_id'] = self.request.session[SESSION_AVENTURA].id
+        initial['request'] = self.request
+        if self.request.session[SESSION_AVENTURA] != '-1':
+            initial['aventura_id'] = self.request.session[SESSION_AVENTURA].id
+        else:
+            initial['aventura_id'] = '-1'
         return initial
+    
     # Override no form
     def form_valid(self, form):
         
@@ -1556,6 +1586,15 @@ class EnredoMensagemUpdateView(UpdateView):
     template_name = 'editor_enredos/enredos/update_enredo_mensagem.html'
     model = EnredoMensagem
     form_class = EnredoMensagemForm
+
+    def get_initial(self):
+        initial = super(EnredoMensagemUpdateView, self).get_initial()
+        initial['request'] = self.request
+        if self.request.session[SESSION_AVENTURA] != '-1':
+            initial['aventura_id'] = self.request.session[SESSION_AVENTURA].id
+        else:
+            initial['aventura_id'] = '-1'
+        return initial
     
     # Override no form
     def form_valid(self, form):

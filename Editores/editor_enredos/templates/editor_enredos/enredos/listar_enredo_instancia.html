@@ -5,8 +5,8 @@
 	<table class="table table-bordered">
 		<tr>
 			<th>Name</th>
-			<th>Type</th>
 			<th>Story</th>
+			<th>Description</th>
 		</tr>
 		<tbody>
 			{% for object in object_list %}
@@ -20,6 +20,7 @@
 					Instancia de Objeto
 				</td>
 				<td>{{ object.enredo_instancia }}</td>
+				<td>{{ object.descricao }}</td>td>
 				<td>
 						{% csrf_token %}
 						<!--<input type="submit" class="btn btn-block btn-small btn-danger " value="Deletar">-->

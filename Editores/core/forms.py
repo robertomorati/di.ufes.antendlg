@@ -594,13 +594,34 @@ class InstancesComportamentoAddForm(forms.ModelForm):
 Form para ocultar select aventura
 '''
 class  EnredoFileForm(forms.ModelForm):
+    
+    def __init__(self, *args, **kwargs):
+        super(EnredoFileForm, self).__init__(*args, **kwargs)
+                
+        # recupera id da instância do agente
+        # instancia_id = kwargs['initial']['instancia_id']
+        # recupera id da aventura
+        id_aventura = kwargs['initial']['aventura_id']
+        req = kwargs['initial']['request']
+        
+        if id_aventura != '-1':
+            self.fields['enredo_file'].required = True
+            self.fields['enredo_file'].label = 'File'
+                    
+            self.fields['nome'].label = 'Name'
+            self.fields['tipo'].label = 'Type'
+            self.fields['descricao'].label = 'Description'
+        else:
+                    
+            ValidationError
+            messages.error(req, "".join("It's necessary activate an adventure for authoring mode.")) 
+            
     class Meta:
         model = EnredoFile
         exclude = ['aventura', ] 
         
 class  EnredoInstanciaForm(forms.ModelForm):
-
-      
+    
         def __init__(self, *args, **kwargs):
             super(EnredoInstanciaForm, self).__init__(*args, **kwargs)
             
@@ -608,27 +629,31 @@ class  EnredoInstanciaForm(forms.ModelForm):
             # instancia_id = kwargs['initial']['instancia_id']
             # recupera id da aventura
             id_aventura = kwargs['initial']['aventura_id']
-            
-            object_list = Objeto.objects.filter(coletavel=True)
-
-            # Recuperando Instâncias
-            flag = 0;
-            buffer_inst = '';
-            for obj in object_list:
-                if flag == 0:
-                    print id_aventura
-                    buffer_inst = InstanciaObjeto.objects.filter(objeto_id=obj.id, aventura_id=id_aventura)
-                    flag = 1;
-                elif flag == 1:
-                    buffer_inst = buffer_inst | InstanciaObjeto.objects.filter(objeto_id=obj.id, aventura_id=id_aventura);  # | concatena apenas QuerySet
-            
-            # Carregando Instâncias
-            self.fields['enredo_instancia'] = InstanciaObjetoRoleModelChoiceField(queryset=buffer_inst,)
-            self.fields['enredo_instancia'].required = True
-            self.fields['enredo_instancia'].label = 'Instances'
-            
-            self.fields['nome'].label = 'Name'
-            self.fields['descricao'].label = 'Description'
+            req = kwargs['initial']['request']
+            if id_aventura != '-1':
+                object_list = Objeto.objects.filter(coletavel=True)
+    
+                # Recuperando Instâncias
+                flag = 0
+                buffer_inst = object_list
+                for obj in object_list:
+                    if flag == 0:
+                        buffer_inst = InstanciaObjeto.objects.filter(objeto_id=obj.id, aventura_id=id_aventura)
+                        flag = 1;
+                    elif flag == 1:
+                        buffer_inst = buffer_inst | InstanciaObjeto.objects.filter(objeto_id=obj.id, aventura_id=id_aventura)  # | concatena apenas QuerySet
+                
+                # Carregando Instâncias
+                self.fields['enredo_instancia'] = InstanciaObjetoRoleModelChoiceField(queryset=buffer_inst,)
+                self.fields['enredo_instancia'].required = True
+                self.fields['enredo_instancia'].label = 'Instances'
+                
+                self.fields['nome'].label = 'Name'
+                self.fields['descricao'].label = 'Description'
+            else:
+                
+                ValidationError
+                messages.error(req, "".join("It's necessary activate an adventure for authoring mode."))  
             # encenacao="DS"   irá recuperar todos os tipos de instâncias
             #self.fields['instancia_objeto'] = queryset=InstanciaObjeto.objects.filter(aventura_id=id_aventura,),)
             #self.fields['instancia_objeto'].required = True
@@ -641,6 +666,26 @@ class  EnredoInstanciaForm(forms.ModelForm):
 Form para ocultar select aventura
 '''
 class  EnredoMensagemForm(forms.ModelForm):
+    
+    def __init__(self, *args, **kwargs):
+        super(EnredoMensagemForm, self).__init__(*args, **kwargs)
+                
+        # recupera id da instância do agente
+        # instancia_id = kwargs['initial']['instancia_id']
+        # recupera id da aventura
+        id_aventura = kwargs['initial']['aventura_id']
+        req = kwargs['initial']['request']
+        if id_aventura != '-1':
+            self.fields['enredo_mensagem'].required = True
+            self.fields['enredo_mensagem'].label = 'Message'
+                    
+            self.fields['nome'].label = 'Name'
+            self.fields['descricao'].label = 'Description'
+        else:
+                    
+            ValidationError
+            messages.error(req, "".join("It's necessary activate an adventure for authoring mode."))  
+                
     class Meta:
         model = EnredoMensagem
         exclude = ['aventura', ] 

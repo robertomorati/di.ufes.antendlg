@@ -10,17 +10,18 @@
 			  {% if messages %}
 						<div class="alert alert-error" width="30">
 							<button type="button" class="close" data-dismiss="alert">
-								<span class="badge badge-important">x</span>
+								
 							</button>
 							<ul class="messages">
 								{% for message in messages %}
-									<li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li> 
+									<li id="ulNoMaker"  {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li> 
 								{% endfor %}
 							</ul>
 						</div>
+				 {% else %}
+					 {% csrf_token %}
+					 {{ form|as_bootstrap }}
 				 {% endif %}
-				 {% csrf_token %}
-				 {{ form|as_bootstrap }}
 		  </div>
 		  <div class="modal-footer">
 		    <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
