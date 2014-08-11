@@ -927,8 +927,8 @@ function loadInstancias(){
 		   
     	if(flagloadBackupInstances == false || flagLoadBackupInstancesMoreOfPos == false){
  
-    		if(flagloadBackupInstances == false) flagloadBackupInstances = true
-    		if(flagLoadBackupInstancesMoreOfPos == false) flagLoadBackupInstancesMoreOfPos = true
+    		if(flagloadBackupInstances == false) flagloadBackupInstances = true;
+    		if(flagLoadBackupInstancesMoreOfPos == false) flagLoadBackupInstancesMoreOfPos = true;
 			
     		//ajax to get all types of instances by aventura_id
 			$.ajax({
@@ -1059,18 +1059,18 @@ function getCookie(c_name)
 //http://stackoverflow.com/questions/3394961/google-maps-api-v3-how-to-draw-dynamic-polygons-polylines
 
 
-
 function getCity(lat, lng,id_aventura) {
 
+	alert("Teste");
     var newIdDiv = "locationAdventure"+id_aventura;
     document.getElementById("locationAdventure").setAttribute("id", newIdDiv);
     document.getElementById(newIdDiv).setAttribute("class", newIdDiv);
     
 	var lat = lat.replace(',', '.');
 	var lng = lng.replace(',', '.');
-    var latlng = new google.maps.LatLng(lat, lng);
+    var pos = new google.maps.LatLng(lat, lng);
     var geocoder = new google.maps.Geocoder(); 
-    geocoder.geocode({'latLng': latlng}, function(results, status) {
+    geocoder.geocode({'latLng': pos}, function(results, status) {
       if (status == google.maps.GeocoderStatus.OK) {
         if (results[1]) {
         //find country name
