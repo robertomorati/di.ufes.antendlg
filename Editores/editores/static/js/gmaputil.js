@@ -1058,10 +1058,13 @@ function getCookie(c_name)
 //http://gmaps-samples-v3.googlecode.com/svn/trunk/poly/poly_edit.html
 //http://stackoverflow.com/questions/3394961/google-maps-api-v3-how-to-draw-dynamic-polygons-polylines
 
+function teste(){
+	alert("Teste");
+}
 
 function getCity(lat, lng,id_aventura) {
 
-	alert("Teste");
+	
     var newIdDiv = "locationAdventure"+id_aventura;
     document.getElementById("locationAdventure").setAttribute("id", newIdDiv);
     document.getElementById(newIdDiv).setAttribute("class", newIdDiv);
