@@ -227,9 +227,18 @@ class Autor(User, models.Model):
     def __unicode__(self):
         return u'%s' % (self.icone_autor)
 
-
 '''
-Aventura - representa um jogo criado. Por exemplo, o ALDloc II é uma aventura baseada na concepção do ALD em 3D.
+class Profissional(models.Model):
+    usuario = models.ForeignKey(User,verbose_name="Usuário")
+    
+    class Meta:
+        abstract = True
+    
+class Regulador(Profissional):
+    especialidade = models.CharField(max_length=100,default="",blank=True,)
+'''
+'''
+Aventura - representa um jogo criado.
 
 @param nome: nome da aventura
 @param descricao: o que é aa aventura?

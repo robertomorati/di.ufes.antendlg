@@ -42,7 +42,7 @@ from forms import CondicaoInstanciaObjetoForm, CondicaoDialogoInstanciaForm, Con
 from forms import AgenteWithoutFieldsForm, AgressivoCreateForm, PassivoCreateForm, ColaborativoCreateForm, InstancesComportamentoAddForm, CompetitivoCreateForm
 from forms import EnredoFileForm, EnredoInstanciaForm, EnredoMensagemForm, CondicaoJogadorObjetoForm, AventuraAtivaWithoutFieldsForm
 
-from forms import AventuraAutoriaEstadoForm
+from forms import AventuraAutoriaEstadoForm, TipoObjetoUpdateForm
 
 from itertools import chain
 
@@ -95,9 +95,22 @@ class TipoObjetoCreateView(CreateView):
 class TipoObjetoUpdateView(UpdateView):
     template_name = 'editor_objetos/tipo_objeto/update.html'
     model = TipoObjeto
+    form_class =  TipoObjetoUpdateForm
     
     def get_success_url(self):
         return reverse('tipo_objeto_list_view')
+    
+    #TODO: verificar se não existe instancias
+    def get_initial(self):
+        initial = super(TipoObjetoUpdateView, self).get_initial()
+        initial['tipo_objeto_pk'] = self.kwargs['pk']
+        initial['request'] = self.request
+        #if self.request.session[SESSION_AVENTURA] != '-1':
+        #    initial['aventura_id'] = self.request.session[SESSION_AVENTURA].id
+        #    initial['autoria_estado'] = self.request.session[SESSION_AVENTURA].autoria_estado
+        #else:
+        #    initial['aventura_id'] = self.request.session[SESSION_AVENTURA]
+        return initial
     
     # Override no form. 
     def form_valid(self, form):
@@ -789,7 +802,7 @@ class AventuraAtivaListView(ListView):
     
     def get_queryset(self):
         if self.request.session[SESSION_AVENTURA] != '-1':
-            object_list = AventuraAtiva.objects.all().filter(aventura_id=self.request.session[SESSION_AVENTURA].id)
+            object_list = AventuraAtiva.objects.all().filter(aventura_id=self.request.session[SESSION_AVENTURA].id).order_by('instancia')
         else:  
             object_list = AventuraAtiva.objects.all().filter(aventura_id='-1')  # sem aventuras ativas
             
@@ -827,10 +840,14 @@ class AtivarAventuraView(CreateView):
             if self.request.session[SESSION_AVENTURA].autoria_estado == 'AC':
             
                 # verificando quantidade de aventuras ativas
-                flag = 1
-                object_list = AventuraAtiva.objects.all().filter(aventura_id=self.request.session[SESSION_AVENTURA].id)
+                numero_instancia = 1
+                object_list = AventuraAtiva.objects.all().filter(aventura_id=self.request.session[SESSION_AVENTURA].id).order_by('instancia')
                 for obj in object_list:
-                    flag = flag + 1
+                    if numero_instancia == obj.instancia:
+                        numero_instancia = numero_instancia + 1
+                    else:
+                        numero_instancia = obj.instancia + (numero_instancia - obj.instancia)
+                        break
                     
                 # gerando chave de acesso
                 if form.instance.publica == False:
@@ -838,7 +855,7 @@ class AtivarAventuraView(CreateView):
                     
                 form.instance.aventura_id = self.request.session[SESSION_AVENTURA].id
                 
-                form.instance.instancia = flag
+                form.instance.instancia = numero_instancia
                
                 # ativando aventura
                 self.object = form.save()  
@@ -861,8 +878,6 @@ class AtivarAventuraView(CreateView):
                 avatares = Avatar.objects.all().filter(aventura_avatar_id=self.request.session[SESSION_AVENTURA].id)
                 
                 missoes = Missao.objects.all().filter(aventuras_id=self.request.session[SESSION_AVENTURA].id)
-                
-                
                 
                 flag = 0
                 condicoes = ''

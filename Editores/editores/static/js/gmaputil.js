@@ -743,15 +743,13 @@ function placeInstancesGoogleMaps(location,icon, id_instancia, name_objeto){
 		  zIndex: 5,
 	  });
 	  
-	  //<TESTE>
-	  /**var circle = new google.maps.Circle({
+	  //TODO: proximidade 
+	  var circle = new google.maps.Circle({
 		  map: $map,
-		  radius: 20,    // 10 miles in metres
+		  radius: 20,    // x miles in metres
 		  fillColor: '#AA0000'
 		});
 	  
-	  circle.bindTo('center', marker, 'position');
-	  **/
 	  iconTime = "" + '<i class=" icon-download-alt"></i>';
 	  
 	  //getting of following link:
@@ -762,10 +760,12 @@ function placeInstancesGoogleMaps(location,icon, id_instancia, name_objeto){
 		    content: iconTime,
       });
 	  
-	 
+	  //TODO: adiciona circulo no marcador
+	  circle.bindTo('center', marker, 'position');
+	  
 	  var info;
-	  //adiciona evento de click para abrir a infowindo da instância.
-	  //Função também responsavel por carregar o conteúdo na infowindow.
+	  //Add evento de click na infowindow. 
+	  //Também responsavel por carregar o conteúdo na infowindow.
 	  google.maps.event.addListener(marker, 'click', function() {
 
 	       var urlIO = '/editor_objetos/instancia_objeto/update_instancia/' +  marker.metadata.id + '/';
@@ -774,6 +774,7 @@ function placeInstancesGoogleMaps(location,icon, id_instancia, name_objeto){
 	       this[nameInfo].open($map, this);
 	       info = this[nameInfo];
 	       var rmMaker = marker;
+	       //TODO: Fix problem with infowindow
 	       //De acordo com "fontes" no stackoverflow, a forma mais eficiente para carregar o conteúdo na infowindow é por meio de ajax.
 	       $.ajax({	
 	    	    type: 'GET',
@@ -914,7 +915,7 @@ function updatePosMarker(json_pos,marker){
 }
 
 /**
- * Carrega instâncias do objeto.
+ * Carrega instâncias de objetos para uma determinada aventura.
  * 
  */
 function loadInstancias(){
@@ -947,6 +948,7 @@ function loadInstancias(){
 			var instancias = $.parseJSON(intancias_objetos_json);
 			
 			for (var i=0;i<instancias.length;i++){
+				
 				if(instancias[i].posicoes_geograficas > 1){
 					placeInstancesPolygonGoogleMaps("", instancias[i].url_icone, instancias[i].id, instancias[i].nome, instancias[i].posicoes_geograficas, instancias[i].pos);
 				
@@ -958,7 +960,7 @@ function loadInstancias(){
 			
 		}
 	}else{
-		intancias_objetos_json = "";//limpa backup
+		intancias_objetos_json = "";//limpa buffer
 	}
 	
 }

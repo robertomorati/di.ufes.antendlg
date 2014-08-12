@@ -6,7 +6,7 @@ Created on 23/10/2013
 '''
 from django import forms 
 from editores.models import Aventura, Autor, PosicaoGeografica, InstanciaObjeto, Objeto, TipoImagem, Icone, Missao, Avatar,\
-    PosInstanciaAtiva, AvatarAtivo, MissaoAtiva, CondicaoAtiva
+    PosInstanciaAtiva, AvatarAtivo, MissaoAtiva, CondicaoAtiva, TipoObjeto
 from editores.models import CondicaoInstanciaObjeto, CondicaoDialogoInstancia, CondicaoJogadorInstancia, CondicaoJogadorObjeto, Agente
 from editores.models import Agressivo, Passivo, Colaborativo, Mensagem, Competitivo, AventuraAtiva
 from editores.models import Enredo, EnredoFile, EnredoInstancia, EnredoMensagem
@@ -765,6 +765,7 @@ class AventuraAtivaWithoutFieldsForm(forms.ModelForm):
         super(AventuraAtivaWithoutFieldsForm, self).__init__(*args, **kwargs)
 
         req = kwargs['initial']['request']
+        
         if kwargs['initial']['aventura_id'] == '-1':
             ValidationError
             messages.error(req, "".join("It's necessary activate an adventure for authoring mode."))  
@@ -776,7 +777,27 @@ class AventuraAtivaWithoutFieldsForm(forms.ModelForm):
     class Meta:
         model = AventuraAtiva
         exclude = ['aventura','joadores_aventura_ativa', 'instancia', 'chave_acesso', ]  
-            
+    
+
+class TipoObjetoUpdateForm(forms.ModelForm):
+    
+    def __init__(self, *args, **kwargs):
+        super(TipoObjetoUpdateForm, self).__init__(*args, **kwargs)
+
+        tipo_objeto_pk = kwargs['initial']['tipo_objeto_pk']
+        req = kwargs['initial']['request']
+        objetos = Objeto.objects.all().filter(tipo_objeto_id=tipo_objeto_pk)
+        
+        count_instancias = 0
+        for obj in objetos:
+            count_instancias = count_instancias + InstanciaObjeto.objects.all().filter(objeto_id = obj.id).count()
+        if count_instancias  >  0:
+            self.fields['posicoes_geograficas'].widget.attrs['readonly'] = True
+            ValidationError
+            messages.error(req, "".join("Não é possível alterar a quantidade de posições geográficas, pois existem instâncias desse tipo de objeto.")) 
+    class Meta:
+        model = TipoObjeto
+           
         
 '''
 ########################################################
