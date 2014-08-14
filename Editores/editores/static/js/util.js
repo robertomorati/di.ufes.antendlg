@@ -367,8 +367,9 @@ function refreshDiv(urlView,idDiv) {
 				var id = $(this).attr('id');
 				var name_objeto = $(this).attr('alt');
 
+				//objeto criado pela primeira vez tem proximidade 1
 				//essa função delega o tipo marker ou Polygon.
-				createInstance(loc,icon, id, name_objeto);
+				createInstance(loc,icon, id, name_objeto, 1);
 				
 			}
 		

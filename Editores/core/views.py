@@ -382,10 +382,9 @@ class InstanciaObjetoCreateView(AjaxableResponseMixin, CreateView):
 class InstanciaObjetoGetJsonView(ListView):
     model = InstanciaObjeto
 
-    # funcao que retorna todas instâncias de objetos de uma dada aventura, com um campo adiciona com a url do icone (json)
     def render_to_response(self, context, **response_kwargs):
         
-        # recupero instancias de uma dada aventura
+        #recupera instâncias de uma dada aventura
         flag = 0;
         flagTwo = 0;
         inst_object_list = InstanciaObjeto.objects.all().filter(aventura_id=self.kwargs['pk'])  # id e nome
@@ -402,6 +401,7 @@ class InstanciaObjetoGetJsonView(ListView):
                 json_inst_objetos += ',{"id":"' + str(inst_obj.pk) + '"' + ',"nome":"' + inst_obj.nome + '"';  # id e nome da instancia
             objeto_list = Objeto.objects.all().filter(pk=inst_obj.objeto_id)  # icone_objeto_id
             pos_list = PosicaoGeografica.objects.all().filter(instancia_objeto_id=inst_obj.pk)
+            json_inst_objetos += ',"proximidade":"' + str(inst_obj.proximidade) + '"';
             for obj in objeto_list:
                 icone_list = Icone.objects.all().filter(pk=obj.icone_objeto_id)
                 for icone in  icone_list:
@@ -424,10 +424,9 @@ class InstanciaObjetoGetJsonView(ListView):
             json_inst_pos = "";
             flagTwo = 0;
              
-        
         json_inst_objetos += ']';
         
-        #print json_inst_objetos
+        print json_inst_objetos
         
         return HttpResponse(json_inst_objetos)
 
@@ -444,8 +443,23 @@ class InstanciaObjetoUpdateView(UpdateView):
     #    return reverse('gmaps_view')
     
     def form_valid(self, form):
-        print str(form)
+        
+        
+        instancia = InstanciaObjeto.objects.filter(pk = form.instance.pk)
+        instancia = instancia[0]
+        
+        location = PosicaoGeografica.objects.filter(instancia_objeto_id=form.instance.pk)
+        location = location[0]
+        lat = location.latitude
+        lng = location.longitude
+        
+        objeto = Objeto.objects.filter(pk=form.instance.objeto_id)
+        icon = Icone.objects.filter(pk=objeto[0].icone_objeto_id)
+        
         self.object = form.save()  
+        
+        if instancia.proximidade != form.instance.proximidade:
+            return HttpResponse(json.dumps({'response': 'proximidade', 'proximidade': form.instance.proximidade,'lat':str(lat), 'lng':str(lng),'icon':str('/media/'+str(icon[0].icone)), 'id_instancia':str(form.instance.pk), 'name_objeto':form.instance.nome}), content_type="application/json")
         # return HttpResponseRedirect(self.get_success_url())
         return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")
     
