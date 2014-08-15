@@ -555,6 +555,21 @@ function createMarkerToPolygon(poly,event,path,markers){
 		createPosMarkerPolygon(marker);
 		
 		//alert(poly.get("qnt_pos_inicial") + " Posição do marcador: " + marker.getPosition() );
+		
+		//Cria circulo para proximidade da instância
+		var circle = new google.maps.Circle({
+			 map: $map,
+			 radius: parseInt(poly.get("proximidade")),
+			 strokeColor: '#000000',
+	      	 strokeOpacity: 0.8,
+	         strokeWeight: 2,
+	         fillColor: '#C8C8C8',
+	         fillOpacity: 0.7,
+		});
+		  
+		marker.circle = circle;
+		marker.circle.bindTo('center', marker, 'position');
+		
 		markers.push(marker);
 		marker.setTitle("POS #" + path.length);//o path deve ser unico para cada marcador.
 
