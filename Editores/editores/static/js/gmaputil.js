@@ -579,7 +579,7 @@ function createMarkerToPolygon(poly,event,path,markers){
 			 setTimeout(function(){
 				 if(singleClickMouse==true)
 				   //TODO: passa circle
-				   infoWindowMarkersPolygon(poly,marker,iconTime,markers,path,marker.getTitle());
+				   infoWindowMarkersPolygon(poly,marker,markers,path,marker.getTitle());
 			 }, 400);  
 		
 		});
