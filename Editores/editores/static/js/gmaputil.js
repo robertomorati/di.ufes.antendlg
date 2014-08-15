@@ -636,7 +636,7 @@ function infoWindowMarkersPolygon(poly,marker,iconTime,markers,path,nome_marker)
 						poly.setMap(null);
 					}
 					
-				}else if(responseText.response == "proximidade"){ {
+				}else if(responseText.response == "proximidade"){
 					//proximidade atualizada
 					//fecha infowindow
 					info.close();
