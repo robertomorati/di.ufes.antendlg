@@ -23,10 +23,10 @@ var singleClickMouse = false;//Flag para tratar o click simples e duplo em marca
 
 
 /**
- * carregaPos()
- * 
  * Função que verifica se a aventura está ativa. 
  * Caso a mesma esteja ativa, a posição do mapa é direcionado para a localização da aventura, caso exista.
+ * 
+ * TODO: criar função para verificar se a função está ativa na SESSION
  */
 var $latlng;//posição do mapa
 function carregaPos (){
@@ -50,7 +50,7 @@ function carregaPos (){
 		        	initialize();//inicializa o google maps
 	        },
 	        error: function() {
-	        	alert("Erro ao recuperar tipos de objetos...Xiiii ;)");
+	        	alert("Erro ao recuperar dados da aventura. Entre em contato com o administrador.");
 	        }
 		});	
 	}else{
@@ -64,8 +64,9 @@ function carregaPos (){
 /**
  * Função que inicializa o google maps. 
  * 
+ * TODO: Adicionar chamada ajax para salvar zoom da aventura.
  */
-var $map;//google maps
+var $map;//mapa
 var overlay;
 function initialize() {
 
@@ -102,8 +103,7 @@ function initialize() {
                             }
                     google.maps.event.removeListener(zoomChangeBoundsListener);
             });
-            //TODO: salvar o zoom atual da aventura
-            
+            //TODO: ajax 
     });
 
     var defaultBounds = new google.maps.LatLngBounds($latlng);
@@ -127,7 +127,8 @@ function initialize() {
             //markers = [];
             
             //Algumas cidades apresentam problemas ao serem localizadas, retornando mais de uma POS.
-            //Desta forma desencadeia uma quantidade absurda de mensagens para o usuário, devido a requisição de salva POS estar dentro do for/loop.
+            //Desta forma desencadeia uma quantidade "absurda" de mensagens para o usuário, 
+	        //pos a requisição de salva POS está dentro do loop.
             //Com o intuito de limitar a mensagem para que parecer somente uma vez, fora criada a flagCount.
             var flagCount = 0;
             var bounds = new google.maps.LatLngBounds();
@@ -154,7 +155,6 @@ function initialize() {
               bounds.extend(place.geometry.location);
               
               //Atualiza a posição da aventura que estiver ativa
-              
 		       jsonObj = '[{"latitude":"' + place.geometry.location.lat() + '"' + ',"longitude":"' + place.geometry.location.lng() + '"}]';
 		      //Getting id aventura from bar user
 		       id_aventura = $('body').find('aventura_ativa_id').attr('id');
@@ -170,7 +170,7 @@ function initialize() {
 				     url:urlView,
 				     data: jsonObj,
 				     success: function(data,status){	  	 
-				    	 //uso da flag
+				    	 //Uso da flagCount
 				      	 if(flagCount == 0){  
 				      		 	//recupera instâncias de objeto para aventura
 				      		 	flagloadInstancias = true;
@@ -187,7 +187,7 @@ function initialize() {
 				     error: function(xhr) {
 				    	  if(flagCount == 0){
 				        	alert("Erro ao atualizar posição geográfica da aventura. Certifique-se de que existe alguma aventura em modo de auntoria." +
-				        		  " Ou vá para o meno Configurações Aventura -> Editar Aventura e ative uma aventura para ser 'autorada'!");
+				        		  " Ou vá para o menu: Configurações Aventura -> Editar Aventura, e ative uma aventura para autoria.");
 				        	flagCount += 1;
 				     		}
 				        }
@@ -216,7 +216,7 @@ function initialize() {
 
 	
 /**
- * Cria a instância de um objeto.
+ * Cria instância de um objeto.
  * 
  * @param location - localização da instância
  * @param icon - imagem para add no marcador
@@ -238,24 +238,24 @@ function createInstance(location,icon, id, name_objeto, proximidade) {
 	     data: json_instancia_objeto,
 	     success: function(data,status){
 	    	 if(data.pk == 0){
-	    		 alert("Impossível criar mais instâncias do objeto " + name_objeto + ". Quantidade de isntâncias no limite.");
+	    		 alert("Impossível criar mais instâncias do objeto " + name_objeto + ". Quantidade de isntâncias esgotadas.");
 	    	 }else{
-	    		    //cria uma nova instância, e atualiza o buffer de instâncias
+	    		    //atualizando buffer de instâncias
 	    		    flagloadBackupInstances = false;
 	    		    flagLoadBackupInstancesMoreOfPos = false;
 	    		    flagloadInstancias = false;
 	    		    loadInstancias();
 	    		    
+	    		    //cria instância
 	    		    if(data.qntde_pos == 1){
-	    		    	placeInstancesGoogleMaps(location,icon, data.pk, name_objeto. proximidade);
+	    		    	placeInstancesGoogleMaps(location,icon, data.pk, name_objeto, proximidade);
 	    		    }else{
-	    		    	placeInstancesPolygonGoogleMaps(location,icon, data.pk, name_objeto,data.qntde_pos,"");
-	    		    }
-			    	
-	    	 	}//fim do else
+	    		    	placeInstancesPolygonGoogleMaps(location,icon, data.pk, name_objeto,data.qntde_pos,"",proximidade);
+	    		    }	
+	    	 }
 	     },
 	     error: function(xhr) {
-	        	alert("Erro criar instância do objeto.");
+	        	alert("É necessário que uma aventura esteja ativa para criar instâncias de objetos.");
 	     }
 	 });
 
@@ -263,7 +263,7 @@ function createInstance(location,icon, id, name_objeto, proximidade) {
 
 
 /**
- * Função para adicionar instância que possui POS > 1
+ * Adiciona instâncias com mais de uma posição geográfica.
  * 
  * @param location - localização de onde a instãncia foi largada
  * @param icon - imagem da instância
@@ -271,7 +271,7 @@ function createInstance(location,icon, id, name_objeto, proximidade) {
  * @param name_objeto
  * @param qntde_pos - quantidade de posições geográficas que a instância pode assumir.
  */
-function placeInstancesPolygonGoogleMaps(location,icon, id_instancia, name_objeto,qntde_pos,pos){
+function placeInstancesPolygonGoogleMaps(location,icon, id_instancia, name_objeto,qntde_pos,pos,proximidade){
 	  
 	/**
 	 * Explicação do MVCArray, utilizado para o marker Polygon.
@@ -299,25 +299,27 @@ function placeInstancesPolygonGoogleMaps(location,icon, id_instancia, name_objet
     poly.set("qnt_pos_inicial", 0);
     poly.set("icone", icon);
     poly.set("nome", name_objeto);
-    poly.set("proximidade", 1);
+    poly.set("proximidade", parseInt(proximidade));
     
     
-    if(pos.length > 0){//processo de carregamento de instâncias
-    
-		//quantidade de pos indica a quantidade de marcadores que aquele Polygon irá ter
+    //carregando instancias de objetos
+    if(pos.length > 0){
+        alert("POS >0");
+		//pos indica a quantidade de marcadores (Markers) que o Poly (instância) possui
 		for (var j=0;j<pos.length;j++){
 			
+			   //atualizando quantidade inserida no mapa
 			   poly.set("qnt_pos_inicial", (poly.get("qnt_pos_inicial")+1));
-			   var loc = new google.maps.LatLng(pos[j].lat, pos[j].lng);
+			   
+		       var loc = new google.maps.LatLng(pos[j].lat, pos[j].lng);
 			   
 			   path.insertAt(path.length, loc);
 			   
 			   createMakerLoaded(poly,loc,id_instancia,path,j,markers,pos);
-				
-	
-		}//fim do for de pos
-    		
-    }else{//processo de autoria 
+
+		}
+    
+    }else{ 
     	     
 	    //cria marcador inicial
 	    poly.set("qnt_pos_inicial", (poly.get("qnt_pos_inicial")+1));
@@ -336,6 +338,7 @@ function placeInstancesPolygonGoogleMaps(location,icon, id_instancia, name_objet
 	    marker.set("id_instancia", id_instancia);
 		markers.push(marker);
 		
+		//TODO: modificar POS para ser usada na concepção dos agentes
 		marker.setTitle("POS #" + path.length);
 		createPosMarkerPolygon(marker);
 
@@ -625,15 +628,33 @@ function infoWindowMarkersPolygon(poly,marker,iconTime,markers,path,nome_marker)
 					//atualiza instâncias
 					loadInstancias();
 					
+					//deleção dos markers de um Polygon
 					for (var i = 0; i <= markers.length; i++){
 						var delMarker = markers[i];
-						//markers.splice(i, (i+1));
+		                //TODO: deleta circulos
 						delMarker.setMap(null);
 						poly.setMap(null);
 					}
 					
-				}else if (ct.indexOf('json') > -1) {
-					 //instância atualizada com sucesso, fecha infowindow
+				}else if(responseText.response == "proximidade"){ {
+					//proximidade atualizada
+					//fecha infowindow
+					info.close();
+					
+					//remove circulos dos marcadores
+					//add novos circulos com proximidade atualizada
+					for (var i = 0; i <= markers.length; i++){
+						var delMarker = markers[i];
+		                //TODO: deleta circulos
+						delMarker.setMap(null);
+						poly.setMap(null);
+					}
+				
+					
+				}
+				else if (ct.indexOf('json') > -1) {
+					 //instância atualizada
+					 //fecha infowindow
 					 info.close();
 				}
   			}
@@ -646,7 +667,8 @@ function infoWindowMarkersPolygon(poly,marker,iconTime,markers,path,nome_marker)
   			$('#instancia_objeto_update_view').ajaxForm(options);
   			$('#instancia_objeto_delete_view').ajaxForm(options);
 	    	  
-	      });//fim do script para tratar o json e domready
+	      });
+	      //fim do script para tratar o json e domready
 	      //atualiza conteúdo
 	      info.setContent(data); 
 	    },
@@ -764,7 +786,7 @@ function placeInstancesGoogleMaps(location,icon, id_instancia, name_objeto, prox
 		    content: iconTime,
       });
 	  
-	   
+	  //Cria circulo para proximidade da instância
 	  var circle = new google.maps.Circle({
 		  map: $map,
 		  radius: parseInt(proximidade_instancia),
@@ -775,9 +797,9 @@ function placeInstancesGoogleMaps(location,icon, id_instancia, name_objeto, prox
           fillOpacity: 0.7,
 		});
 	  
-	  
 	  marker[nameInfo].circle = circle;
 	  marker[nameInfo].circle.bindTo('center', marker, 'position');
+	  
 	  var info;
 	  //Add evento de click na infowindow. 
 	  //Também responsavel por carregar o conteúdo na infowindow.
@@ -814,10 +836,8 @@ function placeInstancesGoogleMaps(location,icon, id_instancia, name_objeto, prox
 	    	  				if(responseText.response == "delete"){
 	    	  					
 	    	  					info.close();//fecha infowindow
-	    	    	  			
-	    	  					info.circle.setMap(null);//remove o circulo
-	    	
-	    	  					rmMaker.setMap(null);//remove marcador
+	    	    	  			info.circle.setMap(null);//remove o circulo
+	    	    	  			rmMaker.setMap(null);//remove marcador
 	    	  		
 	    	  					flagloadBackupInstances = false;//set flag to update instances
 	    	  					loadInstancias();//update isntances
@@ -826,9 +846,8 @@ function placeInstancesGoogleMaps(location,icon, id_instancia, name_objeto, prox
 	    	  					
 	    	  					info.close();//fecha infowindow
 	    	    	  			
-	    	  					info.circle.setMap(null);//remove o circulo
-	    	
-	    	  					rmMaker.setMap(null);//remove marcador
+	    	  					//update radius circle
+	    	  					info.circle.setRadius(parseInt(responseText.proximidade));
 	    	  					
 	    	  					flagloadBackupInstances = false;//set flag to update instances
 	    	  					loadInstancias();//update backup isntances
@@ -995,7 +1014,7 @@ function replaceInstances(){
 	for (var i=0;i<instancias.length;i++){
 		
 		if(instancias[i].posicoes_geograficas > 1){
-			placeInstancesPolygonGoogleMaps("", instancias[i].url_icone, instancias[i].id, instancias[i].nome, instancias[i].posicoes_geograficas, instancias[i].pos);
+			placeInstancesPolygonGoogleMaps("", instancias[i].url_icone, instancias[i].id, instancias[i].nome, instancias[i].posicoes_geograficas, instancias[i].pos,instancias[i].proximidade);
 		
 		}else{
 			var loc = new google.maps.LatLng(instancias[i].pos[0].lat, instancias[i].pos[0].lng);

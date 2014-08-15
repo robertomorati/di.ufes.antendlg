@@ -622,6 +622,7 @@ class AventuraAutoriaEstadoUpdateView(UpdateView):
     def form_valid(self, form):
         # form.instance.autor_id = self.kwargs['pk']
 
+
         self.object = form.save()    
         
         #atualiza objeto na session
@@ -664,6 +665,7 @@ class AventuraCreateView(CreateView):
     
     # Override no form. 
     def form_valid(self, form):
+        
         form.instance.autor_id = self.kwargs['pk']
         self.object = form.save()    
         return HttpResponse(json.dumps({'response' : 'ok'}), content_type="application/json")
@@ -971,10 +973,12 @@ class AventuraAtivaUpdateView(UpdateView):
         return reverse('aventuras_ativas_list_view')
     
     def get_initial(self):
+        
         initial = super(AventuraAtivaUpdateView, self).get_initial()
         initial['request'] = self.request
         if self.request.session[SESSION_AVENTURA] != '-1':
             initial['aventura_id'] = self.request.session[SESSION_AVENTURA].id
+            initial['autoria_estado'] = self.request.session[SESSION_AVENTURA].autoria_estado
         else:
             initial['aventura_id'] = self.request.session[SESSION_AVENTURA]
         return initial
