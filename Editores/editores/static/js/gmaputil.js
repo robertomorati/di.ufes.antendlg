@@ -250,7 +250,8 @@ function createInstance(location,icon, id, name_objeto, proximidade) {
 	    		    if(data.qntde_pos == 1){
 	    		    	placeInstancesGoogleMaps(location,icon, data.pk, name_objeto, proximidade);
 	    		    }else{
-	    		    	placeInstancesPolygonGoogleMaps(location,icon, data.pk, name_objeto,data.qntde_pos,"",proximidade);
+	    		    	//pos igual a 0
+	    		    	placeInstancesPolygonGoogleMaps(location,icon, data.pk, name_objeto,data.qntde_pos,0,proximidade);
 	    		    }	
 	    	 }
 	     },
@@ -304,7 +305,6 @@ function placeInstancesPolygonGoogleMaps(location,icon, id_instancia, name_objet
     
     //carregando instancias de objetos
     if(pos.length > 0){
-        alert("POS >0");
 		//pos indica a quantidade de marcadores (Markers) que o Poly (instância) possui
 		for (var j=0;j<pos.length;j++){
 			
@@ -336,20 +336,33 @@ function placeInstancesPolygonGoogleMaps(location,icon, id_instancia, name_objet
 		
 		marker.set("id_instancia","id_pos");
 	    marker.set("id_instancia", id_instancia);
-		markers.push(marker);
+		
 		
 		//TODO: modificar POS para ser usada na concepção dos agentes
 		marker.setTitle("POS #" + path.length);
 		createPosMarkerPolygon(marker);
 
-		//TODO: circle here
+		//Cria circulo para proximidade da instância
+		var circle = new google.maps.Circle({
+			 map: $map,
+			 radius: parseInt(poly.get("proximidade")),
+			 strokeColor: '#000000',
+	      	 strokeOpacity: 0.8,
+	         strokeWeight: 2,
+	         fillColor: '#C8C8C8',
+	         fillOpacity: 0.7,
+		});
+		  
+		marker.circle = circle;
+		marker.circle.bindTo('center', marker, 'position');
+		
+		markers.push(marker);
 		
 		google.maps.event.addListener(marker, 'click', function() {
 			singleClickMouse = true;
 			//setTimeout("runIfNotDblClick()",300);
 			setTimeout(function(){
 				 if(singleClickMouse==true)
-				   //TODO: pass circle
 				   infoWindowMarkersPolygon(poly,marker,iconTime,markers,path,marker.getTitle());
 			 }, 400);  
 		});
@@ -410,6 +423,7 @@ function placeInstancesPolygonGoogleMaps(location,icon, id_instancia, name_objet
 				}
 				
 				marker.setMap(null);
+				marker.circle.setMap(null);
 				poly.set("qnt_pos_inicial", (poly.get("qnt_pos_inicial")-1));
 				for (var i = 0, I = markers.length; i < I && markers[i] != marker; ++i);
 				markers.splice(i, 1);
@@ -452,9 +466,25 @@ function createMakerLoaded(poly,loc,id_instancia,path,j,markers,pos){
 	  marker.set("id_instancia", id_instancia);
 	  marker.set("id_pos", pos[j].id_pos);
 		
+	  //TODO: modificar POS
 	  marker.setTitle("POS #" + path.length);
+		
+	 //Cria circulo para proximidade da instância
+	var circle = new google.maps.Circle({
+		 map: $map,
+		 radius: parseInt(poly.get("proximidade")),
+		 strokeColor: '#000000',
+	  	 strokeOpacity: 0.8,
+	     strokeWeight: 2,
+	     fillColor: '#C8C8C8',
+	     fillOpacity: 0.7,
+	});	
+		  
+	marker.circle = circle;
+	marker.circle.bindTo('center', marker, 'position');
+	markers.push(marker);
 	  
-	  markers.push(marker);
+	  //TODO: circle here
 	  path.setAt(j, marker.getPosition());
 
 	google.maps.event.addListener(marker, 'click', function() {
@@ -463,6 +493,7 @@ function createMakerLoaded(poly,loc,id_instancia,path,j,markers,pos){
 		 //setTimeout("runIfNotDblClick()", 300);
 		 setTimeout(function(){
 			 if(singleClickMouse==true)
+			   //TODO: pass circle 
 			   infoWindowMarkersPolygon(poly,marker,iconTime,markers,path,marker.getTitle());
 		 }, 400);  
 	
@@ -641,15 +672,20 @@ function infoWindowMarkersPolygon(poly,marker,iconTime,markers,path,nome_marker)
 					//fecha infowindow
 					info.close();
 					
-					//remove circulos dos marcadores
-					//add novos circulos com proximidade atualizada
+					//atualiza flag para atualizar buffer de instâncias
+					flagLoadBackupInstancesMoreOfPos = false;
+					//atualiza instâncias
+					loadInstancias();
+					
+					//atualiza proximidade dos circulos dos marcadores
+					poly.set("proximidade", parseInt(responseText.proximidade));
 					for (var i = 0; i <= markers.length; i++){
-						var delMarker = markers[i];
+						var updateMarker = markers[i];
 		                //TODO: deleta circulos
-						delMarker.setMap(null);
-						poly.setMap(null);
+						//delMarker.setMap(null);
+						//poly.setMap(null);
+						updateMarker.circle.setRadius(parseInt(responseText.proximidade));
 					}
-				
 					
 				}
 				else if (ct.indexOf('json') > -1) {
@@ -1014,6 +1050,7 @@ function replaceInstances(){
 	for (var i=0;i<instancias.length;i++){
 		
 		if(instancias[i].posicoes_geograficas > 1){
+			//POS maior que 0
 			placeInstancesPolygonGoogleMaps("", instancias[i].url_icone, instancias[i].id, instancias[i].nome, instancias[i].posicoes_geograficas, instancias[i].pos,instancias[i].proximidade);
 		
 		}else{
