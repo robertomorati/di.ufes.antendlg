@@ -363,7 +363,7 @@ function placeInstancesPolygonGoogleMaps(location,icon, id_instancia, name_objet
 			//setTimeout("runIfNotDblClick()",300);
 			setTimeout(function(){
 				 if(singleClickMouse==true)
-				   infoWindowMarkersPolygon(poly,marker,iconTime,markers,path,marker.getTitle());
+				   infoWindowMarkersPolygon(poly,marker,markers,path,marker.getTitle());
 			 }, 400);  
 		});
 		
@@ -494,7 +494,7 @@ function createMakerLoaded(poly,loc,id_instancia,path,j,markers,pos){
 		 setTimeout(function(){
 			 if(singleClickMouse==true)
 			   //TODO: pass circle 
-			   infoWindowMarkersPolygon(poly,marker,iconTime,markers,path,marker.getTitle());
+			   infoWindowMarkersPolygon(poly,marker,markers,path,marker.getTitle());
 		 }, 400);  
 	
 	});
@@ -603,12 +603,11 @@ function createMarkerToPolygon(poly,event,path,markers){
  * 
  * @param poly - Instância Polygon 
  * @param marker - marcador que receve a infowindow
- * @param iconTime - ícone de tempo para carregamento dos dados da instância
  * @param markers - lista de marcadores
  * @param path - MVCArray
  * @param nome_marker - nome do marcador
  */
-function infoWindowMarkersPolygon(poly,marker,iconTime,markers,path,nome_marker){
+function infoWindowMarkersPolygon(poly,marker,markers,path,nome_marker){
 	
 	//Icone para fornecer feedback ao usuário de que os dados da instância estão sendo carregados
 	iconTime = "" + '<i class=" icon-download-alt"></i>';
