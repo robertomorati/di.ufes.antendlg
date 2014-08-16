@@ -6,7 +6,7 @@ Created on 18/09/2013
 '''
 from django.conf.urls import patterns, url
 
-from core.views import AventuraListView, AventuraCreateView, AventuraUpdateView
+from core.views import AventuraListView, AventuraCreateView, AventuraUpdateView,AventuraSessionGet
 from core.views import AventuraDesativarView, AventuraDeleteView, AventuraGetJsonView, AventuraAtivarView, AventuraUpdatePositionView
 
 from core.views import PosInstanciaAtivaCreateView, AvatarAtivoCreateView, MissaoAtivaCreateView, AventuraAutoriaEstadoUpdateView
@@ -17,9 +17,7 @@ admin.autodiscover()
 
 urlpatterns = patterns('',                               
   
-    #urls para aventura
-    #lista aventuras ativas
-    
+    url(r'^get_session/$', AventuraSessionGet.as_view(), name='aventura_get_session',),
     url(r'^aventura/update_estado_autoria/(?P<pk>\d+)/$', AventuraAutoriaEstadoUpdateView.as_view(), name='autoria_estado_update_view',),
     url(r'^aventura/(?P<pk>\d+)/$', AventuraListView.as_view(), name='aventura_list_view'),
     url(r'^aventura/ativar_aventura/(?P<pk>\w+)/$', AventuraAtivarView.as_view(), name='aventura_ativar_edicao_view',),#editar remete a criação da aventura

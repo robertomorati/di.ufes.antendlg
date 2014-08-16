@@ -99,6 +99,7 @@ class LoginView(FormView):
                 # session if the existing session corresponds to a different
                 # authenticated user.
                 request.session.flush()
+                request.session.set_expiry(600)
         else:
             request.session.cycle_key()
         request.session[SESSION_KEY] = user.id

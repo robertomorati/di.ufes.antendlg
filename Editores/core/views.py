@@ -608,7 +608,25 @@ class MsgShowView(TemplateView):
                         Views para Aventura
 ====================================================================
 '''
+
+class AventuraSessionGet(ListView):
+    model = Aventura
     
+    def render_to_response(self, context, **response_kwargs):
+        if self.request.session[SESSION_AVENTURA] != '-1':
+            aventura_id = self.request.session[SESSION_AVENTURA].id
+            nome = self.request.session[SESSION_AVENTURA].nome
+            if self.request.session[SESSION_AVENTURA].autoria_estado == 'AC':
+                autoria_estado = "Completa"
+            else:
+                autoria_estado = "Em construção"
+        else:
+            nome = ""
+            autoria_estado = ""
+            aventura_id = '-1'
+        return HttpResponse(json.dumps({'nome': nome , 'id' : aventura_id, 'autoria_estado': autoria_estado }), content_type="application/json")
+
+       
 # atualiza o estado de autoria de uma aventura - completo ou incompleto para que a mesma possa ser publicada
 class AventuraAutoriaEstadoUpdateView(UpdateView):
     template_name = 'editor_aventuras/aventura/autoria_estado_update.html'
@@ -651,6 +669,7 @@ class AventuraListView(ListView):
         
         context['object_list'] = Aventura.objects.all().filter(autor=self.kwargs['pk'])
        
+        context['SESSION_AVENTURA_AUTORIA'] = self.request.session[SESSION_AVENTURA]
         # print self.request.session[SESSION_AVENTURA]
         return context
 

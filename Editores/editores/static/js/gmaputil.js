@@ -32,6 +32,7 @@ var $latlng;//posição do mapa
 function carregaPos (){
 	
 	var id = aventuraAtiva();
+
 	
 	if(id != '-1'){
 		 var urlView = '/editor_aventuras/get_json_aventura/' + id +'/';
@@ -1080,11 +1081,30 @@ function replaceInstances(){
  */
 function aventuraAtiva(){
 	
-	//verifica se existe alguma aventura ativa na barra do usuário
 	var aventura_id = '-1';
-	if($('body').find('aventura_ativa_id').attr('id')>0)
+	if($('body').find('aventura_ativa_id').attr('id')>0){
 		aventura_id = $('body').find('aventura_ativa_id').attr('id');
 	
+	}else{
+			 $.ajax({
+			        type: 'GET',
+			        url: '/editor_aventuras/get_session/',
+			        success: function(response) {
+			        	
+			        	if (response.id>0){
+						$('body').find('aventura_ativa').empty().append('<i class="icon-map-marker"></i> Aventura: ' + response.nome +  ' <i class="icon-cog"></i> Autoria: ' + response.autoria_estado);
+						$('body').find('aventura_ativa').append('<aventura_ativa_id id="' + response.id + '" ></aventura_ativa_id>');
+							return response.id;
+			        	}
+						return aventura_id;
+		     },
+		     error: function() {
+		     	//alert("Erro ao recuperar dados da aventura em autoria. Habilite a aventura desejada para autoria novamente.");
+		    	 return aventura_id;
+		     }
+			});
+			
+	}
 	return aventura_id;
 }
 
