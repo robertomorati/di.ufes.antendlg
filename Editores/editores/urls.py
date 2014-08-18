@@ -4,10 +4,8 @@ from django.contrib import admin
 from editores.views import IndexView, logout_page
 from editores.settings import MEDIA_ROOT
 from django.contrib.auth.decorators import login_required
-from editores.views import LoginView, LoginCreateView, AutorGetJsonView
+from editores.views import LoginView, LoginCreateView, AutorGetJsonView,DefaultRouter
 
-
-from rest_framework import routers
 
 #Teste com o framework rest
 from core_services.views import AventuraView,InstanciasObjetoView,JogadorLoginCreateView
@@ -21,7 +19,7 @@ admin.autodiscover()
 #framework rest
 #Router permite declrar de forma simples as rotas comuns para um determinado controlador de recursos
 #O uso do DefaultRouter difere do SimpleRouveter. Adicionalmente o SimpleRouter permite o uso de autenticação.
-router = routers.DefaultRouter()
+router = DefaultRouter()
 #router.register(r'users', User)
 
 urlpatterns = patterns('',
