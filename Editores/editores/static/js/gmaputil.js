@@ -17,7 +17,7 @@ var flagloadBackupInstances = false;//Flag para controlar o backup de instância
 
 var flagLoadBackupInstancesMoreOfPos = false;//Flag para tratar o backup de instâncias que possuem mais de uma posição geográfica.
 
-var intancias_objetos_json;//buffer para armazenar instâncias de objetos.
+var intancias_objetos_json = "";//buffer para armazenar instâncias de objetos.
 var singleClickMouse = false;//Flag para tratar o click simples e duplo em marcadores do Polygon. Uso somente em instâncias com mais de uma POS.
 
 
@@ -32,34 +32,68 @@ var $latlng;//posição do mapa
 function carregaPos (){
 	
 	var id = aventuraAtiva();
-
-	
+	 
 	if(id != '-1'){
-		 var urlView = '/editor_aventuras/get_json_aventura/' + id +'/';
-		 $.ajax({
-		        type: 'GET',
-		        url: urlView,
-		        cache: false,
-		        async: false,
-		        success: function(response) {
-		        	var obj = $.parseJSON(response);
-		        	if(obj[0].fields.latitude != '' && obj[0].fields.longitude != ''){
-		        		$latlng = new google.maps.LatLng(obj[0].fields.latitude, obj[0].fields.longitude);
-		        	}else{
-		        		$latlng = new google.maps.LatLng(32.6381461, -16.9332489);
-		        	}
-		        	initialize();//inicializa o google maps
-	        },
-	        error: function() {
-	        	alert("Erro ao recuperar dados da aventura. Entre em contato com o administrador.");
-	        }
-		});	
+		 aventuraGet(id);
 	}else{
-		//32,6381461 -16,9332489   -30.068637, -51.120404
-		$latlng = new google.maps.LatLng(32.6381461, -16.9332489);//posição padrão caso a aventura não possua.
-		initialize();//inicializa o google maps em uma posição padrão
+		aventuraGetSession();
 	}
 
+}
+
+/**
+ * Função que verifica se uma aventura está ativa na session do usuário
+ */
+function aventuraGetSession(){
+	$.ajax({
+        type: 'GET',
+        async: false,
+        url: '/editor_aventuras/get_session/',
+        success: function(response) {
+        	
+        	if (response.id>0){
+        		
+			$('body').find('aventura_ativa').empty().append('<i class="icon-map-marker"></i> Aventura: ' + response.nome +  ' <i class="icon-cog"></i> Autoria: ' + response.autoria_estado);
+			$('body').find('aventura_ativa').append('<aventura_ativa_id id="' + response.id + '" ></aventura_ativa_id>');
+			
+			aventuraGet(response.id );
+			
+        	}else{
+        		//32,6381461 -16,9332489   -30.068637, -51.120404
+        		$latlng = new google.maps.LatLng(32.6381461, -16.9332489);//posição padrão caso a aventura não possua.
+        		initialize();//inicializa o google maps em uma posição padrão
+        	}
+	  },
+	  error: function() {
+	  	alert("Erro ao recuperar dados da aventura em autoria. Habilite a aventura desejada para autoria novamente.");
+	  }
+	});
+}
+
+/**
+ * Função que recupera os dados de uma aventura
+ */
+function aventuraGet(aventura_id){
+	var urlView = '/editor_aventuras/get_json_aventura/' + aventura_id +'/';
+	 $.ajax({
+	        type: 'GET',
+	        url: urlView,
+	        cache: false,
+	        async: false,
+	        success: function(response) {
+	        	var obj = $.parseJSON(response);
+	        	if(obj[0].fields.latitude != '' && obj[0].fields.longitude != ''){
+	        		$latlng = new google.maps.LatLng(obj[0].fields.latitude, obj[0].fields.longitude);
+	        	}else{
+	        		$latlng = new google.maps.LatLng(32.6381461, -16.9332489);
+	        	}
+	        	initialize();//inicializa o google maps
+     },
+     error: function() {
+     	alert("Erro ao recuperar dados da aventura. Entre em contato com o administrador.");
+     }
+	});	
+	
 }
 
 /**
@@ -70,7 +104,6 @@ function carregaPos (){
 var $map;//mapa
 var overlay;
 function initialize() {
-
 	//opções iniciais de configuração do mapa ao para ser iniciado
     var myOptions = {
       zoom: 16,
@@ -210,9 +243,17 @@ function initialize() {
 		overlay.draw = function() {};
 		overlay.setMap($map);
 		
-		flagloadInstancias = true;
-		flagLoadBackupInstancesMoreOfPos = true;
-		loadInstancias();
+		if (intancias_objetos_json.length >=5){
+			flagloadInstancias = true;
+			flagLoadBackupInstancesMoreOfPos = true;
+			loadInstancias();
+		}else{
+			flagloadInstancias = false;
+			flagLoadBackupInstancesMoreOfPos = false;
+			loadInstancias();
+			replaceInstances();
+		}
+		
 } 
 
 	
@@ -1027,7 +1068,6 @@ function loadInstancias(){
 	
 	//verifica se a aventura está ativa
 	var aventura_id = aventuraAtiva();
-	
 	if(aventura_id != '-1'){
 		urlView = '/editor_objetos/instancia_objeto/get_instancia/' + aventura_id  + '/';
 		   
@@ -1036,6 +1076,7 @@ function loadInstancias(){
     		//ajax to get all types of instances by aventura_id
 			$.ajax({
 	   		     type:"GET",
+	   		     async: false,
 	   		     url:urlView,
 	   		     success: function(data,status){
 	   		    	intancias_objetos_json = data;//backup das instâncias atualizado
@@ -1061,7 +1102,6 @@ function loadInstancias(){
 function replaceInstances(){
 	
 	var instancias = $.parseJSON(intancias_objetos_json);
-	
 	for (var i=0;i<instancias.length;i++){
 		
 		if(instancias[i].posicoes_geograficas > 1){
@@ -1082,29 +1122,9 @@ function replaceInstances(){
 function aventuraAtiva(){
 	
 	var aventura_id = '-1';
-	if($('body').find('aventura_ativa_id').attr('id')>0){
+	if($('body').find('aventura_ativa_id').attr('id')>0)
 		aventura_id = $('body').find('aventura_ativa_id').attr('id');
 	
-	}else{
-			 $.ajax({
-			        type: 'GET',
-			        url: '/editor_aventuras/get_session/',
-			        success: function(response) {
-			        	
-			        	if (response.id>0){
-						$('body').find('aventura_ativa').empty().append('<i class="icon-map-marker"></i> Aventura: ' + response.nome +  ' <i class="icon-cog"></i> Autoria: ' + response.autoria_estado);
-						$('body').find('aventura_ativa').append('<aventura_ativa_id id="' + response.id + '" ></aventura_ativa_id>');
-							return response.id;
-			        	}
-						return aventura_id;
-		     },
-		     error: function() {
-		     	//alert("Erro ao recuperar dados da aventura em autoria. Habilite a aventura desejada para autoria novamente.");
-		    	 return aventura_id;
-		     }
-			});
-			
-	}
 	return aventura_id;
 }
 
