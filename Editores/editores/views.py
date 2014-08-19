@@ -16,6 +16,7 @@ from django.core.urlresolvers import reverse
 from core.forms import LoginForm, AutorForm
 from django.core import serializers
 from  django.contrib.auth import *
+from django.contrib.auth.views  import *
 import json
 SESSION_AVENTURA = '_user_aventura_id'
 
@@ -27,6 +28,8 @@ from rest_framework.routers import SimpleRouter
 from rest_framework.compat import url
 from rest_framework.urlpatterns import format_suffix_patterns
 from rest_framework import views
+from rest_framework.authentication import *
+
 
 #override DefaultRouter
 class DefaultRouter(SimpleRouter):
@@ -76,6 +79,64 @@ class DefaultRouter(SimpleRouter):
             urls = format_suffix_patterns(urls)
 
         return urls
+    
+@sensitive_post_parameters()
+@csrf_protect
+@never_cache
+def login_player(request, template_name='registration/login_player.html',
+          redirect_field_name=REDIRECT_FIELD_NAME,
+          authentication_form=AuthenticationForm,
+          current_app=None, extra_context=None):
+    """
+    Displays the login form and handles the login action.
+    """
+    redirect_to = request.REQUEST.get(redirect_field_name, '')
+
+    if request.method == "POST":
+        form = authentication_form(request, data=request.POST)
+        if form.is_valid():
+            
+            # Ensure the user-originating redirection url is safe.
+            #if not is_safe_url(url=redirect_to, host=request.get_host()):
+            #    redirect_to = resolve_url(settings.LOGIN_REDIRECT_URL)
+
+            # Okay, security check complete. Log the user in.
+            
+            user = form.get_user()       
+            if not user or not user.is_active:
+                ValidationError
+                messages.error(request, "".join("Invalid username or incorrect password!"))
+                return HttpResponseRedirect('/autenvldg_services/login_player/')
+                #msg = "Invalid username or incorrect password!"
+                #raise exceptions.AuthenticationFailed(msg)
+              
+            else:
+                if Autor.objects.all().filter(user_ptr_id = user.pk).exists():
+                    ValidationError
+                    messages.error(request, "".join("Please, it's necessary use a player account to login."))
+                    return HttpResponseRedirect('/autenvldg_services/login_player/')
+                    
+                #auth_login(request, form.get_user())
+
+            return HttpResponseRedirect('/autenvldg_services/')
+    else:
+        form = authentication_form(request)
+
+    current_site = get_current_site(request)
+
+    context = {
+        'form': form,
+        redirect_field_name: redirect_to,
+        'site': current_site,
+        'site_name': current_site.name,
+    }
+    if extra_context is not None:
+        context.update(extra_context)
+    return TemplateResponse(request, template_name, context,
+                            current_app=current_app)
+
+    
+    
 '''
 Página inicial
 '''
@@ -120,9 +181,8 @@ class LoginView(FormView):
             return self.get(request, *args, **kwargs)
         user = authenticate(username=form.cleaned_data["username"],
                             password=form.cleaned_data["password"])
-        #melhorar
-        
-         
+
+        #TODO: melhorar         
         if not user or not user.is_active:
             ValidationError
             messages.error(request, "".join("Invalid username or incorrect password !"))
@@ -153,13 +213,13 @@ class LoginView(FormView):
                 # session if the existing session corresponds to a different
                 # authenticated user.
                 request.session.flush()
-                request.session.set_expiry(600)
         else:
             request.session.cycle_key()
         request.session[SESSION_KEY] = user.id
         #SESSION_AVENTURA com -1 significa que não existe aventuras sendo editadas
         request.session[SESSION_AVENTURA] = '-1'
         request.session[BACKEND_SESSION_KEY] = user.backend
+        #request.session.set_expiry(50)
         if hasattr(request, 'user'):
             request.user = user
             user_logged_in.send(sender=user.__class__, request=request, user=user)

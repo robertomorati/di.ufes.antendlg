@@ -4,17 +4,17 @@ from django.contrib import admin
 from editores.views import IndexView, logout_page
 from editores.settings import MEDIA_ROOT
 from django.contrib.auth.decorators import login_required
-from editores.views import LoginView, LoginCreateView, AutorGetJsonView,DefaultRouter
+from editores.views import LoginView, LoginCreateView, AutorGetJsonView,DefaultRouter,login_player
 
 
 #Teste com o framework rest
 from core_services.views import AventuraView,InstanciasObjetoView,JogadorLoginCreateView
-
+#from rest_framework.urls import template_name 
 #monitoring apps
 #from statsd import statsd
 
 admin.autodiscover()
-
+template_name = "registration/login_player.html"
 
 #framework rest
 #Router permite declrar de forma simples as rotas comuns para um determinado controlador de recursos
@@ -31,7 +31,7 @@ urlpatterns = patterns('',
     #rest_framework
     url(r'^', include(router.urls)),
     url(r'^autenvldg_services/', include('rest_framework.urls', namespace='rest_framework')),
-
+    url(r'^autenvldg_services/login_player/$', login_player, name='login_player'),
     
     # Login / logout.
     url(r"^autenvldg/login/$",LoginView.as_view(), name="login",),
