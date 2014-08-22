@@ -12,7 +12,7 @@ from core.views import IconeCreateView, IconeListView, IconeUpdateView, IconeDel
 from core.views import GMapView, MsgShowView, PosicaoGeograficaCreateView, PosicaoGeograficaUpdateView, PosicaoGeograficaGetJsonView, PosicaoGeograficaDeleteView
 from core.views import AventuraListView, AventuraCreateView, AventuraUpdateView, AventuraDeleteView, AventuraGetJsonView, AventuraAtivarView, AventuraUpdatePositionView
 from core.views import InstanciaObjetoCreateView, InstanciaObjetoGetJsonView, InstanciaObjetoUpdateView, InstanciaObjetoDeleteView, AventuraDesativarView
-from core.views import SugestaoListView, SugestaoCreateView, SugestaoUpdateView, SugestaoDeleteView
+from core.views import SugestaoListView, SugestaoFileCreateView, SugestaoFileUpdateView, SugestaoDeleteView, SugestaoMessageCreateView, SugestaoMessageUpdateView
 from core.views import TipoImagemListView, TipoImagemCreateView, TipoImagemUpdateView, TipoImagemDeleteView
 from core.views import PosInstanciaAtivaCreateView, AvatarAtivoCreateView, MissaoAtivaCreateView, CondicaoAtivaCreateForm
 
@@ -94,8 +94,10 @@ urlpatterns = patterns('',
     
     #urls para sugestões
     url(r'^sugestoes/$', SugestaoListView.as_view(), name='sugestao_list_view'),
-    url(r'^sugestoes/criar_sugestoes/$', SugestaoCreateView.as_view(), name='sugestao_create_view'),
-    url(r'^sugestoes/update_sugestoes/(?P<pk>\w+)/$', SugestaoUpdateView.as_view(), name='sugestao_update_view'),
+    url(r'^sugestoes/criar_sugestoes/$', SugestaoFileCreateView.as_view(), name='sugestao_file_create_view'),
+    url(r'^sugestoes/update_sugestoes/(?P<pk>\w+)/$', SugestaoFileUpdateView.as_view(), name='sugestao_file_update_view'),
+    url(r'^sugestoes/criar_sugestoes_message/$', SugestaoMessageCreateView.as_view(), name='sugestao_message_create_view'),
+    url(r'^sugestoes/update_sugestoes_message/(?P<pk>\w+)/$', SugestaoMessageUpdateView.as_view(), name='sugestao_message_update_view'),
     url(r'^sugestoes/delete_sugestoes/(?P<pk>\w+)/$', SugestaoDeleteView.as_view(), name='sugestao_delete_view'),
     
     

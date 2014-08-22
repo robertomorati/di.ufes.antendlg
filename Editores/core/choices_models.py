@@ -6,8 +6,8 @@ Created on Jul 30, 2014
 '''
 #choice para tipos de sugestões
 TIPO_SUGESTAO = (
-    (u'STX', u'Texto'),
-    (u'STX', u'Áudio'),
+    #(u'STX', u'Texto'),
+    (u'SAU', u'Áudio'),
     (u'SIMG', u'Imagem'),)
 
 

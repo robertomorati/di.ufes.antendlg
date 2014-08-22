@@ -28,6 +28,12 @@ function openModal(url,idDiv) {
 	});
 };
 
+/**
+ * Playr mp3
+ */
+audiojs.events.ready(function() {
+    audiojs.createAll();
+  });
 
 /**
  * change dynamically size modal 

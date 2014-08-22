@@ -50,7 +50,8 @@ class JogadorLoginCreateView(ListCreateAPIView):
     def get(self,request, *args, **kw):
         #do nothing
         return Response("{'status':'get deactivated'}", status=status.HTTP_200_OK)
-    
+  
+  
 """
 Retorna lista de aventuras por autor
 """

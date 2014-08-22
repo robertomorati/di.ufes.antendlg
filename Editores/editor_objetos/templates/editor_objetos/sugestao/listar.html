@@ -1,3 +1,8 @@
+<script>
+  audiojs.events.ready(function() {
+    var as = audiojs.createAll();
+  });
+</script>
 <div class="form-actions">
 	<h3>
 		<strong>Suggestions</strong>
@@ -12,13 +17,27 @@
 		<tbody>
 			{% for object in object_list %}
 			<tr class="success">
-				<td>
-					<a data-toggle="modal"
-					onClick="openModal('{% url  'sugestao_update_view' object.pk %}','sugestao')"
-					href="#sugestao">{{ object.nome }}</a> 
-				</td>
+				{% if object.tipo_id == 'TXT' %}
+					<td>
+						<a data-toggle="modal"
+						onClick="openModal('{% url  'sugestao_message_update_view' object.pk %}','sugestao')"
+						href="#sugestao">{{ object.nome }}</a> 
+					</td>
+				{% else %}
+					<td>
+						<a data-toggle="modal"
+						onClick="openModal('{% url  'sugestao_file_update_view' object.pk %}','sugestao')"
+						href="#sugestao">{{ object.nome }}</a> 
+					</td>	
+				{% endif %}	
 				<td>{{ object.tipo }}</td>
-				<td>{{ object.sugestao }}</td>
+				<td>
+					{% if object.tipo_id == 'SAU' %}
+					<audio src="{{MEDIA_URL}}{{ object.sugestao }}"preload="auto" />
+					{% else %}
+					{{  object.sugestao }}
+					{% endif %}
+				</td>
 				<td>{{ object.proximidade }}</td>		
 				<td>
 						{% csrf_token %}
@@ -36,7 +55,8 @@
 		</tbody>
 	</table>
 	<!-- Modal para criação de objetos -->
-	<a role="button" onClick="openModal('{% url 'sugestao_create_view' %}','sugestao')" class="btn btn-small btn-primary" data-toggle="modal" href="#sugestao">Create Suggestion</a>
+	<a role="button" onClick="openModal('{% url 'sugestao_file_create_view' %}','sugestao')" class="btn btn-small btn-primary" data-toggle="modal" href="#sugestao">Create Suggestion File</a>
+	<a role="button" onClick="openModal('{% url 'sugestao_message_create_view' %}','sugestao')" class="btn btn-small btn-primary" data-toggle="modal" href="#sugestao">Create Suggestion Message</a>
 	
 	<div id="sugestao" class="modal hide fade"></div>
 </div>

@@ -18,11 +18,13 @@ from django.core import serializers
 from django.core.context_processors import request
 from django.http import HttpResponse
 from core.ajax import AjaxableResponseMixin
+from itertools import chain
 
 # imports para objeto, tipos de objetos, icones utilizados no momento de autoria, instancias dos objetos.
 # Also, imports para posições geográficas que as instâncias possuem, bem como a sugestão e o tipo de imagem
-from editores.models import Objeto, TipoObjeto, Icone, Aventura, InstanciaObjeto, PosicaoGeografica, Sugestao, TipoImagem, \
-    Jogador
+from editores.models import Objeto, TipoObjeto, Icone, Aventura, InstanciaObjeto, PosicaoGeografica, TipoImagem, Jogador
+
+from editores.models import Sugestao, SugestaoFile, SugestaoMensagem
 
 # impost para Enredo, criação de missões e tipos de condições que compoõem missões
 from editores.models import Missao, Condicao, CondicaoDialogoInstancia, CondicaoJogadorInstancia, CondicaoJogadorObjeto, CondicaoInstanciaObjeto
@@ -1069,74 +1071,142 @@ class AventuraAtivaDeleteView(DeleteView):
                         Views para Sugestao
 ====================================================================
 '''
-# Lista todas sugestões
+       
+def geTipoSugestao():
+    pass
+#Liestagem de sugestões
 class SugestaoListView(ListView):
     template_name = 'editor_objetos/sugestao/listar.html'
     model = Sugestao
+    
+    def get_context_data(self, **kwargs):
+        context = super(SugestaoListView, self).get_context_data(**kwargs)
+        if self.request.session[SESSION_AVENTURA] != '-1':
+            sf = SugestaoFile.objects.all()
+            sm = SugestaoMensagem.objects.all()
+            sugestao = Sugestao()
+            for obj in sf:
+                if obj.tipo == 'SAU':
+                    obj.tipo = 'Aúdio'
+                    obj.tipo_id = 'SAU'
+                elif obj.tipo == 'SIMG':
+                    obj.tipo = 'Imagem'
+                    obj.tipo_id = 'SIMG'
+                else:
+                    obj.tipo = 'Texto'
+                    obj.tipo_id = 'TXT'
+                    
+            sugestaom = Sugestao() 
+            for obj in sm:
+                obj.tipo = 'Texto'
+                obj.tipo_id = 'TXT'    
+                #elif obj.tipo == 'SIMG':
+                #    obj.tipo = 'Texto'
+               
+                    
+            sugestao = sf
+            sugestaom = sm      
+            context['object_list'] = chain(sugestao, sugestaom)
+        # print self.request.session[SESSION_AVENTURA]
+        return context
 
-# criação de sugestão
-class SugestaoCreateView(CreateView):
-    template_name = 'editor_objetos/sugestao/create.html'
-    model = Sugestao
+#Criação de SugestãoMessage
+class SugestaoMessageCreateView(CreateView):
+    template_name = 'editor_objetos/sugestao/create_sugestao_message.html'
+    model = SugestaoMensagem
    
-    # redireciona a requisição
+    #redireciona a requisição
     def get_success_url(self):
         return reverse('sugestao_list_view')
     
-    # Override no form
+    #Override no form
     def form_valid(self, form):
-        # arquivos devem ser txt, jpeg, png ou fbx (extensões de objetos 3D para Wikitude SDK Android para AR)
-        tipo = form.cleaned_data['tipo']  # recupera tipo de sugestao
-        arquivo = form.cleaned_data['sugestao']  # recupera file
-        if arquivo:
-            if tipo == 'STX':
-                # valida arquivo de texto para salvar sugestao
-                if not os.path.splitext(arquivo.name)[1] in [".txt"]:
-                    ValidationError
-                    msg = "O arquivo deve ser *.txt...."
-                    messages.error(self.request, "".join(msg))
-                    return HttpResponse(json.dumps({'response': 'exception create'}), content_type="text")
-                elif not arquivo.content_type == 'text/plain':
-                    ValidationError
-                    msg = "Não é um arquivo de texto válido!"
-                    messages.error(self.request, "".join(msg))
-                    return HttpResponse(json.dumps({'response': 'exception create'}), content_type="text")
-            elif tipo == 'SAU':
-                # valida arquivo de audio para salvar sugestao
-                # if not file.content-type in ["audio/mpeg","audio/..."]:
-                if not os.path.splitext(arquivo.name)[1] in [".mp3"]:
-                    ValidationError
-                    msg = "O arquivo deve ser *.mp3...."
-                    messages.error(self.request, "".join(msg))
-                    return HttpResponse(json.dumps({'response': 'exception create'}), content_type="text")
-                elif not arquivo.content_type == 'audio/mp3':
-                    ValidationError
-                    msg = "Não é um arquivo de áudio válido!"
-                    messages.error(self.request, "".join(msg))
-                    return HttpResponse(json.dumps({'response': 'exception create'}), content_type="text")
-            elif tipo == 'SIMG':
-                # valida imagem para salvar
-                if not os.path.splitext(arquivo.name)[1] in [".png", ".jpeg", ".jpg"]:
-                    ValidationError
-                    msg = "O arquivo deve ser *.png ou *.jpeg...."
-                    messages.error(self.request, "".join(msg))
-                    return HttpResponse(json.dumps({'response': 'exception create'}), content_type="text")
-                elif not arquivo.content_type == 'image/png':
-                    if not arquivo.content_type == 'image/jpeg':
-                        ValidationError
-                        msg = "Não é um arquivo de imagem válido!"
-                        messages.error(self.request, "".join(msg))
-                        return HttpResponse(json.dumps({'response': 'exception create'}), content_type="text")
-
-        # file = self.cleaned_data.get('audio_file',False)
-        # print file 
+        
         self.object = form.save()   
         return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")
 
+#Criação de SugestãoMessage
+class SugestaoMessageUpdateView(CreateView):
+    template_name = 'editor_objetos/sugestao/update_sugestao_message.html'
+    model = SugestaoMensagem
+   
+    #redireciona a requisição
+    def get_success_url(self):
+        return reverse('sugestao_list_view')
+    
+    #Override no form
+    def form_valid(self, form):
+        
+        self.object = form.save()   
+        return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")     
+#Criação de SugestãoFile
+class SugestaoFileCreateView(CreateView):
+    template_name = 'editor_objetos/sugestao/create_sugestao_file.html'
+    model = SugestaoFile
+   
+    #redireciona a requisição
+    def get_success_url(self):
+        return reverse('sugestao_list_view')
+    
+    #Override no form
+    def form_valid(self, form):
+        # arquivos devem ser jpeg, png ou fbx (extensões de objetos 3D para Wikitude SDK Android para AR)
+        tipo = form.cleaned_data['tipo']  #recupera tipo de sugestao
+        arquivo = form.cleaned_data['sugestao']  #recupera file
+        if hasattr(arquivo, "content_type"):
+            if arquivo:
+                #if tipo == 'STX':
+                    # valida arquivo de texto para salvar sugestao
+                #    if not os.path.splitext(arquivo.name)[1] in [".txt"]:
+                #        ValidationError
+                #        msg = "O arquivo deve ser *.txt...."
+                #        messages.error(self.request, "".join(msg))
+                #        return HttpResponse(json.dumps({'response': 'exception create'}), content_type="text")
+                #    elif not arquivo.content_type == 'text/plain':
+                #        ValidationError
+                #        msg = "Não é um arquivo de texto válido!"
+                #        messages.error(self.request, "".join(msg))
+                #        return HttpResponse(json.dumps({'response': 'exception create'}), content_type="text")
+                if tipo == 'SAU':
+                    # valida arquivo de audio para salvar sugestao
+                    # if not file.content-type in ["audio/mpeg","audio/..."]:
+                    if not os.path.splitext(arquivo.name)[1] in [".mp3"]:
+                        ValidationError
+                        msg = "O arquivo deve ser *.mp3...."
+                        messages.error(self.request, "".join(msg))
+                        return HttpResponse(json.dumps({'response': 'exception create'}), content_type="text")
+                    elif not arquivo.content_type == 'audio/mp3':
+                        ValidationError
+                        msg = "Não é um arquivo de áudio válido!"
+                        messages.error(self.request, "".join(msg))
+                        return HttpResponse(json.dumps({'response': 'exception create'}), content_type="text")
+                elif tipo == 'SIMG':
+                    #valida imagem para salvar
+                    if not os.path.splitext(arquivo.name)[1] in [".png", ".jpeg", ".jpg"]:
+                        ValidationError
+                        msg = "O arquivo deve ser *.png ou *.jpeg...."
+                        messages.error(self.request, "".join(msg))
+                        return HttpResponse(json.dumps({'response': 'exception create'}), content_type="text")
+                    elif not arquivo.content_type == 'image/png':
+                        if not arquivo.content_type == 'image/jpeg':
+                            ValidationError
+                            msg = "Não é um arquivo de imagem válido!"
+                            messages.error(self.request, "".join(msg))
+                            return HttpResponse(json.dumps({'response': 'exception create'}), content_type="text")
+                else:
+                    ValidationError
+                    msg = "Informe o arquivo de sugestão!"
+                    messages.error(self.request, "".join(msg))
+                    return HttpResponse(json.dumps({'response': 'exception create'}), content_type="text")
+                    
+    
+            self.object = form.save()   
+            return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")
+
 # update sugestao
-class SugestaoUpdateView(UpdateView):
-    template_name = 'editor_objetos/sugestao/update.html'
-    model = Sugestao
+class SugestaoFileUpdateView(UpdateView):
+    template_name = 'editor_objetos/sugestao/update_sugestao_file.html'
+    model = SugestaoFile
     
     # redireciona a requisição
     def get_success_url(self):
@@ -1148,19 +1218,19 @@ class SugestaoUpdateView(UpdateView):
         tipo = form.cleaned_data['tipo']  # recupera tipo de sugestao
         arquivo = form.cleaned_data['sugestao']  # recupera file
         if hasattr(arquivo, "content_type"):
-            if tipo == 'STX':
+            #if tipo == 'STX':
                 # valida arquivo de texto para salvar sugestao
-                if not os.path.splitext(arquivo.name)[1] in [".txt"]:
-                    ValidationError
-                    msg = "O arquivo deve ser *.txt...."
-                    messages.error(self.request, "".join(msg))
-                    return HttpResponse(json.dumps({'response': 'exception create'}), content_type="text")
-                elif not arquivo.content_type == 'text/plain':
-                    ValidationError
-                    msg = "Não é um arquivo de texto válido!"
-                    messages.error(self.request, "".join(msg))
-                    return HttpResponse(json.dumps({'response': 'exception create'}), content_type="text")
-            elif tipo == 'SAU':
+            #    if not os.path.splitext(arquivo.name)[1] in [".txt"]:
+            #        ValidationError
+            #        msg = "O arquivo deve ser *.txt...."
+            #        messages.error(self.request, "".join(msg))
+            #        return HttpResponse(json.dumps({'response': 'exception create'}), content_type="text")
+            #    elif not arquivo.content_type == 'text/plain':
+            #        ValidationError
+            #        msg = "Não é um arquivo de texto válido!"
+            #        messages.error(self.request, "".join(msg))
+            #        return HttpResponse(json.dumps({'response': 'exception create'}), content_type="text")
+            if tipo == 'SAU':
                 # valida arquivo de audio para salvar sugestao
                 # if not file.content-type in ["audio/mpeg","audio/..."]:
                 if not os.path.splitext(arquivo.name)[1] in [".mp3"]:
@@ -1191,7 +1261,8 @@ class SugestaoUpdateView(UpdateView):
         self.object.save()  
         return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")
 
-# delete sugestao
+
+#delete sugestao
 class SugestaoDeleteView(DeleteView):
     template_name = 'editor_objetos/sugestao/delete.html'
     model = Sugestao

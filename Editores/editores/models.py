@@ -117,49 +117,57 @@ Pendências nessa classe: Identificar tipos de arquivos e atualizar a forma de c
 '''
 class Sugestao(models.Model):
     nome = models.CharField(max_length=30,default="", )
-    tipo = models.CharField(max_length=10, choices=TIPO_SUGESTAO, default=u'STX', )
-    sugestao = models.FileField(upload_to ='sugestao/', help_text="Sugestão para tomada de decisão.",default="", )
+    #sugestao = models.FileField(upload_to ='sugestao/', help_text="Sugestão para tomada de decisão.",default="", )
     proximidade = models.IntegerField(max_length=3,default=1)
-    publico = models.BooleanField(default=True,)
+    publico = models.BooleanField(default=False,)#indica se uma sugestão está disponivel para ser usada por outros autores em outras aventuras
     
     def __unicode__(self):
         return u'%s' % (self.nome) 
    
     #verifica se sugestao nao esta sendo utilizado por alguma instancia
-    def delete(self, *args, **kwargs):
-        if not self.sugestoes.all():
-            storage, path = self.sugestao.storage, self.sugestao.path
-            super(Sugestao, self).delete(*args, **kwargs)
-            return storage.delete(path)
-        raise ValidationError(u"Não é possível remover esta sugestão pois existem instâncias de objetos que fazem uso da mesma!")
+    #def delete(self, *args, **kwargs):
+    #    if not self.sugestoes.all():
+    #        storage, path = self.sugestao.storage, self.sugestao.path
+    #        super(Sugestao, self).delete(*args, **kwargs)
+    #        return storage.delete(path)
+    #    raise ValidationError(u"Não é possível remover esta sugestão pois existem instâncias de objetos que fazem uso da mesma!")
     
     #deleta o arquivo antigo
-    def save(self, *args, **kwargs):
+    #def save(self, *args, **kwargs):
         # delete old file when replacing by updating the file
-        try:
-            this = Sugestao.objects.get(id=self.id)
-            if this.sugestao != self.sugestao:
-                this.sugestao.delete(save=False)
-        except: pass # when new photo then we do nothing, normal case          
-        super(Sugestao, self).save(*args, **kwargs)
+    #    try:
+    #        this = Sugestao.objects.get(id=self.id)
+    #        if this.sugestao != self.sugestao:
+    #            this.sugestao.delete(save=False)
+    #    except: pass # when new photo then we do nothing, normal case          
+    #    super(Sugestao, self).save(*args, **kwargs)
+    
+        #verifica se sugestao nao esta sendo utilizado por alguma instancia
+    def delete(self, *args, **kwargs):
         
-'''
-Sugestão de Arquivos
-
+        #recupe id da sugestao
+        id_sugestao = self.id
+        
+        instancias = SugestaoFile.objects.all().filter(sugestao_ptr_id=id_sugestao)
+        
+        buffer = ''
+        for obj in instancias:
+            buffer = obj 
+        
+        if isinstance(buffer, SugestaoFile):
+            if not self.sugestoes.all():
+                storage, path = buffer.sugestao.storage, buffer.sugestao.path
+                super(Sugestao, self).delete(*args, **kwargs)
+                return storage.delete(path)
+            raise ValidationError(u"Não é possível remover esta sugestão pois existem instâncias de objetos que fazem uso da mesma!")
+    
 
 class SugestaoFile(Sugestao, models.Model):
     sugestao = models.FileField(upload_to ='sugestao/', help_text="Sugestão para tomada de decisão.",default="", )
+    tipo = models.CharField(max_length=10, choices=TIPO_SUGESTAO, default=u'SAU', )
     descricao = models.CharField(max_length=100)
     
-    #verifica se sugestao nao esta sendo utilizado por alguma instancia
-    def delete(self, *args, **kwargs):
-        if not self.sugestoes.all():
-            storage, path = self.sugestao.storage, self.sugestao.path
-            super(SugestaoFile, self).delete(*args, **kwargs)
-            return storage.delete(path)
-        raise ValidationError(u"Não é possível remover esta sugestão pois existem instâncias de objetos que fazem uso da mesma!")
-    
-    #deleta o arquivo antigo
+    #deleta o arquivo antigo e salva o novo
     def save(self, *args, **kwargs):
         # delete old file when replacing by updating the file
         try:
@@ -169,13 +177,11 @@ class SugestaoFile(Sugestao, models.Model):
         except: pass # when new photo then we do nothing, normal case          
         super(SugestaoFile, self).save(*args, **kwargs)
 
-'''
-'''
-Sugestão do Tipo Texto
+
 
 class SugestaoMensagem(Sugestao,models.Model):
-    mensagem = models.CharField(max_length=250)
-'''   
+    sugestao = models.CharField(max_length=300)
+   
     
 '''
 Objeto tem um tipo de objeto. O objeto representa algo como, placa, fruta, perigo ou personagens que são instânciados na aventura.
@@ -550,11 +556,11 @@ class EnredoFile(Enredo, models.Model):
     AUDIO = 'SAU'
     IMGC = 'IMGC' 
     IMGM = 'IMGM' 
-    TIPO_SUGESTAO = (
+    TIPO_ENREDO = (
         (AUDIO, 'Áudio'),
         (IMGC, 'Imagem Câmera'),
         (IMGM, 'Imagem Mapa'),)
-    tipo = models.CharField(max_length=10, choices=TIPO_SUGESTAO ,default=AUDIO)
+    tipo = models.CharField(max_length=10, choices=TIPO_ENREDO ,default=AUDIO)
     enredo_file = models.FileField(upload_to ='enredo/', help_text="Elemente que auxilia na contextualição da tomada de decisão..",default="", ) 
 
     
