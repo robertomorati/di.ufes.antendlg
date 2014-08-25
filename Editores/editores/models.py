@@ -103,84 +103,7 @@ class Icone (models.Model):
         except: pass # when new photo then we do nothing, normal case          
         super(Icone, self).save(*args, **kwargs)
 
-    
-'''
-Sugestao é um elemente de percepção para a instância do objeto. 
-A sugestão indica para o jogador que o mesmo está próximo de um perigo. 
-Por exemplo, a proximidade com o Cascumpus pode ser indicada por um áudio de rugido.
 
-@param tipo: a sugestão pode ser de três tipos: áudio, como um rugido do Cascumpus; imagem: fumaça do fogo; e texto, uma mensagem.
-@param sugestao: url da sugestão.
-@param proximidade: é a distância que o jogador tem que estar da sugestão para que ele tenha percepção da mesma.   
-
-Pendências nessa classe: Identificar tipos de arquivos e atualizar a forma de criar sugestões.
-'''
-class Sugestao(models.Model):
-    nome = models.CharField(max_length=30,default="", )
-    #sugestao = models.FileField(upload_to ='sugestao/', help_text="Sugestão para tomada de decisão.",default="", )
-    proximidade = models.IntegerField(max_length=3,default=1)
-    publico = models.BooleanField(default=False,)#indica se uma sugestão está disponivel para ser usada por outros autores em outras aventuras
-    
-    def __unicode__(self):
-        return u'%s' % (self.nome) 
-   
-    #verifica se sugestao nao esta sendo utilizado por alguma instancia
-    #def delete(self, *args, **kwargs):
-    #    if not self.sugestoes.all():
-    #        storage, path = self.sugestao.storage, self.sugestao.path
-    #        super(Sugestao, self).delete(*args, **kwargs)
-    #        return storage.delete(path)
-    #    raise ValidationError(u"Não é possível remover esta sugestão pois existem instâncias de objetos que fazem uso da mesma!")
-    
-    #deleta o arquivo antigo
-    #def save(self, *args, **kwargs):
-        # delete old file when replacing by updating the file
-    #    try:
-    #        this = Sugestao.objects.get(id=self.id)
-    #        if this.sugestao != self.sugestao:
-    #            this.sugestao.delete(save=False)
-    #    except: pass # when new photo then we do nothing, normal case          
-    #    super(Sugestao, self).save(*args, **kwargs)
-    
-        #verifica se sugestao nao esta sendo utilizado por alguma instancia
-    def delete(self, *args, **kwargs):
-        
-        #recupe id da sugestao
-        id_sugestao = self.id
-        
-        instancias = SugestaoFile.objects.all().filter(sugestao_ptr_id=id_sugestao)
-        
-        buffer = ''
-        for obj in instancias:
-            buffer = obj 
-        
-        if isinstance(buffer, SugestaoFile):
-            if not self.sugestoes.all():
-                storage, path = buffer.sugestao.storage, buffer.sugestao.path
-                super(Sugestao, self).delete(*args, **kwargs)
-                return storage.delete(path)
-            raise ValidationError(u"Não é possível remover esta sugestão pois existem instâncias de objetos que fazem uso da mesma!")
-    
-
-class SugestaoFile(Sugestao, models.Model):
-    sugestao = models.FileField(upload_to ='sugestao/', help_text="Sugestão para tomada de decisão.",default="", )
-    tipo = models.CharField(max_length=10, choices=TIPO_SUGESTAO, default=u'SAU', )
-    descricao = models.CharField(max_length=100)
-    
-    #deleta o arquivo antigo e salva o novo
-    def save(self, *args, **kwargs):
-        # delete old file when replacing by updating the file
-        try:
-            this = SugestaoFile.objects.get(id=self.id)
-            if this.sugestao != self.sugestao:
-                this.sugestao.delete(save=False)
-        except: pass # when new photo then we do nothing, normal case          
-        super(SugestaoFile, self).save(*args, **kwargs)
-
-
-
-class SugestaoMensagem(Sugestao,models.Model):
-    sugestao = models.CharField(max_length=300)
    
     
 '''
@@ -268,7 +191,87 @@ class Aventura(models.Model):
     
     def __unicode__(self):
         return u'%s' % (self.nome)
+  
     
+'''
+Sugestao é um elemente de percepção para a instância do objeto. 
+A sugestão indica para o jogador que o mesmo está próximo de um perigo. 
+Por exemplo, a proximidade com o Cascumpus pode ser indicada por um áudio de rugido.
+
+@param tipo: a sugestão pode ser de três tipos: áudio, como um rugido do Cascumpus; imagem: fumaça do fogo; e texto, uma mensagem.
+@param sugestao: url da sugestão.
+@param proximidade: é a distância que o jogador tem que estar da sugestão para que ele tenha percepção da mesma.   
+
+Pendências nessa classe: Identificar tipos de arquivos e atualizar a forma de criar sugestões.
+'''
+
+class Sugestao(models.Model):
+    nome = models.CharField(max_length=30,default="", )
+    #sugestao = models.FileField(upload_to ='sugestao/', help_text="Sugestão para tomada de decisão.",default="", )
+    proximidade = models.IntegerField(max_length=3,default=1)
+    publico = models.BooleanField(default=False,)#indica se uma sugestão está disponivel para ser usada por outros autores em outras aventuras
+    aventura_sugestao = models.ForeignKey(Aventura, related_name="aventura_sugestao", blank=True, default="", null=True,)
+     
+    def __unicode__(self):
+        return u'%s' % (self.nome) 
+   
+    #verifica se sugestao nao esta sendo utilizado por alguma instancia
+    #def delete(self, *args, **kwargs):
+    #    if not self.sugestoes.all():
+    #        storage, path = self.sugestao.storage, self.sugestao.path
+    #        super(Sugestao, self).delete(*args, **kwargs)
+    #        return storage.delete(path)
+    #    raise ValidationError(u"Não é possível remover esta sugestão pois existem instâncias de objetos que fazem uso da mesma!")
+    
+    #deleta o arquivo antigo
+    #def save(self, *args, **kwargs):
+        # delete old file when replacing by updating the file
+    #    try:
+    #        this = Sugestao.objects.get(id=self.id)
+    #        if this.sugestao != self.sugestao:
+    #            this.sugestao.delete(save=False)
+    #    except: pass # when new photo then we do nothing, normal case          
+    #    super(Sugestao, self).save(*args, **kwargs)
+    
+        #verifica se sugestao nao esta sendo utilizado por alguma instancia
+    def delete(self, *args, **kwargs):
+        
+        #recupe id da sugestao
+        id_sugestao = self.id
+        
+        instancias = SugestaoFile.objects.all().filter(sugestao_ptr_id=id_sugestao)
+        
+        buffer = ''
+        for obj in instancias:
+            buffer = obj 
+        
+        if isinstance(buffer, SugestaoFile):
+            if not self.sugestoes.all():
+                storage, path = buffer.sugestao.storage, buffer.sugestao.path
+                super(Sugestao, self).delete(*args, **kwargs)
+                return storage.delete(path)
+            raise ValidationError(u"Não é possível remover esta sugestão pois existem instâncias de objetos que fazem uso da mesma!")
+    
+
+class SugestaoFile(Sugestao, models.Model):
+    sugestao = models.FileField(upload_to ='sugestao/', help_text="Sugestão para tomada de decisão.",default="", )
+    tipo = models.CharField(max_length=10, choices=TIPO_SUGESTAO, default=u'SAU', )
+    descricao = models.CharField(max_length=100)
+    
+    #deleta o arquivo antigo e salva o novo
+    def save(self, *args, **kwargs):
+        # delete old file when replacing by updating the file
+        try:
+            this = SugestaoFile.objects.get(id=self.id)
+            if this.sugestao != self.sugestao:
+                this.sugestao.delete(save=False)
+        except: pass # when new photo then we do nothing, normal case          
+        super(SugestaoFile, self).save(*args, **kwargs)
+
+
+
+class SugestaoMensagem(Sugestao,models.Model):
+    sugestao = models.CharField(max_length=300)  
     
 '''
 TipoImagem representa o tipo de imagem para a instância de objeto.

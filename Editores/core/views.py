@@ -1082,8 +1082,8 @@ class SugestaoListView(ListView):
     def get_context_data(self, **kwargs):
         context = super(SugestaoListView, self).get_context_data(**kwargs)
         if self.request.session[SESSION_AVENTURA] != '-1':
-            sf = SugestaoFile.objects.all()
-            sm = SugestaoMensagem.objects.all()
+            sf = SugestaoFile.objects.all().filter(aventura_sugestao_id = self.request.session[SESSION_AVENTURA].id)
+            sm = SugestaoMensagem.objects.all().filter(aventura_sugestao_id = self.request.session[SESSION_AVENTURA].id)
             sugestao = Sugestao()
             for obj in sf:
                 if obj.tipo == 'SAU':
@@ -1105,8 +1105,10 @@ class SugestaoListView(ListView):
                
                     
             sugestao = sf
-            sugestaom = sm      
-            context['object_list'] = chain(sugestao, sugestaom)
+            sugestaom = sm
+            context['object_list'] = chain(sugestao, sugestaom) 
+        else:
+            context['object_list'] = ''
         # print self.request.session[SESSION_AVENTURA]
         return context
 
@@ -1122,6 +1124,7 @@ class SugestaoMessageCreateView(CreateView):
     #Override no form
     def form_valid(self, form):
         
+        form.instance.aventura_sugestao_id = self.request.session[SESSION_AVENTURA].id
         self.object = form.save()   
         return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")
 
@@ -1199,7 +1202,7 @@ class SugestaoFileCreateView(CreateView):
                     messages.error(self.request, "".join(msg))
                     return HttpResponse(json.dumps({'response': 'exception create'}), content_type="text")
                     
-    
+            form.instance.aventura_sugestao_id = self.request.session[SESSION_AVENTURA].id
             self.object = form.save()   
             return HttpResponse(json.dumps({'response': 'ok'}), content_type="application/json")
 
