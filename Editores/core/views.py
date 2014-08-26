@@ -1421,11 +1421,10 @@ class EnredoFileListView(ListView):
         if self.request.session[SESSION_AVENTURA] != '-1':
             object_list = EnredoFile.objects.all().filter(aventura_id=self.request.session[SESSION_AVENTURA].id)
             
-            print object_list
             
             # object_list = Enredo.objects.all().filter(aventura_id=self.request.session[SESSION_AVENTURA].id)
             
-            print object_list
+
             # for obj in object_list:
                 # print obj
         return object_list

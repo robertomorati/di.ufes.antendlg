@@ -1,3 +1,8 @@
+<script>
+  audiojs.events.ready(function() {
+    var as = audiojs.createAll();
+  });
+</script>
 <div class="form-actions">
 	<h3>
 		<strong>Story Files</strong>
@@ -26,7 +31,13 @@
 					Imagem Câmera
 				{% endif %}
 				</td>
-				<td>{{ object.enredo_file }}</td>
+				<td>
+				{% if object.tipo == "SAU" %}
+				<audio src="{{MEDIA_URL}}{{ object.enredo_file }}"preload="auto" />
+				{% else %}
+				{{ object.enredo_file }}
+				{% endif %}
+				</td>
 				<td>{{ object.descricao }}</td>
 				<td>
 						{% csrf_token %}
