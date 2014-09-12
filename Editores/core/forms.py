@@ -17,7 +17,7 @@ from django.core.exceptions import ValidationError
 from django.contrib import messages
 from django.utils.translation import ugettext_lazy as _
 
-
+from codemirror.fields import CodeMirrorTextarea
 
 '''
 Forms para tratar listagem de condições
@@ -361,6 +361,7 @@ class AutorForm(forms.ModelForm):
 Form utilizado para criar instancia do objeto
 '''
 class InstanciaObjetoCreateForm(forms.ModelForm):
+
     class Meta:
         model = InstanciaObjeto
         exclude = ['nome', 'proximidade', 'encenacao', 'objeto', 'visivel', 'sugestao', 'num_instancia', 'aventura', 'instancia_cont', ]
@@ -389,8 +390,9 @@ class InstanciaObjetoUpdateForm(forms.ModelForm):
 
     nome = forms.CharField(label=_("Nome"), max_length=30, widget=forms.TextInput(attrs={'style' : 'width: 90px'}))
     proximidade = forms.IntegerField(label=_("Proximidade"), widget=forms.TextInput(attrs={'style' : 'width: 20px'}))
-    dialogo = forms.CharField(label=_("Diálogo"), widget=forms.Textarea(attrs={'cols': 40, 'rows': 5, 'style':"width: 500px; height: 100px;"}))
-    
+    #dialogo = forms.CharField(label=_("Diálogo"), widget=forms.Textarea(attrs={'cols': 40, 'rows': 5, 'style':"width: 500px; height: 100px;"}))
+    codemirror_widget = CodeMirrorTextarea(mode="python", theme="cobalt", config={ 'fixedGutter': True })
+    dialogo = forms.CharField(label=_("Diálogo"),widget=codemirror_widget)
     # torna o campo field oculto
     def __init__(self, *args, **kwargs):
         super(InstanciaObjetoUpdateForm, self).__init__(*args, **kwargs)
@@ -419,7 +421,6 @@ class InstanciaObjetoUpdateForm(forms.ModelForm):
                     dialogo += "\n</dialogo>" 
                     self.initial = {'nome':instance.nome, 'dialogo': dialogo, 'proximidade': instance.proximidade,
                                    'encenacao':instance.encenacao, 'sugestao':instance.sugestao_objeto, 'visivel':instance.visivel}
-                    
 '''
 Forms para criação para Comportamentos
 '''

@@ -312,7 +312,7 @@ function createInstance(location,icon, id, name_objeto, proximidade) {
  * @param icon - imagem da instância
  * @param id_instancia
  * @param name_objeto
- * @param qntde_pos - quantidade de posições geográficas que a instância pode assumir.
+ * @param qntde_ # - quantidade de posições geográficas que a instância pode assumir.
  */
 function placeInstancesPolygonGoogleMaps(location,icon, id_instancia, name_objeto,qntde_pos,pos,proximidade){
 	  
@@ -382,6 +382,7 @@ function placeInstancesPolygonGoogleMaps(location,icon, id_instancia, name_objet
 		
 		//TODO: modificar POS para ser usada na concepção dos agentes
 		marker.setTitle("POS #" + path.length);
+		alert("385 POS#" + path.length);
 		createPosMarkerPolygon(marker);
 
 		//Cria circulo para proximidade da instância
@@ -470,6 +471,10 @@ function placeInstancesPolygonGoogleMaps(location,icon, id_instancia, name_objet
 				for (var i = 0, I = markers.length; i < I && markers[i] != marker; ++i);
 				markers.splice(i, 1);
 				path.removeAt(i);
+				alert("474" + path);
+				for (var j = 0, F = markers.length; j < F && markers[j] != marker; ++j){
+					alert("474" + markers[j] + "" +  markers[j].getTitle());
+				}
 				
 	    	 	//pos atualizada
 	    	    //atualiza backup de instâncias
@@ -510,7 +515,7 @@ function createMakerLoaded(poly,loc,id_instancia,path,j,markers,pos){
 		
 	  //TODO: modificar POS
 	  marker.setTitle("POS #" + path.length);
-		
+	  alert("514 POS#" + path.length);
 	 //Cria circulo para proximidade da instância
 	var circle = new google.maps.Circle({
 		 map: $map,
@@ -578,7 +583,7 @@ function createMarkerToPolygon(poly,event,path,markers){
 	    poly.set("qnt_pos_inicial", (poly.get("qnt_pos_inicial")+1));
 		
 	    path.insertAt(path.length, event.latLng);
-	    
+	   
 		var marker = new google.maps.Marker({
 		  position: event.latLng,
 		  map: $map,
@@ -614,7 +619,8 @@ function createMarkerToPolygon(poly,event,path,markers){
 		
 		markers.push(marker);
 		marker.setTitle("POS #" + path.length);//o path deve ser unico para cada marcador.
-
+		alert("618 POS#" + path.length);
+		
 		google.maps.event.addListener(marker, 'click', function() {
 			 singleClickMouse = true;
 

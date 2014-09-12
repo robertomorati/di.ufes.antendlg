@@ -94,6 +94,7 @@ def login_player(request, template_name='registration/login_player.html',
 
     if request.method == "POST":
         form = authentication_form(request, data=request.POST)
+        print form
         if form.is_valid():
             
             # Ensure the user-originating redirection url is safe.
@@ -116,9 +117,14 @@ def login_player(request, template_name='registration/login_player.html',
                     messages.error(request, "".join("Please, it's necessary use a player account to login."))
                     return HttpResponseRedirect('/autenvldg_services/login_player/')
                     
-                #auth_login(request, form.get_user())
+                auth_login(request, form.get_user())#log player to user services
 
             return HttpResponseRedirect('/autenvldg_services/')
+        else:
+            ValidationError
+            messages.error(request, "".join("Please, verify if the username and password are correct. If the problem persists, contact the administrator: robertomorati@gmail.com."))
+            return HttpResponseRedirect('/autenvldg_services/login_player/')
+            
     else:
         form = authentication_form(request)
 

@@ -381,6 +381,7 @@ class PosicaoGeografica(models.Model):
     longitude = models.FloatField()
     altitude = models.FloatField()
     instancia_objeto = models.ForeignKey(InstanciaObjeto, related_name="pos_inst_objeto",blank=True,default="",)
+    #pos_count = models.IntegerField(max_length=100)
     #instancia_objeto = models.ManyToManyField(InstanciaObjeto, related_name="pos_inst_objeto",blank=True,) 
 
     
@@ -388,7 +389,7 @@ class PosicaoGeografica(models.Model):
         nomepos = "POS " + str(posn)
         return u'%s' % (nomepos)
 
-
+    
 '''
 Jogador - representar um jogador cadastrado com seu dispositivo movel
 
