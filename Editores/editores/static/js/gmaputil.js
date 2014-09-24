@@ -376,13 +376,12 @@ function placeInstancesPolygonGoogleMaps(location,icon, id_instancia, name_objet
 			  zIndex: 5,
 		});
 		
-		marker.set("id_instancia","id_pos");
+		marker.set("id_instancia","id_pos","n_pos");
 	    marker.set("id_instancia", id_instancia);
+		marker.set("n_pos", path.length);
 		
-		
-		//TODO: modificar POS para ser usada na concepção dos agentes
-		marker.setTitle("POS #" + path.length);
-		alert("385 POS#" + path.length);
+		marker.setTitle("POS #" + marker.get("n_pos"));
+		alert("385 POS#" + marker.get("n_pos"));
 		createPosMarkerPolygon(marker);
 
 		//Cria circulo para proximidade da instância
@@ -472,8 +471,9 @@ function placeInstancesPolygonGoogleMaps(location,icon, id_instancia, name_objet
 				markers.splice(i, 1);
 				path.removeAt(i);
 				alert("474" + path);
+				//TODO: atualiza POS
 				for (var j = 0, F = markers.length; j < F && markers[j] != marker; ++j){
-					alert("474" + markers[j] + "" +  markers[j].getTitle());
+					alert("474" + markers[j] + "" +  markers[j].getTitle() + "j:" + j);
 				}
 				
 	    	 	//pos atualizada

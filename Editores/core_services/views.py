@@ -63,7 +63,6 @@ class AventuraView(APIView):
         aventuras = Aventura.objects.all().filter(autor=self.kwargs['autor_id'])
 
         #retornar as aventuras
-        aventuras = aventuras
         data = serializers.serialize('json', aventuras,)
         response = Response(data, status=status.HTTP_200_OK)
         
