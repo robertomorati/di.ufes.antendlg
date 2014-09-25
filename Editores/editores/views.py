@@ -115,7 +115,7 @@ def login_player(request, template_name='registration/login_player.html',
                 data = serializers.serialize('json', '"error_login":"Invalid username or incorrect password!"',)
                 return Response(data, status=status.HTTP_200_OK)
                 '''
-                data = '[{"error_login": "Invalid username or incorrect password!"}]'
+                data = '[{"type_status":"error_login"},{"value": "Invalid username or incorrect password!"}]'
                 return HttpResponse(data, content_type="application/json")
             else:
                 if Autor.objects.all().filter(user_ptr_id = user.pk).exists():
@@ -125,10 +125,10 @@ def login_player(request, template_name='registration/login_player.html',
                     return HttpResponseRedirect('/autenvldg_services/login_player/')
                     return Response(serializers.serialize('json', '"error_login":"Please, it is necessary use a player account to login."',), status=status.HTTP_200_OK)
                     '''
-                    data = '[{"error_login": "Please, it is necessary use a player account to login."}]'
+                    data = '[{"type_status":"error_login"},{"value": "Please, it is necessary use a player account to login."}]'
                     return HttpResponse(data, content_type="application/json")
                 auth_login(request, form.get_user())#log player to user services
-            data = '[{"success_login":"' + request.COOKIES.get('csrftoken') + '"}]'
+            data = '[{"type_status":"success_login"},{"value":"' + request.COOKIES.get('csrftoken') + '"}]'
             return HttpResponse(data, content_type="application/json")
             #return HttpResponseRedirect('/autenvldg_services/')
         else:
@@ -139,7 +139,7 @@ def login_player(request, template_name='registration/login_player.html',
             response = Response(data, status=status.HTTP_200_OK)
             return response
             '''
-            data = '[{"error_login": "Please, verify if the username and password are correct. If the problem persists, contact the administrator: robertomorati@gmail.com."}]'
+            data = '[{"type_status":"error_login"},{"value": "Please, verify if the username and password are correct. If the problem persists, contact the administrator: robertomorati@gmail.com."}]'
             return HttpResponse(data, content_type="application/json")
     else:
         form = authentication_form(request)
