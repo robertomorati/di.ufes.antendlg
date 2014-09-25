@@ -106,28 +106,41 @@ def login_player(request, template_name='registration/login_player.html',
             
             user = form.get_user()       
             if not user or not user.is_active:
-                #ValidationError
-                #messages.error(request, "".join("Invalid username or incorrect password!"))
-                #return HttpResponseRedirect('/autenvldg_services/login_player/')
-                #msg = "Invalid username or incorrect password!"
-                #raise exceptions.AuthenticationFailed(msg)
+                '''
+                ValidationError
+                messages.error(request, "".join("Invalid username or incorrect password!"))
+                return HttpResponseRedirect('/autenvldg_services/login_player/')
+                msg = "Invalid username or incorrect password!"
+                raise exceptions.AuthenticationFailed(msg)
                 data = serializers.serialize('json', '"error_login":"Invalid username or incorrect password!"',)
                 return Response(data, status=status.HTTP_200_OK)
+                '''
+                data = '[{"error_login": "Invalid username or incorrect password!"}]'
+                return HttpResponse(data, content_type="application/json")
             else:
                 if Autor.objects.all().filter(user_ptr_id = user.pk).exists():
-                    #ValidationError
-                    #messages.error(request, "".join("Please, it's necessary use a player account to login."))
-                    #return HttpResponseRedirect('/autenvldg_services/login_player/')
+                    '''
+                    ValidationError
+                    messages.error(request, "".join("Please, it's necessary use a player account to login."))
+                    return HttpResponseRedirect('/autenvldg_services/login_player/')
                     return Response(serializers.serialize('json', '"error_login":"Please, it is necessary use a player account to login."',), status=status.HTTP_200_OK)
+                    '''
+                    data = '[{"error_login": "Please, it is necessary use a player account to login."}]'
+                    return HttpResponse(data, content_type="application/json")
                 auth_login(request, form.get_user())#log player to user services
-
-            return HttpResponseRedirect('/autenvldg_services/')
+            data = '[{"success_login":"' + request.COOKIES.get('csrftoken') + '"}]'
+            return HttpResponse(data, content_type="application/json")
+            #return HttpResponseRedirect('/autenvldg_services/')
         else:
-            #ValidationError
-            #messages.error(request, "".join("Please, verify if the username and password are correct. If the problem persists, contact the administrator: robertomorati@gmail.com."))
-            #return HttpResponseRedirect('/autenvldg_services/login_player/')
-            return Response(serializers.serialize('json', '"error_login":"Please, verify if the username and password are correct. If the problem persists, contact the administrator: robertomorati@gmail.com."',), status=status.HTTP_200_OK)
-
+            '''
+            ValidationError
+            messages.error(request, "".join("Please, verify if the username and password are correct. If the problem persists, contact the administrator: robertomorati@gmail.com."))
+            return HttpResponseRedirect('/autenvldg_services/login_player/')
+            response = Response(data, status=status.HTTP_200_OK)
+            return response
+            '''
+            data = '[{"error_login": "Please, verify if the username and password are correct. If the problem persists, contact the administrator: robertomorati@gmail.com."}]'
+            return HttpResponse(data, content_type="application/json")
     else:
         form = authentication_form(request)
 
