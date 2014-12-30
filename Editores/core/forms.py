@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-'''
-Created on 23/10/2013
 
-@author: Roberto Gumarães  Morati Junior
-'''
+__author__ = 'Roberto Guimaraes Morati Junior <robertomorati@gmail.com@gmail.com>'
+__copyright__ = 'Copyright (c) 2013 AutEnvLDG'
+__version__ = '1.0.0'
+
 from django import forms 
 from editores.models import Aventura, Autor, PosicaoGeografica, InstanciaObjeto, Objeto, TipoImagem, Icone, Missao, Avatar,\
     PosInstanciaAtiva, AvatarAtivo, MissaoAtiva, CondicaoAtiva, TipoObjeto
@@ -19,51 +19,53 @@ from django.utils.translation import ugettext_lazy as _
 
 from codemirror.fields import CodeMirrorTextarea
 
-'''
-Forms para tratar listagem de condições
-'''
-# retorna o nome da instância do objeto
+
+#return the name of object's instance
 class CondicoesObjetosFielForm(ModelChoiceField):
     def label_from_instance(self, obj):
         return obj.get_nome_instancia()
 
-# <NOTHING>
+#Nothing, yet.
 class CondicoesObjetosListagemForm(forms.ModelForm):
+    """
+    Forms to list  conditions
+    """
     def __init__(self, *args, **kwargs):
         super(CondicoesObjetosListagemForm, self).__init__(*args, **kwargs)
         
         self.fields['ligacao'] = CondicoesObjetosFielForm()
         
 
-'''
-Forms para templates para criação de Condições
-'''
-# retorna o nome da instancia do objeto       
+
+#returns the name of object instance       
 class CondicaoObjetoModelChoiceField(ModelChoiceField):
     def label_from_instance(self, obj):
         return obj.get_nome_instancia()
 
-# retorna nome da missao
+# returns the name of a mission
 class MissaoModelChoiceField(ModelChoiceField):
     def label_from_instance(self, obj):
         return obj.get_nome_missao()
     
-# retorna nome do enredo
+#returns the name of a Story/Enredo
 class EnredoModelChoiceField(ModelChoiceField):
     def label_from_instance(self, obj):
         return obj.get_nome_enredo()    
 
-# Template para condições do objeto
+# Template to creating objects
 class CondicaoInstanciaObjetoForm(forms.ModelForm):
+    """
+    Form to creating conditions
+    """
     def __init__(self, *args, **kwargs):
         super(CondicaoInstanciaObjetoForm, self).__init__(*args, **kwargs)
            
-        # recupera id da aventura
+        #id of an adventure
         self.aventura_id = kwargs['initial']['aventura_id']
         
         object_list = Objeto.objects.filter(coletavel=True)
 
-        # Recuperando Instâncias
+        #get instances
         flag = 0;
         buffer_inst = '';
         for obj in object_list:
@@ -213,7 +215,7 @@ class InstanciaObjetoRoleModelChoiceField(ModelChoiceField):
     def label_from_instance(self, obj):
         return obj.get_nome_instancia()
 
-# Formada o template para criação de papéis
+# Formata o template para criação de papéis
 class AvatarRoleListForm(forms.ModelForm):  
     def __init__(self, *args, **kwargs):
         super(AvatarRoleListForm, self).__init__(*args, **kwargs)
@@ -372,8 +374,12 @@ Form utilizado para criar POS
 class  PosicaoGeograficaCreateForm(forms.ModelForm):
     class Meta:
         model = PosicaoGeografica
-        exclude = ['latitude', 'longitude', 'altitude', 'instancia_objeto', ] 
-        
+        exclude = ['latitude', 'longitude', 'altitude', 'instancia_objeto',] 
+ 
+class  PosicaoGeograficaUpdateForm(forms.ModelForm):
+    class Meta:
+        model = PosicaoGeografica
+        exclude = ['latitude', 'longitude', 'altitude', 'instancia_objeto', 'pos_count']        
         
 '''
 Form para Update Instancia de Objeto

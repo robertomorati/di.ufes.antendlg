@@ -17,7 +17,7 @@ from core.forms import LoginForm, AutorForm
 from django.core import serializers
 from  django.contrib.auth import *
 from django.contrib.auth.views  import *
-import json
+import json, re
 SESSION_AVENTURA = '_user_aventura_id'
 
 #from django.core.context_processors import csrf
@@ -203,6 +203,7 @@ class LoginView(FormView):
             return self.get(request, *args, **kwargs)
         user = authenticate(username=form.cleaned_data["username"],
                             password=form.cleaned_data["password"])
+        
 
         #TODO: melhorar         
         if not user or not user.is_active:
@@ -241,7 +242,8 @@ class LoginView(FormView):
         #SESSION_AVENTURA com -1 significa que não existe aventuras sendo editadas
         request.session[SESSION_AVENTURA] = '-1'
         request.session[BACKEND_SESSION_KEY] = user.backend
-        #request.session.set_expiry(50)
+        
+
         if hasattr(request, 'user'):
             request.user = user
             user_logged_in.send(sender=user.__class__, request=request, user=user)

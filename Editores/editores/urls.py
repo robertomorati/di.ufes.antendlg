@@ -27,11 +27,18 @@ urlpatterns = patterns('',
     # Admin django
     url(r'^admin/', include(admin.site.urls)),
     
-    
+    url(r'^leapmotion/', include('leapmotion.urls')),
     #rest_framework
     url(r'^', include(router.urls)),
     url(r'^autenvldg_services/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^autenvldg_services/login_player/$', login_player, name='login_player'),
+    
+    #services  
+    #url(r'^api/aventuras[/]?$', login_required(AventuraViewSet.as_view()), name='aventuras-resource'),
+    url(r'^autenvldg_services/aventuras/$', login_required(AventuraView.as_view()), name='aventuras-resource'),
+    url(r'^autenvldg_services/instancias_objetos/(?P<aventura_id>\d+)[/]?$', login_required(InstanciasObjetoView.as_view()), name='instancias-resource'),
+    url(r'^autenvldg_services/register_player/$',JogadorLoginCreateView.as_view(), name='jogador-resource'),
+    
     
     # Login / logout.
     url(r"^autenvldg/login/$",LoginView.as_view(), name="login",),
@@ -54,13 +61,6 @@ urlpatterns = patterns('',
     # Serve static content.
     url(r'^media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': MEDIA_ROOT}),
     
-    
-    #services
-    
-    #url(r'^api/aventuras[/]?$', login_required(AventuraViewSet.as_view()), name='aventuras-resource'),
-    url(r'^autenvldg_services/aventuras/(?P<autor_id>\d+)[/]?$', login_required(AventuraView.as_view()), name='aventuras-resource'),
-    url(r'^autenvldg_services/instancias_objetos/(?P<aventura_id>\d+)[/]?$', login_required(InstanciasObjetoView.as_view()), name='instancias-resource'),
-    url(r'^autenvldg_services/register_player/$',JogadorLoginCreateView.as_view(), name='jogador-resource'),
     
 
     #Sem Uso

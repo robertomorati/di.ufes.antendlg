@@ -38,7 +38,7 @@ from editores.models import AventuraAtiva, CondicaoAtiva, MissaoAtiva, PosInstan
 
 from forms import PosInstanciaAtivaCreateForm, AvatarAtivoCreateForm, MissaoAtivaCreateForm, CondicaoAtivaCreateForm
 
-from forms import AventuraForm, AventuraWithoutFieldsForm, AvatarRoleListForm, InstanciaObjetoCreateForm 
+from forms import AventuraForm, AventuraWithoutFieldsForm, AvatarRoleListForm, InstanciaObjetoCreateForm, PosicaoGeograficaUpdateForm
 from forms import PosicaoGeograficaCreateForm, InstanciaObjetoUpdateForm, UpdateObjetoForm, CreateMissaoForm, CreateAvatarForm
 from forms import CondicaoInstanciaObjetoForm, CondicaoDialogoInstanciaForm, CondicaoJogadorInstanciaForm, AgenteCreateForm
 from forms import AgenteWithoutFieldsForm, AgressivoCreateForm, PassivoCreateForm, ColaborativoCreateForm, InstancesComportamentoAddForm, CompetitivoCreateForm
@@ -418,9 +418,9 @@ class InstanciaObjetoGetJsonView(ListView):
                 if flagTwo == 0:
                     flagTwo = 1;
                     # json_inst_pos += "{'lat':'" + str(pos.latitude) + "'" + ",'lng':'" +str(pos.longitude) + "'"+  ",'altd':'" + str(pos.altitude) + "'}"; 
-                    json_inst_pos += '{"id_pos":"' + str(pos.pk) + '"' + ',"lat":"' + str(pos.latitude) + '"' + ',"lng":"' + str(pos.longitude) + '"' + ',"altd":"' + str(pos.altitude) + '"}';    
+                    json_inst_pos += '{"id_pos":"' + str(pos.pk) + '"' + ',"lat":"' + str(pos.latitude) + '"' + ',"lng":"' + str(pos.longitude) + '"' + ',"altd":"' + str(pos.altitude) + ',"pos_count":"' + str(pos.pos_count) +'"}';    
                 else:
-                    json_inst_pos += ',{"id_pos":"' + str(pos.pk) + '"' + ',"lat":"' + str(pos.latitude) + '"' + ',"lng":"' + str(pos.longitude) + '"' + ',"altd":"' + str(pos.altitude) + '"}';      
+                    json_inst_pos += ',{"id_pos":"' + str(pos.pk) + '"' + ',"lat":"' + str(pos.latitude) + '"' + ',"lng":"' + str(pos.longitude) + '"' + ',"altd":"' + str(pos.altitude) + ',"pos_count":"' + str(pos.pos_count) +'"}';      
             json_inst_pos += ']}';
             json_inst_objetos += str(json_inst_pos);  # "}"
             json_inst_pos = "";
@@ -513,6 +513,7 @@ class PosicaoGeograficaCreateView(AjaxableResponseMixin, CreateView):
         form.instance.longitude = pos[0]['longitude']
         form.instance.instancia_objeto_id = pos[0]['instancia_objeto_id']
         form.instance.altitude = pos[0]['altitude']
+        #form.instance.pos_count = int(1)
         self.object = form.save()
         response = super(AjaxableResponseMixin, self).form_valid(form)
             
@@ -528,7 +529,7 @@ class PosicaoGeograficaCreateView(AjaxableResponseMixin, CreateView):
 class PosicaoGeograficaUpdateView(AjaxableResponseMixin, UpdateView):  
     # template_name = 'editor_objetos/instancia_objeto/create.html'
     model = PosicaoGeografica
-    form_class = PosicaoGeograficaCreateForm
+    form_class = PosicaoGeograficaUpdateForm
     
     def get_success_url(self):
         return reverse('gmaps_view') 

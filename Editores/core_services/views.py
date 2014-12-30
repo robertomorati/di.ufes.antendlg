@@ -12,7 +12,7 @@ from rest_framework import status
 from django.core import serializers
 
 
-from editores.models import Aventura
+from editores.models import AventuraAtiva, Aventura
 from editores.models import Objeto, Icone, TipoObjeto, InstanciaObjeto, PosicaoGeografica, Jogador
 
 from rest_framework import permissions
@@ -20,7 +20,7 @@ from django.db import transaction
 
 from core_services.forms import JogadorSerializer
 from django.contrib.auth.decorators import permission_required
-
+import re
 
 """
 Views para Jogador
@@ -60,12 +60,28 @@ class AventuraView(APIView):
     permission_classes = (permissions.IsAuthenticated,)
     def get(self, request, *args, **kw):
         #recupera todas as aventuras
-        aventuras = Aventura.objects.all().filter(autor=self.kwargs['autor_id'])
-
-        #retornar as aventuras
-        data = serializers.serialize('json', aventuras,)
-        response = Response(data, status=status.HTTP_200_OK)
+        aventuras_ativas = AventuraAtiva.objects.all()#filter( )
         
+        json_aventuras_ativas = '[' 
+        
+        flag = 0
+        for o in aventuras_ativas:
+            if flag == 0:
+                json_aventuras_ativas += '{"aventura_ativa_id":"' + str(o.id) + '"' 
+                flag = 1
+            else:
+                json_aventuras_ativas += ',{"aventura_ativa_id":"' + str(o.id) + '"'
+            json_aventuras_ativas += ',"aventura_nome":"' + str(Aventura.objects.filter(id=o.aventura_id)[0]) + '"'
+            if o.publica == True:
+                json_aventuras_ativas += ',"publico":"' + "True" + '"}'
+            else:
+                json_aventuras_ativas += ',"publico":"' + "False" + '"}'
+        
+        json_aventuras_ativas += ']'
+        #retornar as aventuras
+        #data = serializers.serialize('json', aventuras_ativas,fields=('aventura', 'publica'))
+        #data = data.replace('\\','')
+        response = Response(json_aventuras_ativas, status=status.HTTP_200_OK)
         #print u'%s' % response
         return response
         #return HttpResponse(data, content_type="application/json")
@@ -84,7 +100,7 @@ class InstanciasObjetoView(APIView):
         flag = 0;
         flagTwo = 0;
         inst_object_list = InstanciaObjeto.objects.all().filter(aventura_id=kw['aventura_id'])#id e nome
-        json_inst_objetos = '[';
+        json_inst_objetos = '['
      
         json_inst_pos = '';
         for inst_obj in inst_object_list:     

@@ -620,6 +620,10 @@ function createMarkerToPolygon(poly,event,path,markers){
 		markers.push(marker);
 		marker.setTitle("POS #" + path.length);//o path deve ser unico para cada marcador.
 		alert("618 POS#" + path.length);
+		//TODO: atualiza POS
+		for (var j = 0, F = markers.length; j < F && markers[j] != marker; ++j){
+			alert("loop618" + markers[j] + "" +  markers[j].getTitle() + "j:" + j);
+		}
 		
 		google.maps.event.addListener(marker, 'click', function() {
 			 singleClickMouse = true;
