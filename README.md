@@ -1,12 +1,12 @@
-# dev.autenvldg
+dev.autenvldg
 
 Articles: 
-# http://link.springer.com/chapter/10.1007%2F978-3-319-05948-8_45
+http://link.springer.com/chapter/10.1007%2F978-3-319-05948-8_45
 
-# http://www.br-ie.org/pub/index.php/sbie/article/view/2929/2660
+http://www.br-ie.org/pub/index.php/sbie/article/view/2929/2660
 
 Dissertation:
-# http://www.informatica.ufes.br/pos-graduacao/PPGI/detalhes-da-tese?id=7751
+http://www.informatica.ufes.br/pos-graduacao/PPGI/detalhes-da-tese?id=7751
         
         
         
