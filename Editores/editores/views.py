@@ -22,14 +22,15 @@ SESSION_AVENTURA = '_user_aventura_id'
 
 #from django.core.context_processors import csrf
 #from django.shortcuts import render_to_response
-
+from django.conf.urls import url
 from rest_framework.response import Response
 from rest_framework.routers import SimpleRouter
-from rest_framework.compat import url
+#from rest_framework.compat import urls
 from rest_framework.urlpatterns import format_suffix_patterns
 from rest_framework import views
 from rest_framework import status
 from rest_framework.authentication import *
+from rest_framework import *
 
 
 #override DefaultRouter
@@ -269,7 +270,7 @@ class LoginCreateView(CreateView):
         return reverse('login')
     #Override no form. 
     def form_valid(self, form):
-       
+
         self.object = form.save()
           
 

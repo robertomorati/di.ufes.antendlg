@@ -1,7 +1,14 @@
 Django==1.6.5
 django-bootstrap-toolkit
 PIL
-imagekit
+django-imagekit
+Pillow
 rest_framework
-bootstrap3
+django-bootstrap3
 south
+djangorestframework
+MySQL-python
+pymysql
+markdown  
+django-filter
+dogapi

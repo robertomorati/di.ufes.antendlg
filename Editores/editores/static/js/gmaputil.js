@@ -6,7 +6,7 @@
  * 			 - Persistência de dados de uma dada aventura quando ativa;
  * 			 - Operações (CRUD) nas instancias por json;
  * 
- * @author: Roberto Guimaraes Morati Junior <robertomorati@gmail.com>
+ * @author: Roberto Morati <robertomorati@gmail.com>
  */		
 
 /**
@@ -472,6 +472,7 @@ function placeInstancesPolygonGoogleMaps(location,icon, id_instancia, name_objet
 				path.removeAt(i);
 				alert("474" + path);
 				//TODO: atualiza POS
+				//Database was changed to suport the circle
 				for (var j = 0, F = markers.length; j < F && markers[j] != marker; ++j){
 					alert("474" + markers[j] + "" +  markers[j].getTitle() + "j:" + j);
 				}

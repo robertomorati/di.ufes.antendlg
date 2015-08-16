@@ -247,6 +247,7 @@ INSTALLED_APPS = (
     'statsd',
     'datadog',
     'codemirror',
+    'leapmotion',
     #'rest_framework',
     #'django_cleanup', # remove old files
     # Uncomment the next line to enable the admin:
