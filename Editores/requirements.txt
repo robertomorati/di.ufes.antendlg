@@ -1,6 +1,6 @@
 Django==1.6.5
 django-bootstrap-toolkit
-PIL
+pillow
 imagekit
 rest_framework
 bootstrap3

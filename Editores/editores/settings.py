@@ -232,7 +232,7 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'bootstrap_toolkit',
     'PIL',
-    'imagekit',
+    #'imagekit',
     'south',
     'rest_framework',
     'editor_enredos',
@@ -242,7 +242,7 @@ INSTALLED_APPS = (
     'editor_aventuras',
     'bootstrap3', 
     'statsd',
-    'datadog',
+    #'datadog',
     #'rest_framework',
     #'django_cleanup', # remove old files
     # Uncomment the next line to enable the admin:
