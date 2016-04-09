@@ -39,17 +39,13 @@ ADMINS = (
 MANAGERS = ADMINS
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'autenvldg', #os.path.join(PROJECT_DIR, "../editores.db"),                      # Or path to database file if using sqlite3.
-        'USER': 'autenvldg',                      # Not used with sqlite3.
-        'PASSWORD': 'autenvldg07062014',                  # Not used with sqlite3.
-        'HOST': '192.241.218.138',                      # Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '3306',                      # Set to empty string for default. Not used with sqlite3.
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(PROJECT_DIR, "../editores.db"),
     }
 }
-
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -232,7 +228,7 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'bootstrap_toolkit',
     'PIL',
-    #'imagekit',
+    'imagekit',
     'south',
     'rest_framework',
     'editor_enredos',
@@ -242,7 +238,7 @@ INSTALLED_APPS = (
     'editor_aventuras',
     'bootstrap3', 
     'statsd',
-    #'datadog',
+    'datadog',
     #'rest_framework',
     #'django_cleanup', # remove old files
     # Uncomment the next line to enable the admin:
