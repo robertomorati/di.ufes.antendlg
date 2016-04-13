@@ -7,22 +7,22 @@ Created on 18/09/2013
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
 from django.contrib.auth.models import User
-from editores.models import TipoObjeto,Autor,Jogador
+from editores.models import TipoObjeto,Autor
 
 
 class AutorInline(admin.TabularInline):
     model = Autor
     
-class JogadorInline(admin.TabularInline):
-    model = Jogador
+#class JogadorInline(admin.TabularInline):
+#    model = Jogador
 
-class UserAdmin(DjangoUserAdmin):
-    inlines = (AutorInline,JogadorInline,)
+#class UserAdmin(DjangoUserAdmin):
+#    inlines = (AutorInline,JogadorInline,)
 
 
 
 admin.site.unregister(User)
-admin.site.register(User, UserAdmin)
+#admin.site.register(User, UserAdmin)
 
 ''''
 Código não utilizado
@@ -44,7 +44,7 @@ admin.site.register(TipoObjeto, TipoObjetoAdmin)
 class JogadorAdmin(admin.ModelAdmin):
     pass
 
-admin.site.register(Jogador, JogadorAdmin)
+admin.site.register(Jogador, Admin)
 '''
 
 '''

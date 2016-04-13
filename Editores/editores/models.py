@@ -377,14 +377,15 @@ Jogador - representar um jogador cadastrado com seu dispositivo movel
 @param dica_senha: dica de senha
 @param nickname:   
 '''
-class Jogador(User, models.Model):
+class Jogador( models.Model):
     dica_senha = models.CharField(max_length=200, verbose_name="Dica de Senha",default="",blank=True,)
     nickname = models.CharField(max_length=100, verbose_name="Nickname",default="",blank=True,)
     distancia = models.IntegerField(max_length=10,default=500,)
-    #icone_jogador = models.ImageField(upload_to ='avatar_jogador/', help_text="Avatar do jogador.", default="", blank=True,)
+    icone_jogador = models.ImageField(upload_to ='avatar_jogador/', help_text="Avatar do jogador.", default="", blank=True,)
     
     def __unicode__(self):
         return u'%s' % (self.nickname)
+    
         
 
 '''
@@ -638,7 +639,7 @@ class Condicao(models.Model):
         (START_TALK, 'conversou'),
         (JOIN_OBJ, 'combinou'),)
     AND = 'AND'#jogador pegou objeto
-    OR = 'OR'#jogador começou um dialogo
+    OR = 'OR'# começou um dialogo
     OPERADOR = (
         (AND, 'AND'),
         (OR, 'OR'),)

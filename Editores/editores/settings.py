@@ -230,7 +230,7 @@ INSTALLED_APPS = (
     'bootstrap_toolkit',
     'PIL',
     'imagekit',
-    'south',
+    #'south',
     'rest_framework',
     'editor_enredos',
     'editor_missoes',
@@ -239,16 +239,12 @@ INSTALLED_APPS = (
     'editor_aventuras',
     'bootstrap3', 
     'statsd',
-    'datadog',
-    #'rest_framework',
     #'django_cleanup', # remove old files
     # Uncomment the next line to enable the admin:
     # 'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
 )
-
-
 
 PASSWORD_HASHERS = (
     'django.contrib.auth.hashers.PBKDF2PasswordHasher',
