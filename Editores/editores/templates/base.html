@@ -27,7 +27,7 @@
         {% bootstrap_stylesheet_tag "responsive" %}
 
 		<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=places"></script>
-		<title>{% if title %}{{ title }}{% else %}AntEnDLG - Authoring Environment for Location Decision Games{% endif %}</title>
+		<title>{% if title %}{{ title }}{% else %}The GameSphere{% endif %}</title>
 	</head>
 	{% csrf_token %}
 	<body id="body" onload="refreshDiv('{% url 'gmaps_view' %}','content'); addTabs('{% url 'tipo_objeto_get_view' %}'); getAvatar({{ user.id }});">	
